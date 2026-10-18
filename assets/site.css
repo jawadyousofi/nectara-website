@@ -171,3 +171,13 @@ fieldset { border: 0; display: grid; gap: 10px; }
 .site-foot a:hover { color: var(--forest); }
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: 16px; top: 16px; z-index: 50; background: var(--ground); padding: 8px 14px; }
+
+/* Little Scientists lesson series */
+.lessons { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.lesson { background: var(--card); border-radius: 22px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; min-width: 0; }
+.lesson > img { width: 100%; height: auto; display: block; aspect-ratio: 16 / 10; object-fit: cover; }
+.lesson-body { padding: 22px 24px 26px; display: grid; gap: 10px; align-content: start; }
+.lesson .big-idea { font-style: italic; color: var(--forest); }
+.lesson p { color: var(--ink-soft); }
+.lesson details summary { cursor: pointer; font-weight: 600; color: var(--forest); }
+.lesson details img { margin-top: 12px; border-radius: 14px; width: 100%; height: auto; }
