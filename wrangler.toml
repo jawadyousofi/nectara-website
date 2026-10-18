@@ -1,0 +1,9 @@
+# Cloudflare Pages settings for nectaraschool.org
+name = "nectara-website"
+pages_build_output_dir = "."
+compatibility_date = "2026-10-01"
+
+# Founding-list sign-ups (functions/api/interest.js)
+[[kv_namespaces]]
+binding = "NECTARA_INTEREST"
+id = "e49243529c9e4a8dbf2034c99fd01489"

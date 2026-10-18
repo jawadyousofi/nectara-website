@@ -27,7 +27,7 @@ A small, fast static site with one working form. Hosted on Cloudflare Pages.
 ## Turn on the sign-up form
 
 1. **Workers & Pages → KV → Create namespace** named `nectara-interest`.
-2. In the Pages project: **Settings → Bindings → Add → KV namespace**, variable name `NECTARA_INTEREST`, pick `nectara-interest`. Redeploy.
+2. Done: `wrangler.toml` binds it as `NECTARA_INTEREST` (namespace nectara-interest).
 3. Optional, to download sign-ups as a spreadsheet: **Settings → Variables and secrets**, add secret `ADMIN_TOKEN` (any long random phrase). Then visit
    `https://nectaraschool.org/api/interest-export?token=YOUR_ADMIN_TOKEN` to download a CSV. You can also browse entries in the KV namespace in the dashboard.
 4. Optional email alert for each sign-up (free tier at resend.com): add secrets `RESEND_API_KEY`, `NOTIFY_EMAIL` (where alerts go) and `FROM_EMAIL` (a sender on a domain verified in Resend, e.g. `Nectara <hello@nectaraschool.org>`).
