@@ -8,6 +8,7 @@ BREATH = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 36 C20 24 28 
 WORLD = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="21" fill="none" stroke="#8A4F0B" stroke-width="3.5"/><circle cx="32" cy="11" r="4" fill="#8A4F0B"/><circle cx="51" cy="40" r="4" fill="#8A4F0B"/><circle cx="13" cy="40" r="4" fill="#8A4F0B"/></svg>'
 HEART = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 52 C14 40 10 30 14 22 C18 14 28 14 32 22 C36 14 46 14 50 22 C54 30 50 40 32 52 Z" fill="none" stroke="#C2603E" stroke-width="3.5" stroke-linejoin="round"/></svg>'
 STAR = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8 L37 26 L56 28 L41 39 L46 57 L32 47 L18 57 L23 39 L8 28 L27 26 Z" fill="none" stroke="#E9A23B" stroke-width="3.5" stroke-linejoin="round"/></svg>'
+FLASK = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M26 8 L26 26 L12 50 C10 54 12 57 16 57 L48 57 C52 57 54 54 52 50 L38 26 L38 8 M22 8 L42 8" fill="none" stroke="#3E7CA8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 44 L46 44" stroke="#E9A23B" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="37" r="2.5" fill="#E9A23B"/><circle cx="36" cy="32" r="2" fill="#E9A23B"/></svg>'
 HIVE = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 L54 19 L54 45 L32 58 L10 45 L10 19 Z" fill="none" stroke="#2F4A35" stroke-width="3.5" stroke-linejoin="round"/><path d="M32 22 L42 28 L42 40 L32 46 L22 40 L22 28 Z" fill="none" stroke="#E9A23B" stroke-width="3.5" stroke-linejoin="round"/></svg>'
 HEX_BG = '<svg class="hex" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 6 L106 32 L106 88 L60 114 L14 88 L14 32 Z" fill="none" stroke="#E9A23B" stroke-width="3"/><path d="M60 34 C60 34 80 58 80 70 A20 20 0 0 1 40 70 C40 58 60 34 60 34 Z" fill="none" stroke="#7FB3D5" stroke-width="3"/></svg>'
 TRAIL = '<svg class="trail" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 C150 0 300 40 500 18 S850 4 1000 22" fill="none" stroke="#E9A23B" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 14"/></svg>'
@@ -130,12 +131,14 @@ PAGES['programs.html'] = ('Programs · Nectara', 'Nectara programs for ages 2–
   <div class="band-card" id="blossoms"><span class="ages">6&ndash;7</span><h3>Blossoms</h3><p>Real projects that connect the garden to the wider world.</p><ul><li>Season-long projects: seed to harvest to meal</li><li>Early reading, writing and numbers through living things</li><li>Earth, sky and the cosmos: why the seasons turn</li><li>Helping younger children: everyone serves the hive</li></ul></div>
 </div></section>
 <section class="band-mist"><div class="wrap">
-  <div class="section-head"><span class="eyebrow">Ways to join</span><h2>Formats we&rsquo;re preparing</h2><p class="lead">We&rsquo;re starting small and growing carefully. Founding families will help shape what comes first.</p></div>
+  <div class="section-head"><span class="eyebrow">Ways to join</span><h2>First up: small sessions, big wonder</h2><p class="lead">Nectara begins where children already are: in parks, kitchens, libraries and windowsills. These first programs come before our own garden and classroom. Founding families hear the dates first.</p></div>
   <div class="grid">
-    <div class="tile">{HIVE}<span class="tag">Founding program</span><h3>The Nectara day</h3><p>The full garden-and-studio day for a small founding group. Location, schedule and tuition will be shared with founding families first.</p></div>
-    <div class="tile">{LEAF}<span class="tag">Planned</span><h3>Garden mornings</h3><p>Weekend mornings for a parent and child together: planting, breathing, stories and a shared snack.</p></div>
-    <div class="tile">{STAR}<span class="tag">Planned</span><h3>Nectara at home</h3><p>Monthly garden and wonder activities with short guided videos, so families anywhere can learn the Nectara way.</p></div>
+    <div class="tile" id="little-scientists">{FLASK}<span class="tag">First up &middot; ages 4&ndash;7</span><h3>Little Scientists</h3><p>Hands-on experiments with everyday materials: a rain cloud in a jar, seeds that drink, things that float and sink. Each one ends with a big question to take home.</p></div>
+    <div class="tile" id="park-mornings">{LEAF}<span class="tag">First up &middot; ages 2&ndash;5 with a parent</span><h3>Park mornings</h3><p>A slow walk, a breathing circle with Asal, a story and a nature treasure to bring home. Held at a local park; bring a blanket and muddy-ready shoes.</p></div>
+    <div class="tile" id="garden-in-a-cup">{BREATH}<span class="tag">First up &middot; ages 2&ndash;7 at home</span><h3>Garden in a Cup</h3><p>Grow beans, herbs or microgreens on your windowsill. Each week brings a short check-in and Asal&rsquo;s question of the week to watch roots and leaves grow together.</p></div>
+    <div class="tile" id="at-home">{STAR}<span class="tag">First up &middot; anywhere</span><h3>Nectara at home</h3><p>A monthly pack of simple wonder activities and short guided videos, so families anywhere can learn the Nectara way.</p></div>
   </div>
+  <div class="section-head" style="margin-top:48px"><span class="eyebrow">Coming next</span><h2>The Nectara day</h2><p class="lead">The full garden-and-studio day for a small founding group, once we have a home with room to grow. Location, schedule and tuition will be shared with founding families first.</p></div>
 </div></section>
 <section><div class="wrap split">
   <div class="stack"><h2>A note on what&rsquo;s ready and what&rsquo;s coming</h2><p class="lead">Nectara is new. We&rsquo;ll always tell you plainly what is open, what is planned, and which licensing and approvals apply to each program before it starts.</p></div>
@@ -160,7 +163,7 @@ PAGES['families.html'] = ('For Families · Nectara', 'Parents are a child’s fi
 <section><div class="wrap" style="max-width:820px">
   <div class="section-head"><h2>Questions families ask</h2></div>
   <details><summary>What ages does Nectara serve?</summary><p>Children ages 2 to 7, in three bands: Seeds (2&ndash;3), Sprouts (4&ndash;5) and Blossoms (6&ndash;7).</p></details>
-  <details><summary>When and where will Nectara open?</summary><p>We&rsquo;re preparing our first location now. Founding families will be the first to hear the location, schedule and opening date.</p></details>
+  <details><summary>When and where will Nectara open?</summary><p>We&rsquo;re starting with small sessions in local parks and community spaces, plus activities families can do at home. Our own garden and classroom come next. Founding families hear every date and location first.</p></details>
   <details><summary>What does it cost?</summary><p>Tuition is being set now and will be shared with founding families first, along with any founding-family options.</p></details>
   <details><summary>Is Nectara licensed?</summary><p>We&rsquo;re working through the licensing and approvals that apply to our first program and location. We&rsquo;ll share exactly what is in place before any program begins.</p></details>
   <details><summary>Do children use screens?</summary><p>Rarely, and only with purpose: a short guided video or a call with friends from another part of the world. Most of the day happens in the garden and the studio.</p></details>
@@ -209,8 +212,8 @@ PAGES['about.html'] = ('Our Story · Nectara', 'Why Nectara exists, where the na
 <section class="band-forest"><div class="wrap split">
   <div class="stack"><span class="eyebrow" style="color:#A9BFA0">How Nectara will grow</span><h2>From one garden to many</h2><p>We&rsquo;re starting small on purpose. Each step grows only when the one before it is healthy, so Nectara keeps its soul as it spreads.</p></div>
   <ol class="path">
-    <li><div><h3>The first garden <span class="now">Now</span></h3><p>A founding program and founding families.</p></div></li>
-    <li><div><h3>Garden mornings and Nectara at home</h3><p>Ways for families anywhere to learn the Nectara way.</p></div></li>
+    <li><div><h3>First sessions <span class="now">Now</span></h3><p>Little Scientists, park mornings and founding families.</p></div></li>
+    <li><div><h3>Little Scientists, park mornings and Nectara at home</h3><p>Small sessions and at-home activities that bring the Nectara way to families now.</p></div></li>
     <li><div><h3>Teachers and partners</h3><p>Training and support for educators who share the vision.</p></div></li>
     <li><div><h3>A global hive</h3><p>Nectara gardens in many places, learning from each other as one community.</p></div></li>
   </ol>
@@ -246,7 +249,7 @@ PAGES['join.html'] = ('Join Nectara', 'Join the Nectara founding list to hear fi
       <label class="choice"><input type="checkbox" id="age-under2" name="ages" value="under-2"> Under 2</label>
     </div></fieldset>
     <div class="field"><label for="interest">Most interested in</label>
-      <select id="interest" name="interest"><option value="day">The Nectara day</option><option value="garden-mornings">Garden mornings</option><option value="at-home">Nectara at home</option><option value="teach">Teaching or partnering</option><option value="not-sure">Not sure yet</option></select></div>
+      <select id="interest" name="interest"><option value="little-scientists">Little Scientists (ages 4&ndash;7)</option><option value="park-mornings">Park mornings (ages 2&ndash;5, with a parent)</option><option value="garden-in-a-cup">Garden in a Cup (at home)</option><option value="at-home">Nectara at home</option><option value="day">The full Nectara day (coming next)</option><option value="teach">Teaching or partnering</option><option value="not-sure">Not sure yet</option></select></div>
     <div class="field"><label for="notes">Anything you&rsquo;d like us to know? <span class="hint">(optional)</span></label><textarea id="notes" name="notes" rows="4" maxlength="2000"></textarea></div>
     <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
     <button class="btn" type="submit" style="justify-self:start">Join the founding list</button>
