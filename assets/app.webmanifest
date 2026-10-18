@@ -1,0 +1,15 @@
+{
+  "name": "Nectara Little Scientists",
+  "short_name": "Nectara",
+  "description": "Hands-on science lessons with Asal for children ages 2 to 7.",
+  "start_url": "/app/",
+  "scope": "/app/",
+  "display": "standalone",
+  "background_color": "#FFFDF8",
+  "theme_color": "#F7E7B4",
+  "icons": [
+    { "src": "/assets/app-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/app-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

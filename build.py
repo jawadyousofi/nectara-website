@@ -21,6 +21,7 @@ def page(fname, title, desc, body, artifact=False):
     head = f'''<title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="claude:viewport-fit-sides" content="cover">
+{"<meta name=\"robots\" content=\"noindex\">" if fname in NOINDEX else ""}
 <link rel="canonical" href="{SITE}/{'' if fname == 'index.html' else fname}">
 <meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:image" content="{SITE}/assets/asal.png"><meta property="og:type" content="website">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
@@ -31,7 +32,7 @@ def page(fname, title, desc, body, artifact=False):
 <header class="site-head"><div class="wrap">
   <a class="brand" href="index.html" aria-label="Nectara home"><img src="assets/logo-mark.svg" alt="" width="62" height="44"><span class="wordmark">nectara</span></a>
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
-  <ul class="nav" id="nav">{nav}<li><a class="btn" href="join.html">Join us</a></li></ul>
+  <ul class="nav" id="nav">{nav}<li><a href="login.html"{" aria-current=\"page\"" if fname == "login.html" else ""}>Members</a></li><li><a class="btn" href="join.html">Join us</a></li></ul>
 </div></header>
 <main id="main">
 {body}
@@ -41,12 +42,14 @@ def page(fname, title, desc, body, artifact=False):
   <nav aria-label="Footer">{''.join(f'<a href="{h}">{t}</a>' for h, t in NAV)}<a href="join.html">Join</a></nav>
   <span>nectaraschool.org</span>
 </div></footer>
-<script src="assets/site.js"></script>'''
+<script src="assets/site.js"></script>{''.join(f'<script src="assets/{x}"></script>' for x in EXTRA_JS.get(fname, []))}'''
     if artifact:  # the artifact viewer supplies doctype/head/body
         return head + '\n' + content
     return f'<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n{head}\n</head>\n<body>\n{content}\n</body>\n</html>\n'
 
 PAGES = {}
+NOINDEX = {'admin.html', 'login.html'}
+EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
 <div class="wrap hero">
@@ -154,7 +157,7 @@ PAGES['programs.html'] = ('Programs · Nectara', 'Nectara programs for ages 2–
     (3, '3-float-sink', 'Float or Sink', 'Some things ride on top of the water and some sink down to rest. Each one has its place.', 'After a short treasure walk, children guess and test what floats. A whole orange floats and a peeled one sinks; a ball of clay sinks until it becomes a boat.', 'at bath time, guess before each kitchen item goes in. Will it float or sink?', 'Asal rides a clay boat in a tub where a leaf, feather and orange float and a stone, spoon and peeled orange rest on the bottom', 'Three steps: a whole orange floats, a peeled orange sinks, and a clay boat floats while a clay ball sinks'),
     (4, '4-puddles', 'Where Puddles Go', 'Water never leaves us. The sun lifts it back to the sky, and one day it rains again.', 'Children trace a puddle with chalk and watch it shrink in the sun, make a cloud in a bag for the window, and see their own breath fog a spoon.', 'tape a bag with a little water to a sunny window and look for &ldquo;rain&rdquo; inside each day.', 'Asal flies up with the vapor rising from a chalk-ringed puddle toward a cloud that rains back down', 'Three steps: a cloud in a bag on a window, the breath test on a spoon, and a shrinking puddle inside chalk rings'),
 ])}  </div>
-  <p class="lead" style="margin-top:28px">Sessions run in parks, libraries and community rooms with simple, grocery-store materials. <a href="join.html">Join the founding list</a> and choose Little Scientists to hear about the first dates.</p>
+  <p class="lead" style="margin-top:28px">Sessions run in parks, libraries and community rooms with simple, grocery-store materials. <a href="join.html">Join the founding list</a> and choose Little Scientists to hear about the first dates. Members can <a href="login.html">open the series in the app</a> on a phone, iPad, computer or TV.</p>
 </div></section>
 <section><div class="wrap split">
   <div class="stack"><h2>A note on what&rsquo;s ready and what&rsquo;s coming</h2><p class="lead">Nectara is new. We&rsquo;ll always tell you plainly what is open, what is planned, and which licensing and approvals apply to each program before it starts.</p></div>
@@ -274,6 +277,81 @@ PAGES['join.html'] = ('Join Nectara', 'Join the Nectara founding list to hear fi
   </form>
 </div>''')
 
+PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scientists app.', '''
+<div class="wrap hero portal">
+  <div class="stack">
+    <span class="eyebrow">Members</span>
+    <h1>Little Scientists, at home or on the big screen.</h1>
+    <p class="lead">Hands-on lessons with Asal that work on a phone, iPad, computer or TV. Watch together, do it with your hands, then share what you noticed.</p>
+    <p>Founding families get a free invite code during our pilot. Not on the list yet? <a href="join.html">Join the founding list</a> and choose Little Scientists.</p>
+    <img src="assets/lessons/1-rain-cloud.webp" alt="Asal flies beside a cup of water with a foam cloud and blue rain" width="1200" height="750" style="border-radius:22px;margin-top:8px;height:auto">
+  </div>
+  <div class="portal-box">
+    <p class="status" id="portal-msg" role="status" tabindex="-1" hidden></p>
+
+    <section id="panel-signin" class="panel">
+      <form id="signin-form" novalidate>
+        <h2>Sign in</h2>
+        <div class="field"><label for="si-email">Email</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
+        <button class="btn" type="submit">Sign in</button>
+        <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
+        <p class="hint">Forgot your password? Send us a note through the <a href="join.html">join form</a> and we&rsquo;ll reset it for you.</p>
+      </form>
+    </section>
+
+    <section id="panel-signup" class="panel" hidden>
+      <form id="signup-form" novalidate>
+        <h2>Create your family account</h2>
+        <div class="field"><label for="su-name">Your name</label><input id="su-name" name="name" autocomplete="name" required maxlength="120"></div>
+        <div class="field"><label for="su-email">Email</label><input id="su-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="su-password">Password <span class="hint">(at least 8 characters)</span></label><input id="su-password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+        <div class="row2">
+          <div class="field"><label for="su-child">Child&rsquo;s first name <span class="hint">(optional)</span></label><input id="su-child" name="childName" maxlength="60"></div>
+          <div class="field"><label for="su-age">Age</label><select id="su-age" name="childAge"><option value="">Choose</option><option value="2-3">2&ndash;3</option><option value="4-5">4&ndash;5</option><option value="6-7">6&ndash;7</option></select></div>
+        </div>
+        <div class="field"><label for="su-code">Invite code <span class="hint">(founding families)</span></label><input id="su-code" name="code" autocomplete="off" autocapitalize="characters" maxlength="100"></div>
+        <div class="hp" aria-hidden="true"><label for="su-website">Leave this empty</label><input id="su-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <button class="btn" type="submit">Create account</button>
+        <p class="hint">Already have an account? <button class="linklike" type="button" data-show="signin">Sign in</button></p>
+        <p class="hint">Accounts belong to parents and caregivers. We keep only what we need and never sell or share it.</p>
+      </form>
+    </section>
+
+    <section id="panel-waiting" class="panel" hidden>
+      <form id="code-form" novalidate>
+        <h2>Your account is ready</h2>
+        <p>The Little Scientists app opens with an invite code during our founding pilot. Paid memberships are coming soon.</p>
+        <div class="field"><label for="cd-code">Invite code</label><input id="cd-code" name="code" autocomplete="off" autocapitalize="characters" required maxlength="100"></div>
+        <button class="btn" type="submit">Open the app</button>
+        <p class="hint">No code yet? <a href="join.html">Join the founding list</a> and we&rsquo;ll send one. <button class="linklike" type="button" data-signout>Sign out</button></p>
+      </form>
+    </section>
+
+    <section id="panel-in" class="panel" hidden>
+      <form onsubmit="return false">
+        <h2 id="in-hello">You&rsquo;re signed in</h2>
+        <p>Asal is waiting in the garden.</p>
+        <a class="btn" href="/app/">Open the app</a>
+        <p class="hint"><button class="linklike" type="button" data-signout>Sign out</button></p>
+      </form>
+    </section>
+  </div>
+</div>''')
+
+PAGES['admin.html'] = ('Members Admin · Nectara', 'Nectara member access.', '''
+<div class="wrap" style="padding-block:40px 80px;display:grid;gap:24px">
+  <div class="stack"><span class="eyebrow">Admin</span><h1 style="font-size:var(--step-3)">Member access</h1>
+  <p class="lead">Choose who can open the Little Scientists app. <b>Founding</b>, <b>member</b> and <b>staff</b> can open it; <b>waiting</b> and <b>paused</b> can&rsquo;t.</p></div>
+  <form id="admin-login" novalidate style="max-width:560px">
+    <div class="field"><label for="ad-token">Admin key</label><input id="ad-token" type="password" autocomplete="off" required></div>
+    <button class="btn" type="submit" style="justify-self:start">Show members</button>
+    <p class="hint">The key is the ADMIN_TOKEN secret in Cloudflare. It stays in this browser tab only.</p>
+  </form>
+  <p class="status" id="admin-msg" role="status" hidden></p>
+  <div id="admin-list"></div>
+</div>''')
+
 PAGES['404.html'] = ('Page Not Found · Nectara', 'This page flew away.', '''
 <div class="wrap hero"><div class="stack"><span class="eyebrow">404</span><h1>This page flew away.</h1><p class="lead">Asal looked everywhere, but couldn&rsquo;t find it. Let&rsquo;s head back to the garden.</p><a class="btn" href="index.html" style="justify-self:start">Back home</a></div>
 <figure class="asal-fig"><div class="asal-sun"><img src="assets/asal.svg" alt="Asal the bee kid" width="300" height="400"></div><span class="hello">Oops!</span></figure></div>''')
@@ -285,7 +363,7 @@ if __name__ == '__main__':
     os.makedirs('preview', exist_ok=True)
     for f, (t, d, b) in PAGES.items():  # artifact preview copies: index without skeleton, others full pages
         open('preview/' + f, 'w').write(page(f, t, d, b, artifact=(f == 'index.html')))
-    pages = [f for f in PAGES if f != '404.html']
+    pages = [f for f in PAGES if f != '404.html' and f not in NOINDEX]
     open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{SITE}/{"" if p == "index.html" else p}</loc></url>\n' for p in pages) + '</urlset>\n')
     open('robots.txt', 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     print('built', len(PAGES), 'pages')

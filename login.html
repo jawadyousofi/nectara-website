@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Members · Nectara</title>
+<meta name="description" content="Sign in to the Nectara Little Scientists app.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://nectaraschool.org/login.html">
+<meta property="og:title" content="Members · Nectara"><meta property="og:description" content="Sign in to the Nectara Little Scientists app."><meta property="og:image" content="https://nectaraschool.org/assets/asal.png"><meta property="og:type" content="website">
+<link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-head"><div class="wrap">
+  <a class="brand" href="index.html" aria-label="Nectara home"><img src="assets/logo-mark.svg" alt="" width="62" height="44"><span class="wordmark">nectara</span></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+  <ul class="nav" id="nav"><li><a href="index.html">Home</a></li><li><a href="approach.html">How we learn</a></li><li><a href="programs.html">Programs</a></li><li><a href="families.html">Families</a></li><li><a href="asal.html">Meet Asal</a></li><li><a href="about.html">Our story</a></li><li><a href="login.html" aria-current="page">Members</a></li><li><a class="btn" href="join.html">Join us</a></li></ul>
+</div></header>
+<main id="main">
+
+<div class="wrap hero portal">
+  <div class="stack">
+    <span class="eyebrow">Members</span>
+    <h1>Little Scientists, at home or on the big screen.</h1>
+    <p class="lead">Hands-on lessons with Asal that work on a phone, iPad, computer or TV. Watch together, do it with your hands, then share what you noticed.</p>
+    <p>Founding families get a free invite code during our pilot. Not on the list yet? <a href="join.html">Join the founding list</a> and choose Little Scientists.</p>
+    <img src="assets/lessons/1-rain-cloud.webp" alt="Asal flies beside a cup of water with a foam cloud and blue rain" width="1200" height="750" style="border-radius:22px;margin-top:8px;height:auto">
+  </div>
+  <div class="portal-box">
+    <p class="status" id="portal-msg" role="status" tabindex="-1" hidden></p>
+
+    <section id="panel-signin" class="panel">
+      <form id="signin-form" novalidate>
+        <h2>Sign in</h2>
+        <div class="field"><label for="si-email">Email</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
+        <button class="btn" type="submit">Sign in</button>
+        <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
+        <p class="hint">Forgot your password? Send us a note through the <a href="join.html">join form</a> and we&rsquo;ll reset it for you.</p>
+      </form>
+    </section>
+
+    <section id="panel-signup" class="panel" hidden>
+      <form id="signup-form" novalidate>
+        <h2>Create your family account</h2>
+        <div class="field"><label for="su-name">Your name</label><input id="su-name" name="name" autocomplete="name" required maxlength="120"></div>
+        <div class="field"><label for="su-email">Email</label><input id="su-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="su-password">Password <span class="hint">(at least 8 characters)</span></label><input id="su-password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+        <div class="row2">
+          <div class="field"><label for="su-child">Child&rsquo;s first name <span class="hint">(optional)</span></label><input id="su-child" name="childName" maxlength="60"></div>
+          <div class="field"><label for="su-age">Age</label><select id="su-age" name="childAge"><option value="">Choose</option><option value="2-3">2&ndash;3</option><option value="4-5">4&ndash;5</option><option value="6-7">6&ndash;7</option></select></div>
+        </div>
+        <div class="field"><label for="su-code">Invite code <span class="hint">(founding families)</span></label><input id="su-code" name="code" autocomplete="off" autocapitalize="characters" maxlength="100"></div>
+        <div class="hp" aria-hidden="true"><label for="su-website">Leave this empty</label><input id="su-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <button class="btn" type="submit">Create account</button>
+        <p class="hint">Already have an account? <button class="linklike" type="button" data-show="signin">Sign in</button></p>
+        <p class="hint">Accounts belong to parents and caregivers. We keep only what we need and never sell or share it.</p>
+      </form>
+    </section>
+
+    <section id="panel-waiting" class="panel" hidden>
+      <form id="code-form" novalidate>
+        <h2>Your account is ready</h2>
+        <p>The Little Scientists app opens with an invite code during our founding pilot. Paid memberships are coming soon.</p>
+        <div class="field"><label for="cd-code">Invite code</label><input id="cd-code" name="code" autocomplete="off" autocapitalize="characters" required maxlength="100"></div>
+        <button class="btn" type="submit">Open the app</button>
+        <p class="hint">No code yet? <a href="join.html">Join the founding list</a> and we&rsquo;ll send one. <button class="linklike" type="button" data-signout>Sign out</button></p>
+      </form>
+    </section>
+
+    <section id="panel-in" class="panel" hidden>
+      <form onsubmit="return false">
+        <h2 id="in-hello">You&rsquo;re signed in</h2>
+        <p>Asal is waiting in the garden.</p>
+        <a class="btn" href="/app/">Open the app</a>
+        <p class="hint"><button class="linklike" type="button" data-signout>Sign out</button></p>
+      </form>
+    </section>
+  </div>
+</div>
+</main>
+<footer class="site-foot"><div class="wrap">
+  <span>&copy; 2026 Nectara &middot; Gather. Grow. Give.</span>
+  <nav aria-label="Footer"><a href="index.html">Home</a><a href="approach.html">How we learn</a><a href="programs.html">Programs</a><a href="families.html">Families</a><a href="asal.html">Meet Asal</a><a href="about.html">Our story</a><a href="join.html">Join</a></nav>
+  <span>nectaraschool.org</span>
+</div></footer>
+<script src="assets/site.js"></script><script src="assets/portal.js"></script>
+</body>
+</html>
