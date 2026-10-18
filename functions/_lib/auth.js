@@ -4,9 +4,11 @@
 //   sess:<sha256(token)>  session { email, created }  (expires after 30 days)
 //   prog:<email>          lesson progress { done: { lessonId: isoDate } }
 //   fail:<email>          failed sign-in counter (expires after 15 minutes)
+//   reset:<sha256(token)> password-reset link { email } (expires after 1 hour, or 24 hours when made by an admin)
+//   rlim:<email>          reset-email counter (max 3 an hour)
 // access: 'waiting' (signed up, no access yet) | 'founding' (invite code) | 'member' (paid) | 'staff' | 'paused'
 
-export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:'];
+export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:'];
 export const COOKIE = 'nx_session';
 const SESSION_DAYS = 30;
 const enc = new TextEncoder();
@@ -72,7 +74,33 @@ export async function getUser(env, request) {
   if (!token || !/^[0-9a-f]{64}$/.test(token)) return null;
   const session = await env.NECTARA_INTEREST.get('sess:' + (await sha256(token)), 'json');
   if (!session) return null;
-  return env.NECTARA_INTEREST.get('user:' + session.email, 'json');
+  const user = await env.NECTARA_INTEREST.get('user:' + session.email, 'json');
+  // A password change signs out every session that started before it.
+  if (!user || (user.pwChanged && session.created < user.pwChanged)) return null;
+  return user;
+}
+
+export async function createResetToken(env, email, ttlSeconds = 3600) {
+  const token = hex(crypto.getRandomValues(new Uint8Array(32)));
+  await env.NECTARA_INTEREST.put('reset:' + (await sha256(token)), JSON.stringify({ email, created: Date.now() }), {
+    expirationTtl: ttlSeconds,
+  });
+  return token;
+}
+
+export const resetLink = (request, token) => `${new URL(request.url).origin}/reset.html?token=${token}`;
+
+export const emailEnabled = env => !!env.RESEND_API_KEY;
+
+// Sends one email through Resend (resend.com). Needs the RESEND_API_KEY secret; FROM_EMAIL must be on a verified domain.
+export async function sendEmail(env, { to, subject, text, html }) {
+  if (!env.RESEND_API_KEY) return false;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: env.FROM_EMAIL || 'Nectara <hello@nectaraschool.org>', to: [to], subject, text, html }),
+  });
+  return res.ok;
 }
 
 export const hasAccess = u => !!u && ['founding', 'member', 'staff'].includes(u.access);

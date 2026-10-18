@@ -41,7 +41,17 @@
         <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn" type="submit">Sign in</button>
         <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
-        <p class="hint">Forgot your password? Send us a note through the <a href="join.html">join form</a> and we&rsquo;ll reset it for you.</p>
+        <p class="hint"><button class="linklike" type="button" data-show="forgot">Forgot your password?</button></p>
+      </form>
+    </section>
+
+    <section id="panel-forgot" class="panel" hidden>
+      <form id="forgot-form" novalidate>
+        <h2>Reset your password</h2>
+        <p>Enter the email you signed up with. We&rsquo;ll send a link to choose a new password. It works once and expires in an hour.</p>
+        <div class="field"><label for="fg-email">Email</label><input id="fg-email" name="email" type="email" autocomplete="email" required></div>
+        <button class="btn" type="submit">Send reset link</button>
+        <p class="hint">Remembered it? <button class="linklike" type="button" data-show="signin">Back to sign in</button></p>
       </form>
     </section>
 

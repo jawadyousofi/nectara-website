@@ -48,8 +48,8 @@ def page(fname, title, desc, body, artifact=False):
     return f'<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n{head}\n</head>\n<body>\n{content}\n</body>\n</html>\n'
 
 PAGES = {}
-NOINDEX = {'admin.html', 'login.html'}
-EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js']}
+NOINDEX = {'admin.html', 'login.html', 'reset.html'}
+EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
 <div class="wrap hero">
@@ -296,7 +296,17 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
         <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn" type="submit">Sign in</button>
         <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
-        <p class="hint">Forgot your password? Send us a note through the <a href="join.html">join form</a> and we&rsquo;ll reset it for you.</p>
+        <p class="hint"><button class="linklike" type="button" data-show="forgot">Forgot your password?</button></p>
+      </form>
+    </section>
+
+    <section id="panel-forgot" class="panel" hidden>
+      <form id="forgot-form" novalidate>
+        <h2>Reset your password</h2>
+        <p>Enter the email you signed up with. We&rsquo;ll send a link to choose a new password. It works once and expires in an hour.</p>
+        <div class="field"><label for="fg-email">Email</label><input id="fg-email" name="email" type="email" autocomplete="email" required></div>
+        <button class="btn" type="submit">Send reset link</button>
+        <p class="hint">Remembered it? <button class="linklike" type="button" data-show="signin">Back to sign in</button></p>
       </form>
     </section>
 
@@ -336,6 +346,26 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
         <p class="hint"><button class="linklike" type="button" data-signout>Sign out</button></p>
       </form>
     </section>
+  </div>
+</div>''')
+
+PAGES['reset.html'] = ('Reset Password · Nectara', 'Choose a new password for your Nectara account.', '''
+<div class="wrap hero portal">
+  <div class="stack">
+    <span class="eyebrow">Members</span>
+    <h1>Choose a new password.</h1>
+    <p class="lead">Pick something you&rsquo;ll remember. Once it&rsquo;s saved, you&rsquo;ll go straight back to the garden, and any other devices will need to sign in again.</p>
+    <img src="assets/asal.svg" alt="" width="300" height="400" style="width:min(180px,40%);height:auto">
+  </div>
+  <div class="portal-box">
+    <p class="status" id="reset-msg" role="status" tabindex="-1" hidden></p>
+    <form id="reset-form" novalidate>
+      <h2>New password</h2>
+      <div class="field"><label for="rs-password">New password <span class="hint">(at least 8 characters)</span></label><input id="rs-password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+      <div class="field"><label for="rs-confirm">Type it again</label><input id="rs-confirm" name="confirm" type="password" autocomplete="new-password" minlength="8" required></div>
+      <button class="btn" type="submit">Save and sign in</button>
+      <p class="hint">Link expired? <a href="login.html">Ask for a new one</a> from the sign-in page.</p>
+    </form>
   </div>
 </div>''')
 

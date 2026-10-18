@@ -8,7 +8,7 @@
   if (!/^\/app\//.test(nextPath)) nextPath = '/app/';
 
   function show(panel) {
-    ['signin', 'signup', 'waiting', 'in'].forEach(function (p) { document.getElementById('panel-' + p).hidden = p !== panel; });
+    ['signin', 'signup', 'forgot', 'waiting', 'in'].forEach(function (p) { document.getElementById('panel-' + p).hidden = p !== panel; });
   }
   function say(text, isErr) {
     msg.hidden = !text; msg.textContent = text || ''; msg.className = 'status' + (isErr ? ' err' : '');
@@ -63,6 +63,20 @@
       .finally(function () { busy(signup, false); });
   });
 
+  var forgot = document.getElementById('forgot-form');
+  forgot.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!forgot.reportValidity()) return;
+    busy(forgot, true, 'Sending…');
+    post('/api/auth/forgot', data(forgot)).then(function (j) {
+      if (j.emailEnabled === false) { say('Email resets aren’t switched on yet. Send Nectara a note through the join page and we’ll send you a reset link.', true); return; }
+      forgot.reset(); show('signin');
+      say('If there’s an account for that email, a reset link is on its way. Check your inbox (and spam folder). The link expires in an hour.');
+    })
+      .catch(function (err) { say('Couldn’t send the link: ' + err.message + '.', true); })
+      .finally(function () { busy(forgot, false); });
+  });
+
   var codeForm = document.getElementById('code-form');
   codeForm.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -75,6 +89,7 @@
 
   // Starting state
   if (params.get('signedout')) say('You’re signed out.');
+  if (params.get('forgot')) show('forgot');
   fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
     if (!j || !j.signedIn) { if (params.get('new')) show('signup'); return; }
     if (j.user.hasAccess) {
