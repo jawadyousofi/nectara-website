@@ -2,8 +2,27 @@
 // To add a series: add an entry to SERIES with its four lessons (images in /assets/lessons/).
 window.NECTARA = {
   song: ['Buzz in, breathe in,', 'buzz out, breathe out.', 'I am small,', 'I am strong,', 'I help the garden grow.'],
-  // Story readings: one per month, a children's edition of a Grand series book. Lines starting with * are said together.
+  // Story readings: one per month, a children's edition of a Grand series book. Lines starting with * are said together; lines starting with > are DO IT! moves.
   stories: [
+    {
+      id: "little-drop", title: "Little Drop", month: "September", series: "The Water Series", from: "Seed", audio: true,
+      blurb: "A little drop of water travels from cloud to flower to puddle, and always comes back.",
+      pages: [
+        ["Little Drop", "Up and down and all around!"],
+        ["Way up high,", "in a fluffy white cloud,", "lived a little drop of water."],
+        ["The cloud filled up with drops,", "more and more and more, until…", "Plip! Down came the rain.", "*Up and down and all around!"],
+        ["The little drop landed on a thirsty flower.", "Sip, sip!", "The flower drank it up, from its roots to its petals."],
+        ["Then a frog hopped by. Splash!", "The little drop jumped into a puddle", "with all its friends."],
+        ["Asal looked into the puddle.", "“Little drop, will you go away?”"],
+        ["Out came the warm sun.", "The little drop felt light, lighter, lighter…", "and floated up, up, up."],
+        ["High in the sky, it met other drops.", "Together they made", "a brand new cloud."],
+        ["And one day…", "Plip! Down came the little drop again!", "*Up and down and all around!"],
+        ["Water never leaves us.", "It travels, and it comes back.", "The water in you was once a cloud!"],
+        ["*Breathe in, rise like a cloud.", "*Breathe out, fall like the rain.", "*Up and down and all around!"],
+      ],
+      tips: ["The story reads itself aloud. Tap “Reading aloud” at the top to turn the voice off and read it yourself.", "On “Plip!” tap one finger on your hand like a raindrop, faster and faster for the rain.", "On page 7, rise slowly from crouching to tiptoe as the drop floats up.", "Pairs well with this month’s lessons: Grow a Rain Cloud and Where Puddles Go."],
+      after: "Ask: Where did the little drop go on its journey? Where have you seen water today?",
+    },
     {
       id: 'little-seed', title: 'Little Seed', month: 'October', series: 'Soil and Seeds', from: 'Seed', audio: true,
       blurb: 'A tiny raindrop wakes a little seed, and a whole forest begins.',
@@ -63,6 +82,36 @@ window.NECTARA = {
       after: "Ask: What do you love about the day? What do you love about the night? When do you feel sunny, and when do you feel moony?",
     },
     {
+      id: "i-am-grand", title: "I Am Grand", month: "January", series: "My Amazing Body", from: "Grand", audio: true,
+      blurb: "Türaan wakes up feeling little, and finds out he is grand, and so is everyone.",
+      pages: [
+        ["I Am Grand", "A Türaan World Adventure"],
+        ["This is Türaan.", "This morning, Türaan feels very, very little.", ">Can you make yourself as small as a mouse? Curl up tiny!"],
+        ["“Am I big?” asks Türaan.", "“Am I grand?”", ">Shrug your shoulders. Say it with Türaan: “Am I graaand?”"],
+        ["Mama smiles. “Türaan,” she says,", "“spread your arms WIDE!", "Let’s see how grand you are!”", ">Spread your arms as WIDE as you can! Whoosh!"],
+        ["“When I am this big,” says Türaan,", "*“I AM GRAND!”", ">Arms wide, big voice. Everyone shout: “I am GRAND!”"],
+        ["Türaan puts his hand on his chest.", "Thump, thump, thump.", "“My heart is grand too!”", ">Put your hand on your heart. Can you feel it? Thump, thump!"],
+        ["Türaan zooms out the door.", "The world is SO big, and it is waiting!", ">Run in place as fast as you can! Zoom, zoom, zoom!"],
+        ["Türaan shares his toy truck with his friend.", "“Sharing is grand!”", ">Pretend to hand a friend a toy and say, “Here you go!”"],
+        ["The rock looks SO tall. Türaan takes a big breath…", "and climbs! “Being brave is grand!”", ">Take one big, slow breath in… and let it out. Soooo brave!"],
+        ["Oops! Türaan tumbles down. Bump!", "He gets right back up.", "“Trying again is grand!”", ">Sit down on the floor… then POP back up like Türaan!"],
+        ["Türaan’s friends Amara, Keon, Sofia, Eli, and Priya sit in a big circle.", "Everyone shares one thing they love.", "“Sharing stories is grand!”", ">Tell a friend one thing you love!"],
+        ["They hold hands and make one round circle.", "No one is first. No one is last.", "“Everyone belongs, and that’s grand!”", ">Hold hands with your friends and make a circle!"],
+        ["Together, Türaan and his friends", "dig, dig, dig, and plant tiny seeds.", "“Working together is grand!”", ">Pretend to dig with a shovel. Dig, dig, dig!"],
+        ["Buzz! Flutter! Zip!", "Butterflies dance. Dragonflies zoom.", "A ladybug lands on Türaan’s finger.", "“Being still in nature is grand!”", ">Hold your finger out very, very still… shhh!"],
+        ["A little caterpillar munches a leaf.", "Someday it will be a butterfly!", "“Growing is grand!”", ">Wiggle like a caterpillar… now flap like a butterfly!"],
+        ["Priya feels little today.", "Türaan sits right beside her.", "“Being a friend is grand!”", ">Give yourself a big, warm hug!"],
+        ["Türaan looks around.", "Every friend is grand", "in their own special way!", ">Point to a friend and say: “YOU are grand!”"],
+        ["Walking home, Türaan holds Mama’s hand.", "He tells her all about his grand day.", ">Tell someone one grand thing you did today!"],
+        ["Türaan looks up at the big, big sky.", "The world is grand… and so is he.", ">Reach up, up, up for the stars!"],
+        ["And every night, Türaan whispers it, soft and sure:", "“I… am… grand.”", ">Whisper it quietly with Türaan: “I am grand.” Nighty-night."],
+        ["Türaan isn’t little anymore.", "Türaan is Türaan, and Türaan is", "*GRAND!", ">Biggest arms, biggest voice, all together now: “I AM GRAND!”"],
+        ["Now it’s YOUR turn!", "What makes YOU grand?", "Kind? Brave? A great helper? A good friend?", ">Stand up tall, spread your arms wide, and shout: “I am GRAND!”"],
+      ],
+      tips: ["The story reads itself aloud. Tap “Reading aloud” at the top to turn the voice off and read it yourself.", "Every page has a DO IT! move. Do each one together before turning the page.", "Let children shout the GRAND lines as loud as they like, and whisper the nighttime page.", "Dedicated to Türaan. The pictures are from the published book."],
+      after: "Ask: What makes YOU grand? Then go round the circle and tell each friend why they are grand.",
+    },
+    {
       id: "little-light", title: "Little Light", month: "February", series: "Feelings Have Names", from: "Radiating Heart", audio: true,
       blurb: "Asal finds the little light inside, and the whole garden begins to glow.",
       pages: [
@@ -97,6 +146,25 @@ window.NECTARA = {
       ],
       tips: ["The story reads itself aloud. Tap “Reading aloud” at the top to turn the voice off and read it yourself.", "On page 3, lie down with a small toy on each tummy and watch it ride up and down.", "On page 7, hold up a pretend flower to smell, then a pretend candle to blow out. Do it three times.", "Read the last page slowly and let the quiet last a few seconds."],
       after: "Ask: Where do you feel your breath? When could you use “smell the flower, blow out the candle” this week?",
+    },
+    {
+      id: "one-little-bee", title: "One Little Bee", month: "April", series: "Bees and Pollinators", from: "Grand", audio: true,
+      blurb: "Asal wonders what one little bee can do, and helps a whole garden grow.",
+      pages: [
+        ["One Little Bee", "I am small, I am strong!"],
+        ["Asal is one little bee,", "smaller than a flower."],
+        ["“I am so little,” said Asal.", "“What can one little bee do?”"],
+        ["Asal flew to a flower", "and got a dusting of yellow pollen.", "Achoo!"],
+        ["Then Asal flew to the next flower", "and left a little pollen there."],
+        ["Flower to flower,", "buzz, buzz, buzz.", "*I am small, I am strong!"],
+        ["Soon the apple tree was full of blossoms…", "and then full of apples!"],
+        ["And Asal was not alone.", "Bees came from everywhere,", "buzzing home to the hive."],
+        ["One bee became a hive.", "One hive helped", "a whole garden grow."],
+        ["You are little, like Asal,", "and you help the garden grow too.", "*I am small,", "*I am strong,", "*I help the garden grow!"],
+        ["*Buzz in, breathe in.", "*Buzz out, breathe out.", "*I am small, I am strong!"],
+      ],
+      tips: ["The story reads itself aloud. Tap “Reading aloud” at the top to turn the voice off and read it yourself.", "Fly around the room like Asal on “flower to flower, buzz, buzz, buzz.”", "On page 4, sprinkle pretend pollen on a friend’s shoulder, then “Achoo!”", "The last page is Asal’s breathing song. Hum like a bee on the breath out."],
+      after: "Ask: What did Asal carry from flower to flower? What little things do you do that help?",
     },
     {
       id: "one-circle", title: "One Circle", month: "May", series: "One World", from: "One Circle", audio: true,

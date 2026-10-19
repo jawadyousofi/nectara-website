@@ -150,3 +150,7 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 #next.nudge { animation: nudge 1.6s ease-in-out infinite; }
 @keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
 @media (prefers-reduced-motion: reduce) { #next.nudge { animation: none; outline: 3px solid var(--honey, #E9A23B); } }
+
+/* DO IT! movement prompts in story pages */
+.story-line.doit { font-size: 0.82em; font-weight: 600; color: var(--ink-soft); background: #FDF1DD; border-left: 5px solid var(--honey); padding: 8px 14px; border-radius: 12px; }
+.story-line.doit b { color: var(--honey-deep); letter-spacing: 0.04em; }

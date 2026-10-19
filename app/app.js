@@ -128,10 +128,10 @@
     return st.pages.map(function (lines, i) {
       var img = '<div class="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="1440" height="900"></div>';
       var words = i === 0
-        ? '<span class="phase watch">Story time</span><h1 class="big">' + esc(lines[0]) + '</h1><p class="mid">' + esc(lines[1] || '') + '</p><p class="soft">A children&rsquo;s story from the Grand series book <i>' + esc(st.from) + '</i>.</p>'
+        ? '<span class="phase watch">Story time</span><h1 class="big">' + esc(lines[0]) + '</h1><p class="mid">' + esc(lines[1] || '') + '</p><p class="soft">' + (st.id === 'i-am-grand' ? 'The Grand series picture book by Jawad Yousofi.' : 'A children&rsquo;s story from the Grand series book <i>' + esc(st.from) + '</i>.') + '</p>'
         : '<div class="story-text">' + lines.map(function (t, k) {
-            var say = t.charAt(0) === '*';
-            return '<p class="story-line' + (say ? ' say' : '') + '" style="animation-delay:' + (0.25 + k * 0.45) + 's">' + esc(say ? t.slice(1) : t) + '</p>';
+            var say = t.charAt(0) === '*', doit = t.charAt(0) === '>';
+            return '<p class="story-line' + (say ? ' say' : '') + (doit ? ' doit' : '') + '" style="animation-delay:' + (0.25 + k * 0.45) + 's">' + (doit ? '<b>Do it!</b> ' : '') + esc(say || doit ? t.slice(1) : t) + '</p>';
           }).join('') + '</div>';
       return { visual: img, words: words, kind: i === n - 1 ? 'finish' : '', next: i === 0 ? 'Open the book' : i === n - 1 ? 'The end' : 'Turn the page' };
     });
