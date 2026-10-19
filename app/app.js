@@ -252,7 +252,7 @@
       dialog.innerHTML = '<div class="gu"><header><h2 id="gu-title">Reading together</h2><button class="icon-btn" type="button" id="gu-close" aria-label="Close">' + ICON.close + '</button></header>' +
         '<p><b>' + esc(l.title) + '</b> &middot; about 5 minutes &middot; ages 2&ndash;7. This month&rsquo;s story for ' + esc(l.series) + '.</p>' +
         '<div><h3>Tips</h3><ul>' + l.tips.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
-        '<div><h3>After the story</h3><p>Ask: What did the little seed need to grow? What helps you grow? Then try this month&rsquo;s lessons.</p></div></div>';
+        '<div><h3>After the story</h3><p>' + esc(l.after || 'Ask: What did you notice in the story?') + ' Then try this month&rsquo;s lessons.</p></div></div>';
       dialog.showModal();
       document.getElementById('gu-close').addEventListener('click', function () { dialog.close(); });
       return;
