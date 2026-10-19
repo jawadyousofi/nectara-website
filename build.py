@@ -191,10 +191,10 @@ PAGES['families.html'] = ('For Families · Nectara', 'Parents are a child’s fi
 </div></section>
 {cta()}''')
 
-PAGES['asal.html'] = ('Meet Asal · Nectara', 'Asal is Nectara’s little bee: curious, kind and always buzzing with questions. Asal means honey.', f'''
+PAGES['asal.html'] = ('Meet Asal · Nectara', 'Asal (a-SAL) is Nectara’s little bee: curious, kind and always buzzing with questions. Asal means honey.', f'''
 <div class="wrap hero">
   <div class="stack"><span class="eyebrow">Meet Asal</span><h1>Hi! I&rsquo;m Asal, the little bee.</h1>
-  <p class="lead">Asal means honey. I love flowers, rain, big questions and my friends. I fly from flower to flower to gather nectar, and I fly from question to question to gather wonder.</p></div>
+  <p class="lead">My name is Asal (say it <b>a-SAL</b>), and it means honey. I love flowers, rain, big questions and my friends. I fly from flower to flower to gather nectar, and I fly from question to question to gather wonder.</p></div>
   <figure class="asal-fig"><div class="asal-sun"><img src="assets/asal.svg" alt="Asal, a curly-haired child in a bee costume with antennae and wings, waving" width="300" height="400"></div><span class="hello">Buzz buzz!</span></figure>
 </div>
 <section class="band-pollen"><div class="wrap split">
