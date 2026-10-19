@@ -28,13 +28,13 @@
     check: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
   };
   // ---------- Read-aloud (story narration) ----------
-  var voice = null;
+  var voice = null, voiceBlocked = false;
   var aloudOn = function () { try { return localStorage.getItem('nx_aloud') !== 'off'; } catch (e) { return true; } };
   function setAloud(on) { try { localStorage.setItem('nx_aloud', on ? 'on' : 'off'); } catch (e) {} }
   function stopVoice() { if (voice) { voice.pause(); } }
   function aloudButton() {
     var b = document.getElementById('aloud'); if (!b) return;
-    var on = aloudOn();
+    var on = aloudOn() && !voiceBlocked;
     b.innerHTML = (on ? ICON.speaker : ICON.mute) + '<span class="aloud-label">' + (on ? 'Reading aloud' : 'Read to me') + '</span>';
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
@@ -45,7 +45,7 @@
     voice.onended = function () { var n = document.getElementById('next'); if (n) n.classList.add('nudge'); };
     voice.src = '/assets/stories/' + st.id + '/audio/' + (i < 9 ? '0' : '') + (i + 1) + '.mp3';
     var pr = voice.play();
-    if (pr && pr.catch) pr.catch(function () { setAloud(false); aloudButton(); }); // the browser wants a tap first
+    if (pr && pr.then) pr.then(function () { voiceBlocked = false; aloudButton(); }, function () { voiceBlocked = true; aloudButton(); }); // the browser wants a tap first; keep the saved choice
   }
 
   var PETALS = ['#E9A23B', '#F29BB5', '#7FB3D5', '#F4C25B', '#C9A0DC', '#F39A2B'];
@@ -191,7 +191,7 @@
     var ab = document.getElementById('aloud');
     if (ab) {
       aloudButton();
-      ab.addEventListener('click', function () { var on = !aloudOn(); setAloud(on); aloudButton(); if (on) playPage(l, state.i); else stopVoice(); });
+      ab.addEventListener('click', function () { if (voiceBlocked && aloudOn()) { voiceBlocked = false; playPage(l, state.i); aloudButton(); return; } var on = !aloudOn(); setAloud(on); aloudButton(); if (on) playPage(l, state.i); else stopVoice(); });
       playPage(l, state.i);
     }
     var tb = document.getElementById('timer-btn');
