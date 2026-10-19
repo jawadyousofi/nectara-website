@@ -2,6 +2,28 @@
 // To add a series: add an entry to SERIES with its four lessons (images in /assets/lessons/).
 window.NECTARA = {
   song: ['Buzz in, breathe in,', 'buzz out, breathe out.', 'I am small,', 'I am strong,', 'I help the garden grow.'],
+  // Story readings: one per month, a children's edition of a Grand series book. Lines starting with * are said together.
+  stories: [
+    {
+      id: 'little-seed', title: 'Little Seed', month: 'October', series: 'Soil and Seeds', from: 'Seed',
+      blurb: 'A tiny raindrop wakes a little seed, and a whole forest begins.',
+      pages: [
+        ['Little Seed', 'With Asal the bee kid'],
+        ['High in the sky, a little raindrop wondered,', '“I am so small. What can I do?”'],
+        ['Plip!', 'Down, down, down fell the raindrop,', 'into the soft, dark soil.'],
+        ['In the soil slept a little seed.', 'Small as a crumb.', 'Quiet as a secret.'],
+        ['“Wake up, little seed!” buzzed Asal.', 'The raindrop gave the seed a drink.', '*Small things can do big things!'],
+        ['The seed stretched and yawned.', 'A tiny root reached down, down, down,', 'holding on tight.'],
+        ['A tiny green shoot reached up, up, up,', 'toward the warm, bright sun.'],
+        ['A little sun. A little rain. A little time.', '*Grow, grow, slowly grow.'],
+        ['And one day,', 'the little seed', 'was a tall, tall tree.'],
+        ['The tree gave shade for resting,', 'flowers for the bees,', 'and fruit for sharing.', '“Thank you, tree!” buzzed Asal.'],
+        ['Inside every fruit', 'were new little seeds.', 'One seed became a tree.', 'One tree became a forest.', '*Small things can do big things!'],
+        ['You are a little seed too.', 'Small today, growing every day.', '*Breathe in, I am small.', '*Breathe out, I am growing.', '*Small things can do big things!'],
+      ],
+      tips: ['Read slowly and pause on each picture. Ask: what do you see?', 'Lines in bold are for everyone to say together. Say them louder each time.', 'On “down, down, down” and “up, up, up,” crouch low and stretch tall together.', 'End with the breath on the last page, slowly, two or three times.'],
+    },
+  ],
   series: [
     {
       id: 'water', title: 'The Water Series', month: 'September', ready: true,

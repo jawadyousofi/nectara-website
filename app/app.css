@@ -130,3 +130,14 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .gu h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
 .gu ul { padding-left: 1.2em; display: grid; gap: 4px; }
 .gu p, .gu li { color: var(--ink-soft); }
+
+/* ---------- Story read-along ---------- */
+.stage.story { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.story-frame { width: 100%; border-radius: clamp(14px, 1.6vw, 28px); overflow: hidden; box-shadow: 0 10px 30px rgba(42, 33, 24, 0.12); }
+.story-art { width: 100%; height: auto; display: block; animation: drift 16s ease-in-out infinite alternate; transform-origin: 50% 60%; }
+@keyframes drift { from { transform: scale(1); } to { transform: scale(1.07) translate(-1.2%, -1%); } }
+.story-text { display: grid; gap: clamp(4px, 0.8vw, 14px); }
+.story-line { font-family: var(--display); font-weight: 600; color: var(--forest); font-size: clamp(1.35rem, 0.9rem + 1.9vw, 3rem); line-height: 1.2; opacity: 0; animation: rise 0.6s ease forwards; text-wrap: balance; }
+.story-line.say { font-weight: 800; background: var(--pollen); border-radius: 14px; padding: 4px 14px; justify-self: start; }
+.story-card .wk { color: var(--rain-deep); }
+@media (orientation: portrait), (max-width: 760px) { .stage.story { grid-template-columns: 1fr; } .story-line { font-size: clamp(1.3rem, 1rem + 2.2vw, 2rem); } }

@@ -14,7 +14,11 @@
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(j.error || 'failed'); e.status = r.status; throw e; } return j; }); });
   };
   var allLessons = function () { var out = []; DATA.series.forEach(function (s) { (s.lessons || []).forEach(function (l) { out.push({ s: s, l: l }); }); }); return out; };
-  var findLesson = function (id) { return allLessons().filter(function (x) { return x.l.id === id; })[0]; };
+  var findLesson = function (id) {
+    var st = (DATA.stories || []).filter(function (x) { return x.id === id; })[0];
+    if (st) return { s: { title: 'Story time' }, l: st, story: true };
+    return allLessons().filter(function (x) { return x.l.id === id; })[0];
+  };
 
   var ICON = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
@@ -65,6 +69,13 @@
       '<p>Every lesson you finish grows a flower. ' + (grown === series.lessons.length ? 'The whole garden is blooming! Lessons can be done again any time.' : grown + ' of ' + series.lessons.length + ' flowers grown this month.') + '</p>' +
       '<button class="btn" type="button" data-open="' + next.id + '">' + (grown ? 'Next: ' : 'Start: ') + esc(next.title) + '</button></div>' +
       '<div>' + gardenSvg(series) + '</div></section>' +
+      (DATA.stories && DATA.stories.length ? '<div class="section-title"><h2>Story time</h2><span>A new story each month, read together</span></div><div class="lesson-grid stories">' + DATA.stories.map(function (st) {
+        return '<button class="lesson-card story-card" type="button" data-open="' + st.id + '">' +
+          (state.done[st.id] ? '<span class="done-badge">' + ICON.check + 'Read</span>' : '') +
+          '<img src="/assets/stories/' + st.id + '/01.webp" alt="" width="1440" height="900" loading="lazy">' +
+          '<span class="body"><span class="wk">' + esc(st.month) + ' story &middot; ' + st.pages.length + ' pages</span><h3>' + esc(st.title) + '</h3><span class="soft" style="font-size:0.95rem">' + esc(st.blurb) + '</span>' +
+          '<span class="go">' + (state.done[st.id] ? 'Read it again &rarr;' : 'Read the story &rarr;') + '</span></span></button>';
+      }).join('') + '</div>' : '') +
       '<div class="section-title"><h2>' + esc(series.title) + '</h2><span>' + esc(series.month) + ' &middot; ' + esc(series.idea) + '</span></div>' +
       '<div class="lesson-grid">' + series.lessons.map(function (l) {
         return '<button class="lesson-card" type="button" data-open="' + l.id + '">' +
@@ -89,6 +100,20 @@
   }
 
   // ---------- Lesson slides ----------
+  function buildStorySlides(st) {
+    var n = st.pages.length;
+    return st.pages.map(function (lines, i) {
+      var img = '<div class="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="1440" height="900"></div>';
+      var words = i === 0
+        ? '<span class="phase watch">Story time</span><h1 class="big">' + esc(lines[0]) + '</h1><p class="mid">' + esc(lines[1] || '') + '</p><p class="soft">A children&rsquo;s story from the Grand series book <i>' + esc(st.from) + '</i>.</p>'
+        : '<div class="story-text">' + lines.map(function (t, k) {
+            var say = t.charAt(0) === '*';
+            return '<p class="story-line' + (say ? ' say' : '') + '" style="animation-delay:' + (0.25 + k * 0.45) + 's">' + esc(say ? t.slice(1) : t) + '</p>';
+          }).join('') + '</div>';
+      return { visual: img, words: words, kind: i === n - 1 ? 'finish' : '', next: i === 0 ? 'Open the book' : i === n - 1 ? 'The end' : 'Turn the page' };
+    });
+  }
+
   function buildSlides(s, l) {
     var asal = '<img class="asal" src="/assets/asal.svg" alt="Asal the bee kid" width="300" height="400">';
     var asalSmall = '<img class="asal asal-small" src="/assets/asal.svg" alt="Asal the bee kid" width="300" height="400">';
@@ -114,7 +139,7 @@
     var found = findLesson(id);
     if (!found) { location.hash = '#/'; return; }
     if (!state.lesson || state.lesson.l.id !== id) {
-      state.lesson = found; state.slides = buildSlides(found.s, found.l); requestWake();
+      state.lesson = found; state.slides = found.story ? buildStorySlides(found.l) : buildSlides(found.s, found.l); requestWake();
     }
     state.i = Math.max(0, Math.min(state.slides.length - 1, index || 0));
     var sl = state.slides[state.i], l = found.l, n = state.slides.length;
@@ -127,7 +152,7 @@
       '<div class="p-title">' + esc(l.title) + '</div><div class="dots" aria-hidden="true">' + state.slides.map(function (_, k) { return '<i class="' + (k === state.i ? 'on' : k < state.i ? 'past' : '') + '"></i>'; }).join('') + '</div>' +
       '<button class="icon-btn" type="button" id="gu-open">Grown-ups</button>' +
       (document.fullscreenEnabled ? '<button class="icon-btn" type="button" id="fs" aria-label="Full screen">' + ICON.full + '</button>' : '') + '</div>' +
-      '<main class="stage" id="stage"><div class="visual">' + sl.visual + '</div><div class="words">' + (phaseLabel ? '<span class="phase ' + sl.phase + '">' + phaseLabel + '</span>' : '') + sl.words + '</div></main>' +
+      '<main class="stage' + (found.story ? ' story' : '') + '" id="stage"><div class="visual">' + sl.visual + '</div><div class="words">' + (phaseLabel ? '<span class="phase ' + sl.phase + '">' + phaseLabel + '</span>' : '') + sl.words + '</div></main>' +
       '<div class="p-bottom"><button class="btn ghost" type="button" id="back"' + (state.i === 0 ? ' disabled' : '') + '>Back</button>' +
       '<span class="soft" style="font-size:0.95rem">' + (state.i + 1) + ' of ' + n + '</span>' +
       '<button class="btn" type="button" id="next">' + (sl.next || 'Next') + ' &rarr;</button></div></div>';
@@ -193,6 +218,15 @@
 
   function openGrownups() {
     var l = state.lesson.l;
+    if (state.lesson.story) {
+      dialog.innerHTML = '<div class="gu"><header><h2 id="gu-title">Reading together</h2><button class="icon-btn" type="button" id="gu-close" aria-label="Close">' + ICON.close + '</button></header>' +
+        '<p><b>' + esc(l.title) + '</b> &middot; about 5 minutes &middot; ages 2&ndash;7. This month&rsquo;s story for ' + esc(l.series) + '.</p>' +
+        '<div><h3>Tips</h3><ul>' + l.tips.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
+        '<div><h3>After the story</h3><p>Ask: What did the little seed need to grow? What helps you grow? Then try this month&rsquo;s lessons.</p></div></div>';
+      dialog.showModal();
+      document.getElementById('gu-close').addEventListener('click', function () { dialog.close(); });
+      return;
+    }
     dialog.innerHTML = '<div class="gu"><header><h2 id="gu-title">For grown-ups</h2><button class="icon-btn" type="button" id="gu-close" aria-label="Close">' + ICON.close + '</button></header>' +
       '<p><b>' + esc(l.title) + '</b> &middot; 30 minutes &middot; ages 4&ndash;7 (younger children with a parent helping)</p>' +
       '<div><h3>Materials</h3><ul>' + l.materials.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
