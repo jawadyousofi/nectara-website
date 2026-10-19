@@ -23,8 +23,31 @@
   var ICON = {
     close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
     full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    speaker: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z" fill="currentColor"/><path d="M16 10l4 4M20 10l-4 4"/></svg>',
     check: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
   };
+  // ---------- Read-aloud (story narration) ----------
+  var voice = null;
+  var aloudOn = function () { try { return localStorage.getItem('nx_aloud') !== 'off'; } catch (e) { return true; } };
+  function setAloud(on) { try { localStorage.setItem('nx_aloud', on ? 'on' : 'off'); } catch (e) {} }
+  function stopVoice() { if (voice) { voice.pause(); } }
+  function aloudButton() {
+    var b = document.getElementById('aloud'); if (!b) return;
+    var on = aloudOn();
+    b.innerHTML = (on ? ICON.speaker : ICON.mute) + '<span class="aloud-label">' + (on ? 'Reading aloud' : 'Read to me') + '</span>';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  function playPage(st, i) {
+    stopVoice();
+    if (!st.audio || !aloudOn()) return;
+    if (!voice) { voice = new Audio(); voice.preload = 'auto'; }
+    voice.onended = function () { var n = document.getElementById('next'); if (n) n.classList.add('nudge'); };
+    voice.src = '/assets/stories/' + st.id + '/audio/' + (i < 9 ? '0' : '') + (i + 1) + '.mp3';
+    var pr = voice.play();
+    if (pr && pr.catch) pr.catch(function () { setAloud(false); aloudButton(); }); // the browser wants a tap first
+  }
+
   var PETALS = ['#E9A23B', '#F29BB5', '#7FB3D5', '#F4C25B', '#C9A0DC', '#F39A2B'];
 
   function flower(x, y, color, grown, n) {
@@ -150,6 +173,7 @@
       '<div class="player">' +
       '<div class="p-top"><button class="icon-btn" type="button" id="exit" aria-label="Close lesson">' + ICON.close + '</button>' +
       '<div class="p-title">' + esc(l.title) + '</div><div class="dots" aria-hidden="true">' + state.slides.map(function (_, k) { return '<i class="' + (k === state.i ? 'on' : k < state.i ? 'past' : '') + '"></i>'; }).join('') + '</div>' +
+      (found.story && l.audio ? '<button class="icon-btn aloud" type="button" id="aloud" aria-pressed="false"></button>' : '') +
       '<button class="icon-btn" type="button" id="gu-open">Grown-ups</button>' +
       (document.fullscreenEnabled ? '<button class="icon-btn" type="button" id="fs" aria-label="Full screen">' + ICON.full + '</button>' : '') + '</div>' +
       '<main class="stage' + (found.story ? ' story' : '') + '" id="stage"><div class="visual">' + sl.visual + '</div><div class="words">' + (phaseLabel ? '<span class="phase ' + sl.phase + '">' + phaseLabel + '</span>' : '') + sl.words + '</div></main>' +
@@ -164,6 +188,12 @@
     var fs = document.getElementById('fs');
     if (fs) fs.addEventListener('click', toggleFull);
     root.querySelectorAll('[data-tick]').forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); }); });
+    var ab = document.getElementById('aloud');
+    if (ab) {
+      aloudButton();
+      ab.addEventListener('click', function () { var on = !aloudOn(); setAloud(on); aloudButton(); if (on) playPage(l, state.i); else stopVoice(); });
+      playPage(l, state.i);
+    }
     var tb = document.getElementById('timer-btn');
     if (tb) tb.addEventListener('click', function () { startTimer(l.minutes); });
     if (sl.kind === 'finish' && !state.done[l.id]) {
@@ -184,7 +214,7 @@
     if ('wakeLock' in navigator && !state.wake) navigator.wakeLock.request('screen').then(function (w) { state.wake = w; w.addEventListener('release', function () { state.wake = null; }); }).catch(function () {});
   }
   function stopLesson() {
-    clearTimer(); state.lesson = null;
+    clearTimer(); stopVoice(); state.lesson = null;
     if (state.wake) { state.wake.release().catch(function () {}); state.wake = null; }
     if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
   }

@@ -5,10 +5,10 @@ window.NECTARA = {
   // Story readings: one per month, a children's edition of a Grand series book. Lines starting with * are said together.
   stories: [
     {
-      id: 'little-seed', title: 'Little Seed', month: 'October', series: 'Soil and Seeds', from: 'Seed',
+      id: 'little-seed', title: 'Little Seed', month: 'October', series: 'Soil and Seeds', from: 'Seed', audio: true,
       blurb: 'A tiny raindrop wakes a little seed, and a whole forest begins.',
       pages: [
-        ['Little Seed', 'With Asal the bee kid'],
+        ['Little Seed', 'Small things can do big things!'],
         ['High in the sky, a little raindrop wondered,', '“I am so small. What can I do?”'],
         ['Plip!', 'Down, down, down fell the raindrop,', 'into the soft, dark soil.'],
         ['In the soil slept a little seed.', 'Small as a crumb.', 'Quiet as a secret.'],
@@ -21,7 +21,7 @@ window.NECTARA = {
         ['Inside every fruit', 'were new little seeds.', 'One seed became a tree.', 'One tree became a forest.', '*Small things can do big things!'],
         ['You are a little seed too.', 'Small today, growing every day.', '*Breathe in, I am small.', '*Breathe out, I am growing.', '*Small things can do big things!'],
       ],
-      tips: ['Read slowly and pause on each picture. Ask: what do you see?', 'Lines in bold are for everyone to say together. Say them louder each time.', 'On “down, down, down” and “up, up, up,” crouch low and stretch tall together.', 'End with the breath on the last page, slowly, two or three times.'],
+      tips: ['The story reads itself aloud. Tap “Reading aloud” at the top to turn the voice off and read it yourself.', 'Read slowly and pause on each picture. Ask: what do you see?', 'Lines in bold are for everyone to say together. Say them louder each time.', 'On “down, down, down” and “up, up, up,” crouch low and stretch tall together.', 'End with the breath on the last page, slowly, two or three times.'],
     },
   ],
   series: [

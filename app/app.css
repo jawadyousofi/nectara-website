@@ -141,3 +141,12 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .story-line.say { font-weight: 800; background: var(--pollen); border-radius: 14px; padding: 4px 14px; justify-self: start; }
 .story-card .wk { color: var(--rain-deep); }
 @media (orientation: portrait), (max-width: 760px) { .stage.story { grid-template-columns: 1fr; } .story-line { font-size: clamp(1.3rem, 1rem + 2.2vw, 2rem); } }
+
+/* Read-aloud toggle and the gentle "turn the page" nudge after narration */
+.icon-btn.aloud { gap: 6px; grid-auto-flow: column; }
+.icon-btn.aloud[aria-pressed="true"] { background: var(--mist); }
+.aloud-label { font-size: 0.95rem; }
+@media (max-width: 560px) { .aloud-label { display: none; } }
+#next.nudge { animation: nudge 1.6s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) { #next.nudge { animation: none; outline: 3px solid var(--honey, #E9A23B); } }
