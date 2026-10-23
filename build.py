@@ -48,8 +48,8 @@ def page(fname, title, desc, body, artifact=False):
     return f'<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n{head}\n</head>\n<body>\n{content}\n</body>\n</html>\n'
 
 PAGES = {}
-NOINDEX = {'admin.html', 'login.html', 'reset.html'}
-EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js']}
+NOINDEX = {'admin.html', 'login.html', 'reset.html', 'tv.html', 'link.html'}
+EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js'], 'tv.html': ['qrcode.js', 'tv.js'], 'link.html': ['link.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
 <div class="wrap hero">
@@ -295,18 +295,25 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
         <div class="field"><label for="si-email">Email</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
         <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn" type="submit">Sign in</button>
+        <p class="hint">Forgot your password? <button class="linklike" type="button" data-show="ecode">Email me a sign-in code</button></p>
         <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
-        <p class="hint"><button class="linklike" type="button" data-show="forgot">Forgot your password?</button></p>
       </form>
     </section>
 
-    <section id="panel-forgot" class="panel" hidden>
-      <form id="forgot-form" novalidate>
-        <h2>Reset your password</h2>
-        <p>Enter the email you signed up with. We&rsquo;ll send a link to choose a new password. It works once and expires in an hour.</p>
-        <div class="field"><label for="fg-email">Email</label><input id="fg-email" name="email" type="email" autocomplete="email" required></div>
-        <button class="btn" type="submit">Send reset link</button>
-        <p class="hint">Remembered it? <button class="linklike" type="button" data-show="signin">Back to sign in</button></p>
+    <section id="panel-ecode" class="panel" hidden>
+      <form id="ecode-form" novalidate>
+        <h2>Sign in with a code</h2>
+        <p>No password needed. We&rsquo;ll email you a 6-digit code to type here.</p>
+        <div class="field"><label for="ec-email">Email</label><input id="ec-email" name="email" type="email" autocomplete="email" required></div>
+        <button class="btn" type="submit">Email me a code</button>
+        <p class="hint"><button class="linklike" type="button" data-show="signin">Back to sign in with a password</button></p>
+      </form>
+      <form id="everify-form" novalidate hidden>
+        <h2>Check your email</h2>
+        <p id="ev-sent">We sent a 6-digit code. It expires in 15 minutes.</p>
+        <div class="field"><label for="ev-code">6-digit code</label><input id="ev-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]*" maxlength="7" required class="code-input"></div>
+        <button class="btn" type="submit">Sign in</button>
+        <p class="hint">Nothing yet? Check your spam folder, or <button class="linklike" type="button" id="ev-resend">send a new code</button>.</p>
       </form>
     </section>
 
@@ -343,9 +350,15 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
         <h2 id="in-hello">You&rsquo;re signed in</h2>
         <p>Asal is waiting in the garden.</p>
         <a class="btn" href="/app/">Open the app</a>
+        <p class="hint">Want Nectara on your TV too? Open <b>nectaraschool.org/tv</b> on the TV, then <a href="link.html">enter its code here</a>.</p>
         <p class="hint"><button class="linklike" type="button" data-signout>Sign out</button></p>
       </form>
     </section>
+
+    <a class="tv-card" href="tv.html">
+      <span class="tv-ico" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><rect x="4" y="9" width="40" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M17 41 H31" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+      <span><b>Signing in on a TV?</b> Skip the remote typing. Get a code on the TV and approve it from your phone.</span>
+    </a>
   </div>
 </div>''')
 
@@ -380,6 +393,56 @@ PAGES['admin.html'] = ('Members Admin · Nectara', 'Nectara member access.', '''
   </form>
   <p class="status" id="admin-msg" role="status" hidden></p>
   <div id="admin-list"></div>
+</div>''')
+
+PAGES['tv.html'] = ('TV Sign-in · Nectara', 'Sign in to Nectara on a TV with a code from your phone.', '''
+<div class="wrap tv-pair">
+  <div class="tv-steps">
+    <span class="eyebrow">Nectara on your TV</span>
+    <h1>Sign in this TV with your phone.</h1>
+    <ol>
+      <li><b>On your phone</b>, scan the square code, or go to <b>nectaraschool.org/link</b></li>
+      <li><b>Sign in</b> there if you aren&rsquo;t already</li>
+      <li><b>Tap &ldquo;Allow this TV&rdquo;</b>, and this screen opens Asal&rsquo;s garden</li>
+    </ol>
+    <p class="tv-wait" id="tv-status" role="status">Getting a code&hellip;</p>
+  </div>
+  <div class="tv-code-card">
+    <div class="tv-qr" id="tv-qr" aria-hidden="true"></div>
+    <p class="tv-label">Your TV code</p>
+    <p class="tv-code" id="tv-code" aria-live="polite">&middot;&middot;&middot; &middot;&middot;&middot;</p>
+    <p class="hint" id="tv-timer">&nbsp;</p>
+  </div>
+</div>
+<p class="wrap hint" style="padding-bottom:40px">Prefer typing? <a href="login.html">Sign in with your email</a> instead.</p>''')
+
+PAGES['link.html'] = ('Link a TV · Nectara', 'Let a TV into your Nectara account.', '''
+<div class="wrap hero portal">
+  <div class="stack">
+    <span class="eyebrow">Members</span>
+    <h1>Let your TV in.</h1>
+    <p class="lead">Type the code showing on your TV (or scan it with your phone&rsquo;s camera). The TV signs in by itself, and nobody has to type with the remote.</p>
+    <img src="assets/asal.svg" alt="" width="300" height="400" style="width:min(180px,40%);height:auto">
+  </div>
+  <div class="portal-box">
+    <p class="status" id="link-msg" role="status" tabindex="-1" hidden></p>
+    <form id="link-form" novalidate>
+      <h2>TV code</h2>
+      <div class="field"><label for="lk-code">Code on the TV</label><input id="lk-code" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="8" required class="code-input"></div>
+      <button class="btn" type="submit">Allow this TV</button>
+      <p class="hint" id="lk-who"></p>
+    </form>
+    <form id="link-signin" hidden onsubmit="return false">
+      <h2>Sign in first</h2>
+      <p>Sign in on this phone, and we&rsquo;ll bring you right back to approve the TV.</p>
+      <a class="btn" id="lk-signin" href="login.html">Sign in</a>
+    </form>
+    <form id="link-done" hidden onsubmit="return false">
+      <h2>Your TV is in!</h2>
+      <p>Look at the TV: Asal&rsquo;s garden is opening. You can close this page.</p>
+      <a class="btn ghost" href="/app/">Open the app here too</a>
+    </form>
+  </div>
 </div>''')
 
 PAGES['404.html'] = ('Page Not Found · Nectara', 'This page flew away.', '''

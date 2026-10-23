@@ -111,7 +111,7 @@
       '<div class="coming">' + DATA.series.filter(function (s) { return !s.ready; }).map(function (s) {
         return '<div><small>' + esc(s.month) + '</small><b>' + esc(s.title) + '</b><p>' + esc(s.idea) + '</p></div>';
       }).join('') + '</div>' +
-      '<div class="tips"><div class="tip"><b>On a TV</b>Open a lesson and tap the full-screen button. Arrow keys and a TV remote&rsquo;s arrows and OK button move the lesson along.</div>' +
+      '<div class="tips"><div class="tip"><b>On a TV</b>Open <b>nectaraschool.org/tv</b> on the TV and approve its code from your phone (<a href="/link.html">enter a TV code</a>). Then open a lesson and tap full screen; the remote&rsquo;s arrows and OK button move it along.</div>' +
       '<div class="tip"><b>On a phone or iPad</b>Swipe or tap Next. Add Nectara to your home screen from your browser&rsquo;s share menu, and it opens like an app.</div>' +
       '<div class="tip"><b>For grown-ups</b>Every lesson has a Grown-ups button with the materials list, setup and safety notes. Gather materials before you start.</div></div>' +
       '</div>';

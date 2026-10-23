@@ -13,7 +13,7 @@ export async function onRequestGet({ request, env }) {
   do {
     const page = await env.NECTARA_INTEREST.list({ cursor });
     for (const k of page.keys) {
-      if (/^(user|sess|prog|fail|reset|rlim):/.test(k.name)) continue; // member-account keys, not founding-list entries
+      if (/^(user|sess|prog|fail|reset|rlim|ecode|elim|pair|mail|tvfail):/.test(k.name)) continue; // member-account keys, not founding-list entries
       const e = await env.NECTARA_INTEREST.get(k.name, 'json');
       if (e) rows.push(cols.map(c => esc(e[c])).join(','));
     }

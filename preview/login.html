@@ -40,18 +40,25 @@
         <div class="field"><label for="si-email">Email</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
         <div class="field"><label for="si-password">Password</label><input id="si-password" name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn" type="submit">Sign in</button>
+        <p class="hint">Forgot your password? <button class="linklike" type="button" data-show="ecode">Email me a sign-in code</button></p>
         <p class="hint">New here? <button class="linklike" type="button" data-show="signup">Create an account</button></p>
-        <p class="hint"><button class="linklike" type="button" data-show="forgot">Forgot your password?</button></p>
       </form>
     </section>
 
-    <section id="panel-forgot" class="panel" hidden>
-      <form id="forgot-form" novalidate>
-        <h2>Reset your password</h2>
-        <p>Enter the email you signed up with. We&rsquo;ll send a link to choose a new password. It works once and expires in an hour.</p>
-        <div class="field"><label for="fg-email">Email</label><input id="fg-email" name="email" type="email" autocomplete="email" required></div>
-        <button class="btn" type="submit">Send reset link</button>
-        <p class="hint">Remembered it? <button class="linklike" type="button" data-show="signin">Back to sign in</button></p>
+    <section id="panel-ecode" class="panel" hidden>
+      <form id="ecode-form" novalidate>
+        <h2>Sign in with a code</h2>
+        <p>No password needed. We&rsquo;ll email you a 6-digit code to type here.</p>
+        <div class="field"><label for="ec-email">Email</label><input id="ec-email" name="email" type="email" autocomplete="email" required></div>
+        <button class="btn" type="submit">Email me a code</button>
+        <p class="hint"><button class="linklike" type="button" data-show="signin">Back to sign in with a password</button></p>
+      </form>
+      <form id="everify-form" novalidate hidden>
+        <h2>Check your email</h2>
+        <p id="ev-sent">We sent a 6-digit code. It expires in 15 minutes.</p>
+        <div class="field"><label for="ev-code">6-digit code</label><input id="ev-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]*" maxlength="7" required class="code-input"></div>
+        <button class="btn" type="submit">Sign in</button>
+        <p class="hint">Nothing yet? Check your spam folder, or <button class="linklike" type="button" id="ev-resend">send a new code</button>.</p>
       </form>
     </section>
 
@@ -88,9 +95,15 @@
         <h2 id="in-hello">You&rsquo;re signed in</h2>
         <p>Asal is waiting in the garden.</p>
         <a class="btn" href="/app/">Open the app</a>
+        <p class="hint">Want Nectara on your TV too? Open <b>nectaraschool.org/tv</b> on the TV, then <a href="link.html">enter its code here</a>.</p>
         <p class="hint"><button class="linklike" type="button" data-signout>Sign out</button></p>
       </form>
     </section>
+
+    <a class="tv-card" href="tv.html">
+      <span class="tv-ico" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><rect x="4" y="9" width="40" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M17 41 H31" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+      <span><b>Signing in on a TV?</b> Skip the remote typing. Get a code on the TV and approve it from your phone.</span>
+    </a>
   </div>
 </div>
 </main>

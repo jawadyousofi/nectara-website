@@ -24,7 +24,8 @@ export async function onRequestGet({ request, env }) {
     cursor = page.list_complete ? undefined : page.cursor;
   } while (cursor);
   members.sort((a, b) => (a.created < b.created ? 1 : -1));
-  return json({ members });
+  const lastMailError = await env.NECTARA_INTEREST.get('mail:last-error', 'json');
+  return json({ members, lastMailError });
 }
 
 export async function onRequestPost({ request, env }) {

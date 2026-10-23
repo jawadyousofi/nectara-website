@@ -6,9 +6,13 @@
 //   fail:<email>          failed sign-in counter (expires after 15 minutes)
 //   reset:<sha256(token)> password-reset link { email } (expires after 1 hour, or 24 hours when made by an admin)
 //   rlim:<email>          reset-email counter (max 3 an hour)
+//   ecode:<email>         emailed 6-digit sign-in code { hash, tries } (expires after 15 minutes)
+//   elim:<email>          sign-in-code email counter (max 5 an hour)
+//   pair:<CODE>           TV pairing { pollHash, status: pending|approved, email } (expires after 10 minutes)
+//   mail:last-error       the most recent email that failed to send { at, status, detail } (shown on the admin page)
 // access: 'waiting' (signed up, no access yet) | 'founding' (invite code) | 'member' (paid) | 'staff' | 'paused'
 
-export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:'];
+export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:', 'ecode:', 'elim:', 'pair:', 'mail:', 'tvfail:'];
 export const COOKIE = 'nx_session';
 const SESSION_DAYS = 30;
 const enc = new TextEncoder();
@@ -93,15 +97,37 @@ export const resetLink = (request, token) => `${new URL(request.url).origin}/res
 export const emailEnabled = env => !!env.RESEND_API_KEY;
 
 // Sends one email through Resend (resend.com). Needs the RESEND_API_KEY secret; FROM_EMAIL must be on a verified domain.
+// Returns true when Resend accepted the email. On failure it records why in mail:last-error (shown on the admin page).
 export async function sendEmail(env, { to, subject, text, html }) {
   if (!env.RESEND_API_KEY) return false;
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: env.FROM_EMAIL || 'Nectara <hello@nectaraschool.org>', to: [to], subject, text, html }),
-  });
-  return res.ok;
+  let status = 0, detail = '';
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: env.FROM_EMAIL || 'Nectara <hello@nectaraschool.org>', to: [to], subject, text, html }),
+    });
+    if (res.ok) return true;
+    status = res.status;
+    detail = (await res.text().catch(() => '')).slice(0, 400);
+  } catch (e) {
+    detail = String(e && e.message || e).slice(0, 400);
+  }
+  console.error('Nectara email failed', status, detail);
+  if (env.NECTARA_INTEREST) {
+    await env.NECTARA_INTEREST.put('mail:last-error', JSON.stringify({ at: new Date().toISOString(), status, detail, subject }),
+      { expirationTtl: 60 * 60 * 24 * 30 }).catch(() => {});
+  }
+  return false;
 }
+
+// Short codes people read off a screen: no 0/O, 1/I/L, 2/Z, 5/S, 8/B lookalikes.
+const CODE_CHARS = 'ACDEFGHJKMNPQRTUVWXY34679';
+export function shortCode(len = 6) {
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  return [...bytes].map(b => CODE_CHARS[b % CODE_CHARS.length]).join('');
+}
+export const randomToken = () => hex(crypto.getRandomValues(new Uint8Array(32)));
 
 export const hasAccess = u => !!u && ['founding', 'member', 'staff'].includes(u.access);
 

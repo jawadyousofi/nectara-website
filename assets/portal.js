@@ -5,10 +5,10 @@
   if (!msg) return;
   var params = new URLSearchParams(location.search);
   var nextPath = params.get('next') || '/app/';
-  if (!/^\/app\//.test(nextPath)) nextPath = '/app/';
+  if (!/^\/(app\/|link\.html)/.test(nextPath)) nextPath = '/app/';
 
   function show(panel) {
-    ['signin', 'signup', 'forgot', 'waiting', 'in'].forEach(function (p) { document.getElementById('panel-' + p).hidden = p !== panel; });
+    ['signin', 'signup', 'ecode', 'waiting', 'in'].forEach(function (p) { document.getElementById('panel-' + p).hidden = p !== panel; });
   }
   function say(text, isErr) {
     msg.hidden = !text; msg.textContent = text || ''; msg.className = 'status' + (isErr ? ' err' : '');
@@ -63,18 +63,44 @@
       .finally(function () { busy(signup, false); });
   });
 
-  var forgot = document.getElementById('forgot-form');
-  forgot.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!forgot.reportValidity()) return;
-    busy(forgot, true, 'Sending…');
-    post('/api/auth/forgot', data(forgot)).then(function (j) {
-      if (j.emailEnabled === false) { say('Email resets aren’t switched on yet. Send Nectara a note through the join page and we’ll send you a reset link.', true); return; }
-      forgot.reset(); show('signin');
-      say('If there’s an account for that email, a reset link is on its way. Check your inbox (and spam folder). The link expires in an hour.');
+  // Sign in with an emailed 6-digit code (also the way back in after a forgotten password).
+  var ecode = document.getElementById('ecode-form');
+  var everify = document.getElementById('everify-form');
+  var codeEmail = '';
+  function sendCode() {
+    busy(ecode, true, 'Sending…');
+    return post('/api/auth/email-code', { email: codeEmail }).then(function () {
+      ecode.hidden = true; everify.hidden = false; say('');
+      document.getElementById('ev-sent').textContent = 'We sent a 6-digit code to ' + codeEmail + '. It expires in 15 minutes.';
+      document.getElementById('ev-code').focus();
     })
-      .catch(function (err) { say('Couldn’t send the link: ' + err.message + '.', true); })
-      .finally(function () { busy(forgot, false); });
+      .catch(function (err) { say('Couldn’t send a code: ' + err.message + '.', true); })
+      .finally(function () { busy(ecode, false); });
+  }
+  ecode.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!ecode.reportValidity()) return;
+    codeEmail = data(ecode).email.trim().toLowerCase();
+    sendCode();
+  });
+  document.getElementById('ev-resend').addEventListener('click', function () {
+    post('/api/auth/email-code', { email: codeEmail }).then(function () { say('A new code is on its way. Use the newest email.'); })
+      .catch(function (err) { say('Couldn’t send a code: ' + err.message + '.', true); });
+  });
+  everify.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!everify.reportValidity()) return;
+    busy(everify, true, 'Checking…');
+    post('/api/auth/email-verify', { email: codeEmail, code: data(everify).code }).then(function (j) { afterAuth(j.user); })
+      .catch(function (err) { say('Couldn’t sign in: ' + err.message + '.', true); })
+      .finally(function () { busy(everify, false); });
+  });
+  document.querySelectorAll('[data-show="ecode"]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ecode.hidden = false; everify.hidden = true;
+      var typed = document.getElementById('si-email').value;
+      if (typed && !document.getElementById('ec-email').value) document.getElementById('ec-email').value = typed;
+    });
   });
 
   var codeForm = document.getElementById('code-form');
@@ -89,7 +115,7 @@
 
   // Starting state
   if (params.get('signedout')) say('You’re signed out.');
-  if (params.get('forgot')) show('forgot');
+  if (params.get('forgot')) show('ecode');
   fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
     if (!j || !j.signedIn) { if (params.get('new')) show('signup'); return; }
     if (j.user.hasAccess) {

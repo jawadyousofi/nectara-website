@@ -21,7 +21,8 @@
       try { sessionStorage.setItem('nx_admin', input.value.trim()); } catch (e) {}
       var counts = {};
       j.members.forEach(function (m) { counts[m.access] = (counts[m.access] || 0) + 1; });
-      say(j.members.length + ' accounts · ' + LEVELS.filter(function (l) { return counts[l]; }).map(function (l) { return counts[l] + ' ' + l; }).join(' · '));
+      var mailNote = j.lastMailError ? ' · Last email problem (' + j.lastMailError.at.slice(0, 16).replace('T', ' ') + ' UTC): ' + (j.lastMailError.status || '') + ' ' + j.lastMailError.detail : '';
+      say(j.members.length + ' accounts · ' + LEVELS.filter(function (l) { return counts[l]; }).map(function (l) { return counts[l] + ' ' + l; }).join(' · ') + mailNote, !!j.lastMailError);
       list.innerHTML = '<div class="admin-wrap"><table class="admin-table"><thead><tr><th>Parent</th><th>Email</th><th>Child</th><th>Joined</th><th>Access</th><th>Password</th></tr></thead><tbody>' +
         j.members.map(function (m) {
           var kid = (m.children || []).map(function (c) { return esc(c.name || '') + (c.age ? ' (' + esc(c.age) + ')' : ''); }).join(', ');

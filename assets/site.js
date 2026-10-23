@@ -49,3 +49,25 @@
       .finally(function () { btn.disabled = false; btn.textContent = 'Join the founding list'; });
   });
 })();
+
+// Show/hide button on every password box, so typos (especially with a TV remote) are easy to spot.
+(function () {
+  document.querySelectorAll('input[type="password"]').forEach(function (input) {
+    var wrap = document.createElement('div');
+    wrap.className = 'pw-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pw-toggle'; b.textContent = 'Show';
+    b.setAttribute('aria-label', 'Show password'); b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () {
+      var showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      b.textContent = showing ? 'Show' : 'Hide';
+      b.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      b.setAttribute('aria-pressed', showing ? 'false' : 'true');
+      input.focus();
+    });
+    wrap.appendChild(b);
+  });
+})();
