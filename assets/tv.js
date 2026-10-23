@@ -3,6 +3,9 @@
   'use strict';
   var codeEl = document.getElementById('tv-code');
   if (!codeEl) return;
+  // On the sign-in page the QR box is embedded: shown only on big screens (TVs, computers), never on phones.
+  var embed = document.querySelector('[data-tv-embed]');
+  if (embed && !window.matchMedia('(min-width: 900px)').matches) return;
   var qrEl = document.getElementById('tv-qr');
   var statusEl = document.getElementById('tv-status');
   var timerEl = document.getElementById('tv-timer');
@@ -52,8 +55,12 @@
   }
   // Already signed in on this TV? Go straight to the app.
   fetch('/api/auth/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (j) { if (j && j.signedIn && j.user.hasAccess) location.replace('/app/'); else start(); })
-    .catch(start);
+    .then(function (j) {
+      if (j && j.signedIn && j.user.hasAccess) { if (!embed) location.replace('/app/'); return; }
+      if (embed) { embed.hidden = false; var link = document.querySelector('.tv-card-link'); if (link) link.hidden = true; }
+      start();
+    })
+    .catch(function () { if (embed) embed.hidden = false; start(); });
   tickTimer = setInterval(tick, 1000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden && current && Date.now() > expiresAt) start(); });
 })();

@@ -219,3 +219,10 @@ fieldset { border: 0; display: grid; gap: 10px; }
 .tv-qr svg { width: 100%; height: 100%; display: block; }
 .tv-label { margin-top: 10px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.95rem; }
 .tv-code { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 7vw, 5.5rem); letter-spacing: 0.08em; color: var(--forest); line-height: 1; }
+.tv-inline { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; align-items: center; padding: 20px; border-radius: 22px; background: var(--pollen, #F7E7B4); }
+.tv-inline .tv-qr { width: 180px; padding: 8px; border-radius: 12px; }
+.tv-inline-text { display: grid; gap: 6px; }
+.tv-inline-text > b { color: var(--forest); font-size: 1.15rem; }
+.tv-inline .tv-code { font-size: 2.6rem; }
+.portal-box .tv-inline { order: -1; }
+.portal-box section.panel { padding-block: 0; }

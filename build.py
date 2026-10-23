@@ -49,7 +49,7 @@ def page(fname, title, desc, body, artifact=False):
 
 PAGES = {}
 NOINDEX = {'admin.html', 'login.html', 'reset.html', 'tv.html', 'link.html'}
-EXTRA_JS = {'login.html': ['portal.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js'], 'tv.html': ['qrcode.js', 'tv.js'], 'link.html': ['link.js']}
+EXTRA_JS = {'login.html': ['portal.js', 'qrcode.js', 'tv.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js'], 'tv.html': ['qrcode.js', 'tv.js'], 'link.html': ['link.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
 <div class="wrap hero">
@@ -355,10 +355,20 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
       </form>
     </section>
 
-    <a class="tv-card" href="tv.html">
+    <a class="tv-card tv-card-link" href="tv.html">
       <span class="tv-ico" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><rect x="4" y="9" width="40" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M17 41 H31" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
       <span><b>Signing in on a TV?</b> Skip the remote typing. Get a code on the TV and approve it from your phone.</span>
     </a>
+    <div class="tv-inline" data-tv-embed hidden>
+      <div class="tv-qr" id="tv-qr" aria-hidden="true"></div>
+      <div class="tv-inline-text">
+        <b>On a TV? Scan this with your phone.</b>
+        <span>Or go to <b>nectaraschool.org/link</b> on your phone and enter:</span>
+        <span class="tv-code" id="tv-code" aria-live="polite">&middot;&middot;&middot; &middot;&middot;&middot;</span>
+        <span class="hint" id="tv-status" role="status">Getting a code&hellip;</span>
+        <span class="hint" id="tv-timer"></span>
+      </div>
+    </div>
   </div>
 </div>''')
 

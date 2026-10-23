@@ -100,10 +100,20 @@
       </form>
     </section>
 
-    <a class="tv-card" href="tv.html">
+    <a class="tv-card tv-card-link" href="tv.html">
       <span class="tv-ico" aria-hidden="true"><svg viewBox="0 0 48 48" width="40" height="40"><rect x="4" y="9" width="40" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M17 41 H31" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
       <span><b>Signing in on a TV?</b> Skip the remote typing. Get a code on the TV and approve it from your phone.</span>
     </a>
+    <div class="tv-inline" data-tv-embed hidden>
+      <div class="tv-qr" id="tv-qr" aria-hidden="true"></div>
+      <div class="tv-inline-text">
+        <b>On a TV? Scan this with your phone.</b>
+        <span>Or go to <b>nectaraschool.org/link</b> on your phone and enter:</span>
+        <span class="tv-code" id="tv-code" aria-live="polite">&middot;&middot;&middot; &middot;&middot;&middot;</span>
+        <span class="hint" id="tv-status" role="status">Getting a code&hellip;</span>
+        <span class="hint" id="tv-timer"></span>
+      </div>
+    </div>
   </div>
 </div>
 </main>
@@ -112,6 +122,6 @@
   <nav aria-label="Footer"><a href="index.html">Home</a><a href="approach.html">How we learn</a><a href="programs.html">Programs</a><a href="families.html">Families</a><a href="asal.html">Meet Asal</a><a href="about.html">Our story</a><a href="join.html">Join</a></nav>
   <span>nectaraschool.org</span>
 </div></footer>
-<script src="assets/site.js"></script><script src="assets/portal.js"></script>
+<script src="assets/site.js"></script><script src="assets/portal.js"></script><script src="assets/qrcode.js"></script><script src="assets/tv.js"></script>
 </body>
 </html>
