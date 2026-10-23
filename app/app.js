@@ -270,6 +270,16 @@
   dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
 
   // ---------- Input: keys, TV remotes, swipes ----------
+  // TV remote Back button (LG webOS sends keyCode 461; others send GoBack/BrowserBack):
+  // closes the grown-ups panel, leaves a lesson for the home screen, and on the home screen exits the TV app.
+  document.addEventListener('keydown', function (e) {
+    if (!(e.keyCode === 461 || e.key === 'GoBack' || e.key === 'BrowserBack')) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    if (dialog.open) { dialog.close(); return; }
+    if (state.lesson) { location.hash = '#/'; return; }
+    if (/Web0S|webOS/i.test(navigator.userAgent)) { try { window.close(); } catch (err) {} }
+    else if (history.length > 1) history.back();
+  });
   document.addEventListener('keydown', function (e) {
     if (!state.lesson || dialog.open) return;
     var tag = (e.target && e.target.tagName) || '';

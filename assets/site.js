@@ -71,3 +71,10 @@
     wrap.appendChild(b);
   });
 })();
+
+// TV remote Back button on the website pages (LG webOS keyCode 461): go back a page, or exit the TV app.
+document.addEventListener('keydown', function (e) {
+  if (e.keyCode !== 461) return;
+  e.preventDefault();
+  if (history.length > 1) history.back(); else { try { window.close(); } catch (err) {} }
+});

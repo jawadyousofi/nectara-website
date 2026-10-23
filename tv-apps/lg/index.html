@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Nectara</title>
+<style>html,body{margin:0;height:100%;background:#FFFDF5;font-family:sans-serif;color:#2F4A35;display:grid;place-items:center;text-align:center}
+img{width:220px}p{font-size:32px}</style></head>
+<body><div><img src="largeIcon.png" alt=""><p id="m">Opening Asal&rsquo;s garden&hellip;</p></div>
+<script>
+// The Nectara TV app opens the live site, so lessons and stories update without reinstalling.
+// /tv goes straight to the app when this TV is signed in, or shows the QR code to sign in with a phone.
+setTimeout(function () {
+  if (navigator.onLine === false) { document.getElementById('m').textContent = 'This TV is offline. Connect to Wi-Fi to visit the garden.'; return; }
+  location.replace('https://nectaraschool.org/tv');
+}, 600);
+document.addEventListener('keydown', function (e) { if (e.keyCode === 461) { try { window.close(); } catch (err) {} } });
+</script></body></html>
