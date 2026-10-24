@@ -97,22 +97,26 @@
       var ball = mesh(new T.SphereGeometry(0.15, 14, 12), YEL, 0.12); ball.position.set(s * 0.9, 1.95, 0.15); a.add(ball);
     });
 
-    // Arms: shoulder → elbow → hand
+    // Arms: shoulder → elbow → hand. Rounded joints (no seams) so the arms grow out of the sweater.
     [-1, 1].forEach(function (s) {
-      var sh = new T.Group(); sh.position.set(s * 0.78, 1.62, 0); bob.add(sh);
-      var up = mesh(new T.CylinderGeometry(0.17, 0.16, 0.56, 12), WHITE, 0.05); up.position.y = -0.28; sh.add(up);
+      var sh = new T.Group(); sh.position.set(s * 0.64, 1.64, 0); bob.add(sh);
+      var puff = mesh(new T.SphereGeometry(0.25, 16, 12), WHITE); sh.add(puff);                         // shoulder, tucked into the body
+      var up = mesh(new T.CylinderGeometry(0.19, 0.175, 0.55, 14), WHITE); up.position.y = -0.27; sh.add(up);
       var el = new T.Group(); el.position.y = -0.55; sh.add(el);
-      var fo = mesh(new T.CylinderGeometry(0.16, 0.15, 0.46, 12), WHITE, 0.05); fo.position.y = -0.23; el.add(fo);
-      var cuff = mesh(new T.TorusGeometry(0.15, 0.055, 8, 16), YEL); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.46; el.add(cuff);
-      var hand = mesh(new T.SphereGeometry(0.17, 14, 12), SKIN, 0.05); hand.position.y = -0.6; el.add(hand);
+      el.add(mesh(new T.SphereGeometry(0.178, 14, 12), WHITE));                                         // elbow
+      var fo = mesh(new T.CylinderGeometry(0.175, 0.16, 0.46, 14), WHITE); fo.position.y = -0.23; el.add(fo);
+      var cuff = mesh(new T.TorusGeometry(0.16, 0.06, 8, 16), YEL); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.46; el.add(cuff);
+      var hand = mesh(new T.SphereGeometry(0.18, 14, 12), SKIN, 0.05); hand.position.y = -0.6; el.add(hand);
       rig['sh' + s] = sh; rig['el' + s] = el;
     });
-    // Legs: hip → knee → shoe (striped tights)
+    // Legs: hip → knee → shoe (striped tights), also with rounded joints
     [-1, 1].forEach(function (s) {
-      var hip = new T.Group(); hip.position.set(s * 0.3, 0.5, 0); bob.add(hip);
-      var th = mesh(new T.CylinderGeometry(0.2, 0.18, 0.52, 14), STRIPE, 0.05); th.position.y = -0.26; hip.add(th);
+      var hip = new T.Group(); hip.position.set(s * 0.3, 0.55, 0); bob.add(hip);
+      hip.add(mesh(new T.SphereGeometry(0.215, 14, 12), STRIPE));
+      var th = mesh(new T.CylinderGeometry(0.21, 0.19, 0.5, 14), STRIPE); th.position.y = -0.25; hip.add(th);
       var kn = new T.Group(); kn.position.y = -0.5; hip.add(kn);
-      var sn = mesh(new T.CylinderGeometry(0.18, 0.17, 0.48, 14), STRIPE, 0.05); sn.position.y = -0.24; kn.add(sn);
+      kn.add(mesh(new T.SphereGeometry(0.192, 14, 12), STRIPE));
+      var sn = mesh(new T.CylinderGeometry(0.19, 0.17, 0.48, 14), STRIPE); sn.position.y = -0.24; kn.add(sn);
       var shoe = mesh(new T.SphereGeometry(0.22, 14, 12), WHITE, 0.06); shoe.scale.set(1.15, 0.7, 1.6); shoe.position.set(0, -0.55, 0.1); kn.add(shoe);
       rig['hip' + s] = hip; rig['kn' + s] = kn;
     });
@@ -224,7 +228,7 @@
     var waving = t < this.waveUntil;
     [-1, 1].forEach(function (s) {
       var sh = R['sh' + s], el = R['el' + s];
-      var rx = lerp(Math.sin(t * 2.3 + s) * 0.08, 0.75, this.flyAmt), rz = s * lerp(0.3, 0.22, this.flyAmt), ex = lerp(-0.25, -0.1, this.flyAmt), ez = 0;
+      var rx = lerp(Math.sin(t * 2.3 + s) * 0.08, 0.75, this.flyAmt), rz = s * lerp(0.16, 0.18, this.flyAmt), ex = lerp(-0.25, -0.1, this.flyAmt), ez = 0;
       if (this.talking && !flying && s === -1) { rx = -0.5 + Math.sin(t * 3.1) * 0.15; ex = -0.9 + Math.sin(t * 4.3) * 0.2; }
       if (waving && s === 1 && !flying) { rz = 2.55; rx = -0.1; ez = Math.sin(t * 14) * 0.45; ex = 0; }
       sh.rotation.x = lerp(sh.rotation.x, rx, Math.min(1, dt * 10)); sh.rotation.z = lerp(sh.rotation.z, rz, Math.min(1, dt * 10));
