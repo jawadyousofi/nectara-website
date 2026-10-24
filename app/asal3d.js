@@ -35,7 +35,7 @@
   }
 
   function buildAsal() {
-    var SKIN = toon(0xd99f74), WHITE = toon(0xfffdf5), HAIR = toon(0x2b1a12), YEL = toon(0xf2c14e), DARK = toon(0x2a2118);
+    var SKIN = toon(0xe3ac80), WHITE = toon(0xfffdf5), HAIR = toon(0x2b1a12), YEL = toon(0xf2c14e), DARK = toon(0x2a2118);
     var STRIPE = toon(0xffffff, { map: stripes() });
     var rig = {};
     var root = new T.Group(); rig.root = root;           // position + facing (yaw)
@@ -58,17 +58,21 @@
     var neck = mesh(new T.CylinderGeometry(0.2, 0.22, 0.3, 14), SKIN); neck.position.y = 2.05; bob.add(neck);
     var head = new T.Group(); head.position.y = 2.95; bob.add(head); rig.head = head;
     head.add(mesh(new T.SphereGeometry(1, 32, 24), SKIN, 0.03));
-    // Face
+    // Face (after the original drawing and I Am Grand): big round eyes with whites and sparkles, rosy cheeks, ears, small nose
     var eyes = new T.Group(); head.add(eyes); rig.eyes = eyes;
+    var WHITE_B = new T.MeshBasicMaterial({ color: 0xffffff }), IRIS = toon(0x241510);
     [-1, 1].forEach(function (s) {
-      var e = mesh(new T.SphereGeometry(0.15, 16, 12), DARK); e.scale.set(1, 1.25, 0.55); e.position.set(s * 0.32, 0.02, 0.9); eyes.add(e);
-      var h = mesh(new T.SphereGeometry(0.048, 8, 8), new T.MeshBasicMaterial({ color: 0xffffff })); h.position.set(s * 0.32 + 0.05, 0.1, 0.99); eyes.add(h);
-      var ch = new T.Mesh(new T.SphereGeometry(0.15, 12, 10), new T.MeshBasicMaterial({ color: 0xf0a08a, transparent: true, opacity: 0.55 }));
-      ch.scale.set(1, 0.6, 0.3); ch.position.set(s * 0.56, -0.26, 0.8); head.add(ch);
+      var sc = mesh(new T.SphereGeometry(0.21, 20, 16), WHITE_B); sc.scale.set(1, 1.18, 0.42); sc.position.set(s * 0.36, -0.08, 0.88); eyes.add(sc);
+      var ir = mesh(new T.SphereGeometry(0.165, 20, 16), IRIS); ir.scale.set(1, 1.15, 0.42); ir.position.set(s * 0.36, -0.1, 0.935); eyes.add(ir);
+      var h1 = new T.Mesh(new T.SphereGeometry(0.07, 10, 8), WHITE_B); h1.scale.z = 0.4; h1.position.set(s * 0.36 + 0.06, -0.01, 0.995); eyes.add(h1);
+      var h2 = new T.Mesh(new T.SphereGeometry(0.03, 8, 6), WHITE_B); h2.scale.z = 0.4; h2.position.set(s * 0.36 - 0.06, -0.17, 0.99); eyes.add(h2);
+      var ch = new T.Mesh(new T.SphereGeometry(0.17, 14, 10), new T.MeshBasicMaterial({ color: 0xf08f78, transparent: true, opacity: 0.5 }));
+      ch.scale.set(1, 0.62, 0.3); ch.position.set(s * 0.6, -0.38, 0.78); head.add(ch);
+      var ear = mesh(new T.SphereGeometry(0.2, 14, 12), SKIN, 0.06); ear.scale.set(0.55, 0.85, 0.5); ear.position.set(s * 0.98, -0.12, 0.05); head.add(ear);
     });
-    var smile = mesh(new T.TorusGeometry(0.17, 0.035, 8, 20, Math.PI), toon(0x8a3b2e)); smile.rotation.z = Math.PI; smile.position.set(0, -0.3, 0.94); head.add(smile); rig.smile = smile;
-    var mouth = mesh(new T.SphereGeometry(0.15, 16, 12), toon(0x5a1f18)); mouth.scale.set(1, 0.05, 0.4); mouth.position.set(0, -0.38, 0.9); head.add(mouth); rig.mouth = mouth;
-    var nose = mesh(new T.SphereGeometry(0.05, 8, 8), toon(0xc98a64)); nose.position.set(0, -0.12, 0.99); head.add(nose);
+    var smile = mesh(new T.TorusGeometry(0.15, 0.032, 8, 20, Math.PI), toon(0x8a3b2e)); smile.rotation.z = Math.PI; smile.position.set(0, -0.46, 0.9); head.add(smile); rig.smile = smile;
+    var mouth = mesh(new T.SphereGeometry(0.14, 16, 12), toon(0x5a1f18)); mouth.scale.set(1, 0.05, 0.4); mouth.position.set(0, -0.54, 0.86); head.add(mouth); rig.mouth = mouth;
+    var nose = mesh(new T.SphereGeometry(0.055, 10, 8), toon(0xd0956c)); nose.scale.set(1.2, 0.9, 1); nose.position.set(0, -0.28, 0.985); head.add(nose);
     // Curly hair: little balls over the top and back, framing the face
     var hair = new T.Group(); head.add(hair);
     var N = 110;
@@ -76,12 +80,14 @@
       var yy = 1 - (i / (N - 1)) * 1.45, rr = Math.sqrt(Math.max(0, 1 - yy * yy)), th = i * 2.399963;
       var d = new T.Vector3(Math.cos(th) * rr, yy, Math.sin(th) * rr);
       if (d.y < -0.42) continue;
-      if (d.z > 0.28 && d.y < 0.46 && Math.abs(d.x) < 0.86) continue;   // keep the face clear
+      if (d.z > 0.2 && d.y < 0.6 && Math.abs(d.x) < 0.9) continue;   // keep the face clear
       var c = mesh(new T.SphereGeometry(0.27 + ((i * 37) % 10) / 70, 10, 8), HAIR);
       c.position.copy(d.multiplyScalar(0.98)); hair.add(c);
     }
-    [[-0.86, -0.42, 0.25], [0.86, -0.42, 0.25], [-0.8, -0.62, 0.05], [0.8, -0.62, 0.05], [0, 0.62, 0.78]].forEach(function (p) {
-      var c = mesh(new T.TorusGeometry(0.12, 0.05, 8, 16, Math.PI * 1.6), HAIR); c.position.set(p[0], p[1], p[2]); c.rotation.y = p[0] * 1.2; hair.add(c);
+    // forehead curls and ringlets at the temples
+    [[-0.42, 0.62, 0.72, 0.13], [-0.14, 0.7, 0.72, 0.14], [0.16, 0.68, 0.73, 0.13], [0.44, 0.6, 0.72, 0.12], [0.02, 0.5, 0.86, 0.11],
+     [-0.9, 0.22, 0.42, 0.13], [0.9, 0.22, 0.42, 0.13], [-0.94, -0.12, 0.3, 0.12], [0.94, -0.12, 0.3, 0.12], [-0.86, -0.42, 0.18, 0.11], [0.86, -0.42, 0.18, 0.11]].forEach(function (p) {
+      var c = mesh(new T.TorusGeometry(p[3], 0.055, 8, 18, Math.PI * 1.7), HAIR); c.position.set(p[0], p[1], p[2]); c.rotation.set(0.3, p[0] * 0.9, p[0] * 2); hair.add(c);
     });
     // Antennae
     [-1, 1].forEach(function (s) {

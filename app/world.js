@@ -510,7 +510,7 @@
     asalTo(800, 470, true);
     startAmbient('map');
     var greeted = false; try { greeted = sessionStorage.getItem('nx_world_hi') === '1'; sessionStorage.setItem('nx_world_hi', '1'); } catch (e) {}
-    if (!greeted) showPanel({ name: 'Asal', text: W.intro.text, audio: W.intro.id, acts: [{ label: 'Let’s explore!', fn: closePanel }] });
+    if (!greeted) showPanel({ name: 'Asal', text: W.intro.text, audio: W.intro.id, acts: [{ label: 'Let’s go!', icon: 'explore', fn: closePanel }] });
     else focusItem(0);
   }
 
@@ -530,7 +530,7 @@
     startAmbient(p.id);
     var key = 'nx_world_seen_' + p.id, seen = false;
     try { seen = sessionStorage.getItem(key) === '1'; sessionStorage.setItem(key, '1'); } catch (e) {}
-    if (!seen) showPanel({ name: p.name, text: p.intro.text, audio: p.intro.id, acts: [{ label: 'Let’s look!', fn: closePanel }] });
+    if (!seen) showPanel({ name: p.name, text: p.intro.text, audio: p.intro.id, acts: [{ label: 'Let’s look!', icon: 'explore', fn: closePanel }] });
     else focusItem(0);
     hint();
   }
@@ -588,11 +588,8 @@
       btn.classList.add('found');
       setTimeout(function () { flyNectar(s); }, 400);
     }
-    var acts = [];
-    if (s.move) acts.push({ label: 'Move with me!', fn: function () { startMove(s); } });
-    acts.push({ label: 'Try it outside', fn: function () { showMission(s); } });
-    if (s.link) acts.push({ label: s.link.label, fn: function () { stopAll(); location.hash = '#/lesson/' + (s.link.story || s.link.lesson); } });
-    acts.push({ label: 'Keep exploring', fn: closePanel });
+    var acts = [{ label: 'Explore', icon: 'explore', fn: closePanel },
+      { label: 'Go back', icon: 'back', cls: 'sky', fn: function () { closePanel(); goBack(); } }];
     showPanel({ name: s.name, text: text, audio: audio, acts: acts, wonder: true, spotY: s.y });
   }
   function flyNectar(s) {
@@ -607,21 +604,57 @@
   }
 
   // ---------- Panel (what Asal says) ----------
+  var ICONS = {
+    explore: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 L27 9.5 L27 22.5 L16 29 L5 22.5 L5 9.5 Z" fill="#FFF3B0" stroke="#2A2118" stroke-width="2.2"/><circle cx="14.5" cy="14.5" r="5" fill="none" stroke="#2A2118" stroke-width="2.6"/><path d="M18 18 L22.5 22.5" stroke="#2A2118" stroke-width="3" stroke-linecap="round"/></svg>',
+    back: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFFFFF" stroke="#1F4E73" stroke-width="2.2"/><path d="M18.5 9.5 L11.5 16 L18.5 22.5" fill="none" stroke="#1F4E73" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  // Asal's words appear one by one as he says them, fade when he is done, then the buttons pop in.
   function showPanel(o) {
     S.mode = 'panel';
     var p = document.getElementById('w-panel'); if (!p) return;
-    // Keep the words away from what the child is looking at: low things get the box at the top.
-    p.className = 'w-panel' + (o.spotY > 430 ? ' top' : '');
-    p.innerHTML = '<div class="w-panel-in' + (o.leaf ? ' leaf' : '') + '">' + asalArt('w-panel-asal') + '<div class="w-panel-words">' +
-      '<h2>' + o.name + '</h2><p>' + o.text.replace(/I wonder,/, '<b>I wonder,</b>') + '</p>' +
-      '<div class="w-acts">' + o.acts.map(function (a, i) { return '<button type="button" class="w-act' + (i === 0 ? ' first' : '') + '" data-i="' + i + '">' + a.label + '</button>'; }).join('') + '</div></div></div>';
+    clearTimeout(S.capT); cancelAnimationFrame(S.capRaf);
+    p.className = 'w-panel w-cap' + (o.spotY > 430 ? ' top' : '');
+    var words = o.text.split(/\s+/);
+    p.innerHTML = '<div class="w-cap-text" id="w-cap-text" tabindex="-1" role="status">' +
+      words.map(function (w) { return '<span' + (/^wonder,?$/i.test(w) || w === 'I' && false ? ' class="wonder"' : '') + '>' + w + '</span>'; }).join(' ') + '</div>' +
+      '<div class="w-acts" id="w-acts" hidden>' + o.acts.map(function (a, i) {
+        return '<button type="button" class="w-act fun ' + (a.cls || 'honey') + '" data-i="' + i + '" style="animation-delay:' + (i * 0.12) + 's"><span class="w-act-ico">' + (ICONS[a.icon] || '') + '</span><span>' + a.label + '</span></button>';
+      }).join('') + '</div>';
     p.hidden = false;
-    [].forEach.call(p.querySelectorAll('.w-act'), function (b) { b.addEventListener('click', function () { var a = o.acts[+b.getAttribute('data-i')]; sfx('step'); a.fn(); }); });
-    var first = p.querySelector('.w-act'); if (first) first.focus();
-    if (o.audio) speak(o.audio, o.text);
+    var spans = [].slice.call(p.querySelectorAll('.w-cap-text span')), cap = document.getElementById('w-cap-text');
+    var chars = [], total = 0;
+    words.forEach(function (w) { total += w.length + 1; chars.push(total); });
+    var shown = 0, done = false, t0 = Date.now();
+    function reveal(frac) {
+      var n = 0; while (n < spans.length && chars[n] <= frac * total + 2) n++;
+      for (; shown < n; shown++) spans[shown].className += ' on';
+    }
+    function tick() {
+      if (done) return;
+      var a = S.audio, frac;
+      if (a && a.duration && !isNaN(a.duration) && a.currentTime > 0) frac = Math.min(1, a.currentTime / (a.duration * 0.94));
+      else frac = Math.min(1, (Date.now() - t0) / (Math.max(1500, total * 58)));
+      reveal(frac);
+      S.capRaf = requestAnimationFrame(tick);
+    }
+    function finish() {
+      if (done) return; done = true; cancelAnimationFrame(S.capRaf); reveal(1);
+      S.capT = setTimeout(function () {
+        cap.className += ' fade';
+        var acts = document.getElementById('w-acts'); if (!acts) return;
+        acts.hidden = false;
+        [].forEach.call(acts.querySelectorAll('.w-act'), function (b) { b.addEventListener('click', function () { var a = o.acts[+b.getAttribute('data-i')]; sfx('sparkle'); b.className += ' pressed'; setTimeout(a.fn, 160); }); });
+        var first = acts.querySelector('.w-act'); if (first) first.focus();
+      }, 900);
+    }
+    S.capSkip = finish;
+    cap.addEventListener('click', finish);
+    cap.focus();
+    tick();
+    if (o.audio) speak(o.audio, o.text, finish); else setTimeout(finish, total * 58);
   }
   function closePanel() {
-    stopVoice();
+    stopVoice(); clearTimeout(S.capT); cancelAnimationFrame(S.capRaf); S.capSkip = null;
     var p = document.getElementById('w-panel'); if (p) { p.hidden = true; p.innerHTML = ''; }
     S.mode = 'world';
     focusItem(S.focus >= 0 && S.focus < S.items.length ? S.focus : 0);
@@ -703,6 +736,7 @@
       else goBack();
       return;
     }
+    if (k === 13 && S.mode === 'panel' && S.capSkip && document.activeElement && document.activeElement.id === 'w-cap-text') { e.preventDefault(); S.capSkip(); return; }
     var dirs = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
     if (dirs[k]) {
       e.preventDefault(); e.stopImmediatePropagation();

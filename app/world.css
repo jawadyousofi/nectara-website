@@ -250,3 +250,31 @@
 /* 3D Asal */
 .w-asal3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 .has3d .w-asal, .has3d .w-panel-asal { display: none; }
+
+/* Captions: Asal's words appear as he speaks, then fade (light footprint so his flight stays visible) */
+.w-panel.w-cap { left: 50%; right: auto; width: 72%; margin-left: -36%; bottom: 4%; text-align: center; pointer-events: none; }
+.w-panel.w-cap.top { top: 12%; bottom: auto; }
+.w-cap-text { display: inline-block; max-width: 100%; min-height: 1.3em; pointer-events: auto; cursor: pointer; padding: 0.5em 1.1em; border-radius: 1.4em; background: rgba(42, 33, 24, 0.5); color: #FFFFFF; font-family: var(--display); font-weight: 700; font-size: 2.3em; line-height: 1.32; text-shadow: 0 0.06em 0.12em rgba(0, 0, 0, 0.35); outline: none; transition: opacity 0.8s ease, transform 0.8s ease; }
+.w-cap-text span { display: none; }
+.w-cap-text span.on { display: inline-block; animation: wword 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes wword { from { opacity: 0; transform: translateY(0.3em) scale(0.85); } to { opacity: 1; transform: none; } }
+.w-cap-text span.wonder { color: #FFE08A; }
+.w-cap-text.fade { opacity: 0; transform: translateY(-0.4em); pointer-events: none; }
+.w-cap .w-acts { margin-top: -1.2em; pointer-events: auto; }
+.w-cap.top .w-acts { margin-top: -1.6em; }
+
+/* Fun, chunky buttons that pop in, bob, wiggle when chosen and squish when pressed */
+.w-act.fun { position: relative; display: inline-flex; align-items: center; font-size: 2.2em; padding: 0.35em 1.1em 0.35em 0.45em; margin: 0 0.4em; border: 0.12em solid #FFFFFF; border-radius: 2em; color: #2A2118; font-family: var(--display); font-weight: 800; letter-spacing: 0.01em; cursor: pointer; outline: none;
+  background: linear-gradient(180deg, #FFD36E 0%, #F2B23A 60%, #E9A23B 100%); box-shadow: 0 0.28em 0 #B8741F, 0 0.5em 1em rgba(42, 33, 24, 0.3); transform-origin: 50% 100%;
+  animation: wpopin 0.55s cubic-bezier(0.3, 1.7, 0.5, 1) both, wbtnbob 2.4s ease-in-out 0.6s infinite; }
+.w-act.fun.sky { background: linear-gradient(180deg, #BFE3F5 0%, #8CC4E6 60%, #7FB3D5 100%); color: #123A57; box-shadow: 0 0.28em 0 #3E7CA8, 0 0.5em 1em rgba(42, 33, 24, 0.3); }
+.w-act-ico { display: inline-block; width: 1.5em; height: 1.5em; margin-right: 0.4em; border-radius: 50%; }
+.w-act-ico svg { width: 100%; height: 100%; display: block; }
+.w-act.fun::after { content: ''; position: absolute; left: 14%; right: 14%; top: 0.14em; height: 0.32em; border-radius: 1em; background: rgba(255, 255, 255, 0.55); pointer-events: none; }
+.w-act.fun:focus, .w-act.fun:hover { animation: wbtnwiggle 0.9s ease-in-out infinite; box-shadow: 0 0.28em 0 #B8741F, 0 0 0 0.18em #FFFFFF, 0 0 0 0.36em #2F4A35, 0 0.5em 1.4em rgba(42, 33, 24, 0.35); transform: scale(1.08); }
+.w-act.fun.sky:focus, .w-act.fun.sky:hover { box-shadow: 0 0.28em 0 #3E7CA8, 0 0 0 0.18em #FFFFFF, 0 0 0 0.36em #2F4A35, 0 0.5em 1.4em rgba(42, 33, 24, 0.35); }
+.w-act.fun:active, .w-act.fun.pressed { animation: none; transform: translateY(0.22em) scale(0.96); box-shadow: 0 0.06em 0 #B8741F, 0 0.2em 0.5em rgba(42, 33, 24, 0.3); }
+.w-act.fun.sky:active, .w-act.fun.sky.pressed { box-shadow: 0 0.06em 0 #3E7CA8, 0 0.2em 0.5em rgba(42, 33, 24, 0.3); }
+@keyframes wpopin { 0% { opacity: 0; transform: scale(0.3) translateY(1em); } 70% { opacity: 1; transform: scale(1.12) translateY(-0.1em); } 100% { transform: none; } }
+@keyframes wbtnbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.12em); } }
+@keyframes wbtnwiggle { 0%, 100% { transform: scale(1.08) rotate(0); } 25% { transform: scale(1.1) rotate(-3deg); } 75% { transform: scale(1.1) rotate(3deg); } }
