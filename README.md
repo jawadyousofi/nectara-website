@@ -39,3 +39,11 @@ Until step 2 is done, the form politely says sign-ups aren't connected yet.
 - Founder paragraph on **Our story** mentions you and your son; edit if you'd rather keep it more private.
 - Programs, tuition, location and licensing are written as "coming" on purpose. Licensing rules for early-childhood programs vary by state and program type, so confirm what applies before announcing a start date.
 - The logo mark in `assets/logo-mark.svg` is a vector redraw of "The Flight". Swap in the final artwork file if you have one.
+
+## Asal's World (members app)
+
+An open world children explore freely: the Garden, the Pond, the Hive and the Sky (`/app/#/world`).
+- Content and words: `app/world-data.js`. Engine and drawings: `app/world.js`. Styles: `app/world.css`.
+- Asal's voice lines: `assets/world/audio/*.mp3`, made with `tools/world_voice.py` (offline Kokoro voice). Rerun it after changing any line (use `--force` to remake existing lines).
+- Works with touch, mouse, keyboard and TV remotes (arrows, OK, Back). Day, dusk and night follow the device clock; the seed bed grows over real days.
+- Sessions end gently after 20 minutes (grown-ups can hold a button for 10 more). Discoveries are saved as `w-<id>` in lesson progress.

@@ -88,6 +88,9 @@
       '<div class="home">' +
       '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>Little Scientists</small></span></a>' +
       '<div class="who"><span>' + (first ? 'Hi, ' + esc(first) : '') + '</span><button class="btn ghost" id="signout" type="button" style="min-height:44px;padding:0 16px">Sign out</button></div></header>' +
+      (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
+        '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +
+        (window.NectaraWorld.foundCount() ? window.NectaraWorld.foundCount() + ' drops of nectar gathered so far.' : '') + '</p><span class="btn">Explore</span></span></button>' : '') +
       '<section class="garden-card"><div><h1>' + (child ? esc(child) + '&rsquo;s garden' : 'Asal&rsquo;s garden') + '</h1>' +
       '<p>Every lesson you finish grows a flower. ' + (grown === series.lessons.length ? 'The whole garden is blooming! Lessons can be done again any time.' : grown + ' of ' + series.lessons.length + ' flowers grown this month.') + '</p>' +
       '<button class="btn" type="button" data-open="' + next.id + '">' + (grown ? 'Next: ' : 'Start: ') + esc(next.title) + '</button></div>' +
@@ -115,6 +118,7 @@
       '<div class="tip"><b>On a phone or iPad</b>Swipe or tap Next. Add Nectara to your home screen from your browser&rsquo;s share menu, and it opens like an app.</div>' +
       '<div class="tip"><b>For grown-ups</b>Every lesson has a Grown-ups button with the materials list, setup and safety notes. Gather materials before you start.</div></div>' +
       '</div>';
+    var wc = document.getElementById('world-card'); if (wc) wc.addEventListener('click', function () { location.hash = '#/world'; });
     root.querySelectorAll('[data-open]').forEach(function (b) { b.addEventListener('click', function () { location.hash = '#/lesson/' + b.getAttribute('data-open'); }); });
     document.getElementById('signout').addEventListener('click', function () {
       api('/api/auth/logout', { method: 'POST' }).finally(function () { location.href = '/login.html?signedout=1'; });
@@ -300,6 +304,9 @@
 
   // ---------- Routing ----------
   function route() {
+    var w = location.hash.match(/^#\/world(?:\/([a-z]+))?/);
+    if (w && window.NectaraWorld) { stopLesson(); state.lesson = null; window.NectaraWorld.open(w[1]); return; }
+    if (window.NectaraWorld) window.NectaraWorld.close();
     var m = location.hash.match(/^#\/lesson\/([a-z0-9-]+)(?:\/(\d+))?/);
     if (m) renderLesson(m[1], m[2] ? parseInt(m[2], 10) : 0); else renderHome();
   }
