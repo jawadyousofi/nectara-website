@@ -8,6 +8,11 @@
   var root = document.getElementById('root');
   var VW = 1600, VH = 900;
   var DAY = 86400000;
+  // Asal with moving parts (wings flap, arm waves, eyes blink); falls back to the plain picture.
+  function asalArt(cls) {
+    return '<div class="asal-art ' + (cls || '') + '"><div class="a-float"><div class="a-pose">' +
+      (window.ASAL_SVG || '<img src="/assets/asal.svg" alt="" width="300" height="400">') + '</div></div></div>';
+  }
 
   var S = {
     active: false, place: null, items: [], focus: -1, mode: 'world', // world | panel | move | bye
@@ -383,7 +388,7 @@
     root.innerHTML = '<div class="w-wrap t-' + night + (h >= 19 ? ' w-evening' : '') + '" id="w-wrap"><div class="w-stage" id="w-stage">' +
       SCENES[view]() +
       '<div class="w-spots" id="w-spots"></div>' +
-      '<img class="w-asal" id="w-asal" src="/assets/asal.svg" alt="" width="300" height="400">' +
+      '<div class="w-asal" id="w-asal">' + asalArt() + '</div>' +
       '<div class="w-top"><button class="w-btn w-nav" id="w-back" type="button"></button>' +
       '<div class="w-jar" id="w-jar" aria-live="polite"></div>' +
       '<button class="w-btn w-nav" id="w-sound" type="button"></button></div>' +
@@ -430,11 +435,29 @@
     back._x = 80; back._y = 50; snd._x = 1520; snd._y = 50;
     S.items.push(back, snd);
   }
+  // Asal flies: wings beat fast, she leans and turns toward where she is going, then turns to face us and waves.
   function asalTo(x, y, quick) {
     var a = document.getElementById('w-asal'); if (!a) return;
     var ax = Math.max(60, Math.min(VW - 220, x + (x > 1200 ? -230 : 90))), ay = Math.max(60, Math.min(VH - 360, y - 260));
-    if (quick) a.style.transition = 'none';
-    a.setAttribute('style', pct(ax, ay) + (quick ? ';transition:none' : ''));
+    if (quick || S.ax === undefined) {
+      clearTimeout(S.flyT); clearTimeout(S.landT);
+      a.className = 'w-asal'; a.setAttribute('style', pct(ax, ay) + ';transition:none');
+      S.ax = ax; S.ay = ay; return;
+    }
+    var dx = ax - S.ax, dy = ay - S.ay, dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 12) return;   // already there, or already on the way
+    clearTimeout(S.flyT); clearTimeout(S.landT);
+    var dur = Math.max(0.7, Math.min(1.8, dist / 650));
+    var dir = Math.abs(dx) < 30 ? (S.dir || 'dir-right') : (dx < 0 ? 'dir-left' : 'dir-right');
+    S.dir = dir; S.ax = ax; S.ay = ay;
+    a.className = 'w-asal flying ' + dir;   // turn and lean first, then take off
+    S.flyT = setTimeout(function () {
+      a.setAttribute('style', pct(ax, ay) + ';transition-duration:' + dur + 's');
+      S.landT = setTimeout(function () {
+        a.className = 'w-asal landing ' + dir;
+        S.landT = setTimeout(function () { a.className = 'w-asal'; }, 1300);
+      }, dur * 1000);
+    }, 220);
   }
 
   // ---------- Map ----------
@@ -536,7 +559,7 @@
     acts.push({ label: 'Try it outside', fn: function () { showMission(s); } });
     if (s.link) acts.push({ label: s.link.label, fn: function () { stopAll(); location.hash = '#/lesson/' + (s.link.story || s.link.lesson); } });
     acts.push({ label: 'Keep exploring', fn: closePanel });
-    showPanel({ name: s.name, text: text, audio: audio, acts: acts, wonder: true });
+    showPanel({ name: s.name, text: text, audio: audio, acts: acts, wonder: true, spotY: s.y });
   }
   function flyNectar(s) {
     var stage = document.getElementById('w-stage'); if (!stage) return;
@@ -546,14 +569,16 @@
     setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); updateJar(); sfx('sparkle'); var j = document.getElementById('w-jar'); if (j) { j.classList.remove('bump'); void j.offsetWidth; j.classList.add('bump'); } }, 1300);
   }
   function showMission(s) {
-    showPanel({ name: 'Try it outside', text: s.mission, audio: 'm-' + s.id, acts: [{ label: 'Back to ' + (S.place ? S.place.name.replace('The ', 'the ') : 'the map'), fn: closePanel }], leaf: true });
+    showPanel({ name: 'Try it outside', text: s.mission, audio: 'm-' + s.id, acts: [{ label: 'Back to ' + (S.place ? S.place.name.replace('The ', 'the ') : 'the map'), fn: closePanel }], leaf: true, spotY: s.y });
   }
 
   // ---------- Panel (what Asal says) ----------
   function showPanel(o) {
     S.mode = 'panel';
     var p = document.getElementById('w-panel'); if (!p) return;
-    p.innerHTML = '<div class="w-panel-in' + (o.leaf ? ' leaf' : '') + '"><img src="/assets/asal.svg" alt="" class="w-panel-asal"><div class="w-panel-words">' +
+    // Keep the words away from what the child is looking at: low things get the box at the top.
+    p.className = 'w-panel' + (o.spotY > 430 ? ' top' : '');
+    p.innerHTML = '<div class="w-panel-in' + (o.leaf ? ' leaf' : '') + '">' + asalArt('w-panel-asal') + '<div class="w-panel-words">' +
       '<h2>' + o.name + '</h2><p>' + o.text.replace(/I wonder,/, '<b>I wonder,</b>') + '</p>' +
       '<div class="w-acts">' + o.acts.map(function (a, i) { return '<button type="button" class="w-act' + (i === 0 ? ' first' : '') + '" data-i="' + i + '">' + a.label + '</button>'; }).join('') + '</div></div></div>';
     p.hidden = false;
@@ -573,7 +598,7 @@
     var o = document.getElementById('w-over'); if (!o) return;
     var p = document.getElementById('w-panel'); if (p) p.hidden = true;
     S.mode = 'move';
-    o.innerHTML = '<div class="w-move"><img src="/assets/asal.svg" alt="" class="w-move-asal"><p>' + s.move.text + '</p><div class="w-count"><i></i></div><button type="button" class="w-act first" id="w-move-done">We did it!</button></div>';
+    o.innerHTML = '<div class="w-move">' + asalArt('w-move-asal excited') + '<p>' + s.move.text + '</p><div class="w-count"><i></i></div><button type="button" class="w-act first" id="w-move-done">We did it!</button></div>';
     o.hidden = false;
     var done = function () { clearTimeout(S.moveTimer); o.hidden = true; o.innerHTML = ''; sfx('chime'); S.mode = 'world'; closePanel(); };
     document.getElementById('w-move-done').addEventListener('click', done);
@@ -599,7 +624,7 @@
     var wrap = document.getElementById('w-wrap'); if (wrap) wrap.classList.add('w-sleepy');
     var p = document.getElementById('w-panel'); if (p) p.hidden = true;
     var o = document.getElementById('w-over'); if (!o) return;
-    o.innerHTML = '<div class="w-move bye"><img src="/assets/asal.svg" alt="" class="w-move-asal sleepy"><p>' + W.bye.text + '</p>' +
+    o.innerHTML = '<div class="w-move bye">' + asalArt('w-move-asal sleepy') + '<p>' + W.bye.text + '</p>' +
       '<button type="button" class="w-act first" id="w-bye-home">Goodbye, Asal!</button>' +
       '<button type="button" class="w-act grown" id="w-bye-more">Grown-ups: hold for 10 more minutes</button></div>';
     o.hidden = false;
