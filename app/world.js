@@ -20,6 +20,31 @@
     sessionStart: 0, limitMin: 20, tick: null, cloudShape: 0, lastSpot: null
   };
 
+  // ---------- 3D Asal (loaded on demand; the drawn Asal stays as a fallback) ----------
+  function load3D() {
+    if (S.a3dTried) return; S.a3dTried = true;
+    if (!(window.WebGLRenderingContext)) return;
+    function add(src, cb) { var sc = document.createElement('script'); sc.src = src; sc.onload = cb; sc.onerror = function () {}; document.head.appendChild(sc); }
+    add('/assets/three.min.js', function () {
+      add('/app/asal3d.js', function () {
+        if (!window.Asal3D || !window.Asal3D.supported()) return;
+        try {
+          S.a3dCanvas = document.createElement('canvas'); S.a3dCanvas.className = 'w-asal3d';
+          S.a3d = new window.Asal3D(S.a3dCanvas);
+          attach3D(true);
+        } catch (e) { S.a3d = null; }
+      });
+    });
+  }
+  function attach3D(fresh) {
+    var stage = document.getElementById('w-stage'); if (!S.a3d || !stage) return;
+    stage.insertBefore(S.a3dCanvas, document.getElementById('w-panel'));
+    document.getElementById('w-wrap').classList.add('has3d');
+    fit();
+    if (S.lastTarget) { var lt = S.lastTarget; S.lastTarget = null; asalTo(lt[0], lt[1], true); }
+    if (S.mode === 'bye') S.a3d.setMood('sleepy');
+  }
+
   // ---------- Storage ----------
   function load() {
     try {
@@ -119,11 +144,12 @@
     if (!S.sound) { setTimeout(end, Math.min(9000, 1200 + text.length * 45)); return; }
     var a = new Audio('/assets/world/audio/' + id + '.mp3');
     S.audio = a;
-    a.onended = end;
+    if (S.a3d) { window.__nxWorldCtx = ctx(); S.a3d.talk(a); }
+    a.onended = function () { if (S.a3d) S.a3d.talk(null); end(); };
     a.onerror = function () { setTimeout(end, 1500 + text.length * 40); };
     var p = a.play(); if (p && p.catch) p.catch(function () { setTimeout(end, 1500 + text.length * 40); });
   }
-  function stopVoice() { if (S.audio) { try { S.audio.pause(); } catch (e) {} S.audio = null; } }
+  function stopVoice() { if (S.audio) { try { S.audio.pause(); } catch (e) {} S.audio = null; } if (S.a3d) S.a3d.talk(null); }
 
   // ---------- Small drawing helpers ----------
   function cloud(x, y, s, cls) {
@@ -371,6 +397,7 @@
     stage.style.width = w + 'px'; stage.style.height = h + 'px';
     stage.style.left = ((vw - w) / 2) + 'px'; stage.style.top = ((vh - h) / 2) + 'px';
     stage.style.fontSize = (w / 100) + 'px';   // 1em = 1% of the stage width
+    if (S.a3d) S.a3d.resize(Math.round(w), Math.round(h));
   }
   function pct(x, y) { return 'left:' + (x / VW * 100) + '%;top:' + (y / VH * 100) + '%'; }
 
@@ -398,6 +425,7 @@
     document.getElementById('w-back').addEventListener('click', goBack);
     document.getElementById('w-sound').addEventListener('click', toggleSound);
     soundLabel(); updateJar();
+    if (S.a3d) attach3D();
   }
   function soundLabel() {
     var b = document.getElementById('w-sound'); if (!b) return;
@@ -437,6 +465,12 @@
   }
   // Asal flies: wings beat fast, she leans and turns toward where she is going, then turns to face us and waves.
   function asalTo(x, y, quick) {
+    if (S.a3d) {
+      var side = x > 1150 ? -1 : 1, tx = Math.max(140, Math.min(1460, x + side * 230)), ty = Math.max(250, Math.min(740, y - 60));
+      if (y > 430 && ty < 520) ty = 520;   // stay clear of the speech box at the top
+      S.a3d.moveTo(tx, ty, quick); return;
+    }
+    S.lastTarget = [x, y];
     var a = document.getElementById('w-asal'); if (!a) return;
     var ax = Math.max(60, Math.min(VW - 220, x + (x > 1200 ? -230 : 90))), ay = Math.max(60, Math.min(VH - 360, y - 260));
     if (quick || S.ax === undefined) {
@@ -620,7 +654,7 @@
     }, 10000);
   }
   function goodbye() {
-    S.mode = 'bye'; stopAmbient();
+    S.mode = 'bye'; stopAmbient(); if (S.a3d) S.a3d.setMood('sleepy');
     var wrap = document.getElementById('w-wrap'); if (wrap) wrap.classList.add('w-sleepy');
     var p = document.getElementById('w-panel'); if (p) p.hidden = true;
     var o = document.getElementById('w-over'); if (!o) return;
@@ -630,7 +664,7 @@
     o.hidden = false;
     document.getElementById('w-bye-home').addEventListener('click', function () { stopAll(); location.hash = '#/'; });
     var more = document.getElementById('w-bye-more'), holdT = null;
-    function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
+    function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; if (S.a3d) S.a3d.setMood('idle'); startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
     function endHold() { more.classList.remove('holding'); clearTimeout(holdT); }
     more.addEventListener('mousedown', startHold); more.addEventListener('touchstart', startHold, { passive: true });
     more.addEventListener('mouseup', endHold); more.addEventListener('mouseleave', endHold); more.addEventListener('touchend', endHold);
@@ -689,6 +723,7 @@
   window.NectaraWorld = {
     open: function (placeId) {
       if (!S.active) { load(); syncFromServer(); S.active = true; startSession(); }
+      load3D();
       stopAll();
       if (placeId) openPlace(placeId); else openMap();
       if (S.mode !== 'bye' && Date.now() - S.sessionStart > S.limitMin * 60000) goodbye();

@@ -47,3 +47,4 @@ An open world children explore freely: the Garden, the Pond, the Hive and the Sk
 - Asal's voice lines: `assets/world/audio/*.mp3`, made with `tools/world_voice.py` (offline Kokoro voice). Rerun it after changing any line (use `--force` to remake existing lines).
 - Works with touch, mouse, keyboard and TV remotes (arrows, OK, Back). Day, dusk and night follow the device clock; the seed bed grows over real days.
 - Sessions end gently after 20 minutes (grown-ups can hold a button for 10 more). Discoveries are saved as `w-<id>` in lesson progress.
+- Asal in 3D: `app/asal3d.js` (built with three.js r128 in `assets/three.min.js`, loaded only when the world opens). If a device can't show 3D, the drawn Asal is used instead.

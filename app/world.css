@@ -246,3 +246,7 @@
 .w-rotate svg { width: 56px; height: 56px; margin: 0 auto 8px; color: #2F4A35; }
 @media (orientation: portrait) and (max-width: 820px) { .w-rotate { display: block; } }
 .t-night .w-rotate { color: #F7E7B4; } .t-night .w-rotate svg { color: #F7E7B4; }
+
+/* 3D Asal */
+.w-asal3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.has3d .w-asal, .has3d .w-panel-asal { display: none; }
