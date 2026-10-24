@@ -154,3 +154,46 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 /* DO IT! movement prompts in story pages */
 .story-line.doit { font-size: 0.82em; font-weight: 600; color: var(--ink-soft); background: #FDF1DD; border-left: 5px solid var(--honey); padding: 8px 14px; border-radius: 12px; }
 .story-line.doit b { color: var(--honey-deep); letter-spacing: 0.04em; }
+
+/* ---------- Living story pictures ---------- */
+.story-frame { position: relative; cursor: pointer; transform-origin: 0% 50%; }
+.story-frame.turn-fwd { animation: pageturn 0.85s cubic-bezier(0.2, 0.7, 0.25, 1); }
+.story-frame.turn-back { animation: pageturnback 0.85s cubic-bezier(0.2, 0.7, 0.25, 1); transform-origin: 100% 50%; }
+@keyframes pageturn { 0% { transform: perspective(1800px) rotateY(-80deg); opacity: 0.15; box-shadow: -30px 10px 40px rgba(42, 33, 24, 0.35); } 60% { opacity: 1; } 100% { transform: perspective(1800px) rotateY(0); } }
+@keyframes pageturnback { 0% { transform: perspective(1800px) rotateY(80deg); opacity: 0.15; } 60% { opacity: 1; } 100% { transform: perspective(1800px) rotateY(0); } }
+.story-fx { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; pointer-events: none; }
+.fx { position: absolute; display: block; animation-iteration-count: infinite; animation-timing-function: linear; }
+.fx svg { display: block; width: 100%; height: 100%; }
+.fx-rain { width: 0.7%; height: 3.4%; background: rgba(127, 179, 213, 0.75); border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%; animation-name: fxfall; }
+@keyframes fxfall { from { top: -8%; } to { top: 108%; } }
+.fx-leaves { width: 3.4%; height: 5.4%; animation-name: fxleaf; animation-timing-function: ease-in-out; }
+@keyframes fxleaf { 0% { top: -10%; transform: translateX(0) rotate(0); } 25% { transform: translateX(26px) rotate(80deg); } 50% { transform: translateX(-18px) rotate(160deg); } 75% { transform: translateX(22px) rotate(260deg); } 100% { top: 110%; transform: translateX(0) rotate(360deg); } }
+.fx-seeds { width: 1.2%; height: 1.9%; border-radius: 50%; background: radial-gradient(circle, #FFFFFF 30%, rgba(255, 255, 255, 0) 70%); animation-name: fxrise; animation-timing-function: ease-in-out; }
+.fx-bubbles { width: 2.2%; height: 3.5%; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.85); background: rgba(220, 235, 245, 0.25); animation-name: fxrise; animation-timing-function: ease-in-out; }
+@keyframes fxrise { 0% { top: 108%; transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 50% { transform: translateX(24px); } 85% { opacity: 1; } 100% { top: -8%; transform: translateX(-10px); opacity: 0; } }
+.fx-glow { width: 3.6%; height: 5.8%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 243, 176, 0.95) 0%, rgba(255, 243, 176, 0) 70%); animation-name: fxrise; animation-timing-function: ease-in-out; }
+.fx-stars, .fx-sparkles, .fx-fireflies { width: 1.4%; height: 2.2%; animation-name: fxtwinkle; animation-timing-function: ease-in-out; }
+.fx-stars { background: #FFF3B0; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+.fx-sparkles { width: 1.8%; height: 2.9%; background: #FFFFFF; clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.fx-fireflies { width: 0.9%; height: 1.4%; border-radius: 50%; background: #F7E7B4; box-shadow: 0 0 12px 5px rgba(247, 231, 180, 0.8); animation-name: fxfirefly; animation-timing-function: ease-in-out; }
+@keyframes fxtwinkle { 0%, 100% { opacity: 0; transform: scale(0.4) rotate(0); } 50% { opacity: 1; transform: scale(1.1) rotate(45deg); } }
+@keyframes fxfirefly { 0%, 100% { opacity: 0.1; transform: translate(0, 0); } 30% { opacity: 1; transform: translate(18px, -12px); } 60% { opacity: 0.6; transform: translate(-10px, -24px); } }
+.fx-bees { width: 4.5%; height: 5.4%; animation-name: fxbee; animation-timing-function: ease-in-out; }
+.fx-bees .fx-wing { transform-origin: 50% 100%; animation: fxflap 0.1s linear infinite alternate; transform-box: fill-box; }
+@keyframes fxflap { from { transform: scaleY(1); } to { transform: scaleY(0.5); } }
+@keyframes fxbee { 0% { left: -8%; transform: translateY(0); } 25% { transform: translateY(-30px); } 50% { transform: translateY(16px); } 75% { transform: translateY(-20px); } 100% { left: 106%; transform: translateY(0); } }
+.fx-ring { position: absolute; top: 0; left: 0; right: 0; bottom: 0; animation: fxspin 40s linear infinite; }
+@keyframes fxspin { to { transform: rotate(360deg); } }
+.fx-orbit { width: 1.6%; height: 2.6%; margin: -0.8% 0 0 -0.8%; border-radius: 50%; opacity: 0.85; animation-name: fxpulse; animation-duration: 2.4s; animation-timing-function: ease-in-out; }
+@keyframes fxpulse { 0%, 100% { transform: scale(0.7); } 50% { transform: scale(1.25); } }
+/* Tap the picture: a sparkle burst */
+.fx-burst { position: absolute; width: 0; height: 0; pointer-events: none; }
+.fx-burst i { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+.fx-burst b { position: absolute; left: -7px; top: -7px; width: 14px; height: 14px; background: #F2C14E; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); animation: fxburst 1s ease-out forwards; }
+.fx-burst i:nth-child(even) b { background: #FFFFFF; }
+@keyframes fxburst { 0% { transform: translateX(0) scale(0.4); opacity: 1; } 100% { transform: translateX(70px) scale(1.2) rotate(120deg); opacity: 0; } }
+/* Words light up as they are read */
+.story-line { transition: color 0.3s, transform 0.3s, background-color 0.3s; }
+.story-line.reading { color: #A86514; background-color: rgba(247, 231, 180, 0.75); border-radius: 12px; box-shadow: 0 0 0 6px rgba(247, 231, 180, 0.75); }
+.story-line.say.reading { background: #F2C14E; color: #2A2118; }
+@media (prefers-reduced-motion: reduce) { .fx, .fx-ring, .story-frame { animation: none !important; } .story-fx { display: none; } }

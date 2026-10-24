@@ -44,6 +44,8 @@
     if (!voice) { voice = new Audio(); voice.preload = 'auto'; }
     voice.onended = function () { var n = document.getElementById('next'); if (n) n.classList.add('nudge'); };
     voice.src = '/assets/stories/' + st.id + '/audio/' + (i < 9 ? '0' : '') + (i + 1) + '.mp3';
+    voice.ontimeupdate = null;
+    followReading([].slice.call(document.querySelectorAll('.story-line')));
     var pr = voice.play();
     if (pr && pr.then) pr.then(function () { voiceBlocked = false; aloudButton(); }, function () { voiceBlocked = true; aloudButton(); }); // the browser wants a tap first; keep the saved choice
   }
@@ -127,10 +129,55 @@
   }
 
   // ---------- Lesson slides ----------
+  // ---------- Living story pictures ----------
+  // Each story gets its own gentle motion over the illustration (rain, leaves, bees, fireflies…).
+  var FX = {
+    'little-drop': 'rain', 'little-seed': 'seeds', 'little-leaf': 'leaves', 'day-and-night': 'stars', 'i-am-grand': 'sparkles',
+    'little-light': 'glow', 'little-breath': 'bubbles', 'one-little-bee': 'bees', 'one-circle': 'orbit', 'still-water': 'fireflies'
+  };
+  var LEAF = '<svg viewBox="0 0 20 20"><path d="M2 18 C2 8 8 2 18 2 C18 12 12 18 2 18Z" fill="#E9A23B"/><path d="M2 18 L14 6" stroke="#C9822A" stroke-width="1.5"/></svg>';
+  var MINIBEE = '<svg viewBox="0 0 40 30"><ellipse cx="16" cy="8" rx="7" ry="9" fill="#fff" opacity=".85" class="fx-wing"/><ellipse cx="24" cy="8" rx="7" ry="9" fill="#fff" opacity=".85" class="fx-wing"/><ellipse cx="20" cy="18" rx="13" ry="9" fill="#F2C14E" stroke="#2A2118" stroke-width="2"/><path d="M16 10 V26 M23 10 V26" stroke="#2A2118" stroke-width="4"/><circle cx="31" cy="16" r="2" fill="#2A2118"/></svg>';
+  function rnd(seed) { var x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); }
+  function storyFx(id, page) {
+    var kind = FX[id]; if (!kind) return '';
+    var n = { rain: 18, seeds: 10, leaves: 8, stars: 14, sparkles: 12, glow: 9, bubbles: 10, bees: 3, orbit: 12, fireflies: 14 }[kind];
+    var out = '';
+    for (var k = 0; k < n; k++) {
+      var r1 = rnd(k + page * 31), r2 = rnd(k * 7 + page * 13 + 1), r3 = rnd(k * 3 + page * 5 + 2);
+      var style = 'left:' + (r1 * 96).toFixed(1) + '%;top:' + (r2 * 90).toFixed(1) + '%;animation-delay:-' + (r3 * 8).toFixed(2) + 's;animation-duration:' + (4 + r2 * 5).toFixed(2) + 's';
+      if (kind === 'orbit') { var ang = k / n * Math.PI * 2; style = 'left:' + (50 + 30 * Math.cos(ang)).toFixed(1) + '%;top:' + (50 + 30 * Math.sin(ang)).toFixed(1) + '%;animation-delay:-' + (k * 0.3).toFixed(1) + 's;background:' + ['#E2725B', '#F2C14E', '#7BC25A', '#7FB3D5', '#9C7FC9', '#F4A6C0'][k % 6]; }
+      out += '<i class="fx fx-' + kind + '" style="' + style + '">' + (kind === 'leaves' ? LEAF : kind === 'bees' ? MINIBEE : '') + '</i>';
+    }
+    return '<div class="story-fx fx-set-' + kind + '" aria-hidden="true">' + (kind === 'orbit' ? '<div class="fx-ring">' + out + '</div>' : out) + '</div>';
+  }
+  function sparkleAt(frame, e) {
+    var r = frame.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+    var b = document.createElement('div'); b.className = 'fx-burst'; b.style.left = x + '%'; b.style.top = y + '%';
+    for (var k = 0; k < 10; k++) b.innerHTML += '<i style="transform:rotate(' + (k * 36) + 'deg)"><b></b></i>';
+    frame.appendChild(b); setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 1200);
+    try {
+      var c = window.__nxCtx || (window.__nxCtx = new (window.AudioContext || window.webkitAudioContext)());
+      [1319, 1760, 2093].forEach(function (f, i) { var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + i * 0.06; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.05, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.4); });
+    } catch (err) {}
+  }
+  // Light up each line as it is read aloud (timed by line length across the recording).
+  function followReading(lines) {
+    if (!voice || !lines.length) return;
+    var weights = lines.map(function (p) { return Math.max(8, p.textContent.length); }), total = weights.reduce(function (a, b) { return a + b; }, 0);
+    function tick() {
+      if (!voice.duration || isNaN(voice.duration)) return;
+      var at = voice.currentTime / voice.duration * total, sum = 0, cur = -1;
+      for (var k = 0; k < weights.length; k++) { sum += weights[k]; if (at < sum) { cur = k; break; } }
+      lines.forEach(function (p, k) { p.classList.toggle('reading', k === cur); p.classList.toggle('read', k < cur); });
+    }
+    voice.ontimeupdate = tick;
+    voice.addEventListener('ended', function () { lines.forEach(function (p) { p.classList.remove('reading'); p.classList.add('read'); }); }, { once: true });
+  }
+
   function buildStorySlides(st) {
     var n = st.pages.length;
     return st.pages.map(function (lines, i) {
-      var img = '<div class="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="1440" height="900"></div>';
+      var img = '<div class="story-frame" id="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="1440" height="900">' + storyFx(st.id, i) + '</div>';
       var words = i === 0
         ? '<span class="phase watch">Story time</span><h1 class="big">' + esc(lines[0]) + '</h1><p class="mid">' + esc(lines[1] || '') + '</p><p class="soft">' + (st.id === 'i-am-grand' ? 'The Grand series picture book by Jawad Yousofi.' : 'A children&rsquo;s story from the Grand series book <i>' + esc(st.from) + '</i>.') + '</p>'
         : '<div class="story-text">' + lines.map(function (t, k) {
@@ -168,7 +215,8 @@
     if (!state.lesson || state.lesson.l.id !== id) {
       state.lesson = found; state.slides = found.story ? buildStorySlides(found.l) : buildSlides(found.s, found.l); requestWake();
     }
-    state.i = Math.max(0, Math.min(state.slides.length - 1, index || 0));
+    var lastI = state.lastI; state.i = Math.max(0, Math.min(state.slides.length - 1, index || 0)); state.lastI = state.i;
+    var turn = found.story && lastI !== undefined && lastI !== state.i ? (state.i > lastI ? ' turn-fwd' : ' turn-back') : '';
     var sl = state.slides[state.i], l = found.l, n = state.slides.length;
     document.title = l.title + ' · Nectara';
     clearTimer();
@@ -185,6 +233,8 @@
       '<span class="soft" style="font-size:0.95rem">' + (state.i + 1) + ' of ' + n + '</span>' +
       '<button class="btn" type="button" id="next">' + (sl.next || 'Next') + ' &rarr;</button></div></div>';
 
+    var sf = document.getElementById('story-frame');
+    if (sf) { if (turn) sf.className += turn; sf.addEventListener('click', function (e) { sparkleAt(sf, e); }); }
     document.getElementById('exit').addEventListener('click', function () { location.hash = '#/'; });
     document.getElementById('back').addEventListener('click', prev);
     document.getElementById('next').addEventListener('click', next);
@@ -218,6 +268,7 @@
     if ('wakeLock' in navigator && !state.wake) navigator.wakeLock.request('screen').then(function (w) { state.wake = w; w.addEventListener('release', function () { state.wake = null; }); }).catch(function () {});
   }
   function stopLesson() {
+    state.lastI = undefined;
     clearTimer(); stopVoice(); state.lesson = null;
     if (state.wake) { state.wake.release().catch(function () {}); state.wake = null; }
     if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
