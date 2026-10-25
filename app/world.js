@@ -588,9 +588,17 @@
       btn.classList.add('found');
       setTimeout(function () { flyNectar(s); }, 400);
     }
-    var acts = [{ label: 'Explore', icon: 'explore', fn: closePanel },
-      { label: 'Go back', icon: 'back', cls: 'sky', fn: function () { closePanel(); goBack(); } }];
-    showPanel({ name: s.name, text: text, audio: audio, acts: acts, wonder: true, spotY: s.y });
+    showPanel({ name: s.name, text: text, audio: audio, acts: spotActs(s, {}), wonder: true, spotY: s.y });
+  }
+  // The buttons that pop up when Asal is done: try it for real (move, outside), then keep exploring or go back.
+  // Activities already done in this visit drop away, so the row only ever offers something new.
+  function spotActs(s, used) {
+    var acts = [];
+    if (s.move && !used.move) acts.push({ label: 'Move with me', icon: 'move', cls: 'rose', fn: function () { startMove(s, used); } });
+    if (s.mission && !used.outside) acts.push({ label: 'Try it outside', icon: 'outside', cls: 'leaf', fn: function () { used.outside = true; showMission(s, used); } });
+    acts.push({ label: 'Explore', icon: 'explore', fn: closePanel });
+    acts.push({ label: 'Go back', icon: 'back', cls: 'sky', fn: function () { closePanel(); goBack(); } });
+    return acts;
   }
   function flyNectar(s) {
     var stage = document.getElementById('w-stage'); if (!stage) return;
@@ -599,13 +607,15 @@
     setTimeout(function () { d.setAttribute('style', 'left:76%;top:5%;transform:scale(0.4);opacity:0.2'); }, 30);
     setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); updateJar(); sfx('sparkle'); var j = document.getElementById('w-jar'); if (j) { j.classList.remove('bump'); void j.offsetWidth; j.classList.add('bump'); } }, 1300);
   }
-  function showMission(s) {
-    showPanel({ name: 'Try it outside', text: s.mission, audio: 'm-' + s.id, acts: [{ label: 'Back to ' + (S.place ? S.place.name.replace('The ', 'the ') : 'the map'), fn: closePanel }], leaf: true, spotY: s.y });
+  function showMission(s, used) {
+    showPanel({ name: 'Try it outside', text: s.mission, audio: 'm-' + s.id, acts: spotActs(s, used || { outside: true }), leaf: true, spotY: s.y });
   }
 
   // ---------- Panel (what Asal says) ----------
   var ICONS = {
     explore: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 L27 9.5 L27 22.5 L16 29 L5 22.5 L5 9.5 Z" fill="#FFF3B0" stroke="#2A2118" stroke-width="2.2"/><circle cx="14.5" cy="14.5" r="5" fill="none" stroke="#2A2118" stroke-width="2.6"/><path d="M18 18 L22.5 22.5" stroke="#2A2118" stroke-width="3" stroke-linecap="round"/></svg>',
+    move: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFE1EA" stroke="#8A2E4E" stroke-width="2.2"/><circle cx="16" cy="9" r="2.6" fill="#8A2E4E"/><path d="M16 12 L16 19 M9.5 12.5 L16 14.5 L22.5 11 M16 19 L11.5 25 M16 19 L21 24.5" fill="none" stroke="#8A2E4E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    outside: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#E4F5DD" stroke="#2F5E36" stroke-width="2.2"/><circle cx="21.5" cy="10.5" r="3" fill="#F2B23A"/><path d="M10 24 C10 17 13 13 17 12 C16.5 17 14 21 10 24 Z" fill="#5FA36A" stroke="#2F5E36" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 24 L14.5 17.5" stroke="#2F5E36" stroke-width="1.6" stroke-linecap="round"/></svg>',
     back: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFFFFF" stroke="#1F4E73" stroke-width="2.2"/><path d="M18.5 9.5 L11.5 16 L18.5 22.5" fill="none" stroke="#1F4E73" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
   // Asal's words appear one by one as he says them, fade when he is done, then the buttons pop in.
@@ -617,7 +627,7 @@
     var words = o.text.split(/\s+/);
     p.innerHTML = '<div class="w-cap-text" id="w-cap-text" tabindex="-1" role="status">' +
       words.map(function (w) { return '<span' + (/^wonder,?$/i.test(w) || w === 'I' && false ? ' class="wonder"' : '') + '>' + w + '</span>'; }).join(' ') + '</div>' +
-      '<div class="w-acts" id="w-acts" hidden>' + o.acts.map(function (a, i) {
+      '<div class="w-acts' + (o.acts.length > 2 ? ' many' : '') + '" id="w-acts" hidden>' + o.acts.map(function (a, i) {
         return '<button type="button" class="w-act fun ' + (a.cls || 'honey') + '" data-i="' + i + '" style="animation-delay:' + (i * 0.12) + 's"><span class="w-act-ico">' + (ICONS[a.icon] || '') + '</span><span>' + a.label + '</span></button>';
       }).join('') + '</div>';
     p.hidden = false;
@@ -661,13 +671,18 @@
   }
 
   // ---------- Move with me ----------
-  function startMove(s) {
+  function startMove(s, used) {
+    used = used || {}; used.move = true;
     var o = document.getElementById('w-over'); if (!o) return;
     var p = document.getElementById('w-panel'); if (p) p.hidden = true;
     S.mode = 'move';
     o.innerHTML = '<div class="w-move">' + asalArt('w-move-asal excited') + '<p>' + s.move.text + '</p><div class="w-count"><i></i></div><button type="button" class="w-act first" id="w-move-done">We did it!</button></div>';
     o.hidden = false;
-    var done = function () { clearTimeout(S.moveTimer); o.hidden = true; o.innerHTML = ''; sfx('chime'); S.mode = 'world'; closePanel(); };
+    var done = function () {
+      clearTimeout(S.moveTimer); stopVoice(); o.hidden = true; o.innerHTML = ''; sfx('chime'); S.mode = 'world';
+      // After moving, Asal cheers and the next choices pop up.
+      showPanel({ name: s.name, text: 'Wonderful moving! What shall we do next?', acts: spotActs(s, used), spotY: s.y });
+    };
     document.getElementById('w-move-done').addEventListener('click', done);
     document.getElementById('w-move-done').focus();
     speak(s.move.id, s.move.text);
