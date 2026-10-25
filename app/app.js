@@ -3,6 +3,18 @@
 (function () {
   'use strict';
   var DATA = window.NECTARA;
+  // The Seven Petals each lesson and story grows (Nectara Whole-Child Framework), shown for grown-ups.
+  var GROW_PETALS = { body: ['Body', '#E07A5F'], heart: ['Heart', '#E76F9A'], mind: ['Mind', '#5B8DEF'], voice: ['Voice', '#F2B23A'], earth: ['Earth', '#5FA36A'], world: ['World', '#3E9CA8'], spirit: ['Spirit', '#9B7FD4'] };
+  var GROWS = {
+    'little-drop': ['earth', 'mind', 'spirit'], 'little-seed': ['earth', 'spirit', 'body'], 'little-leaf': ['earth', 'body', 'world'],
+    'day-and-night': ['mind', 'spirit'], 'i-am-grand': ['spirit', 'body', 'heart'], 'little-light': ['heart', 'voice'],
+    'little-breath': ['body', 'spirit'], 'one-little-bee': ['earth', 'world'], 'one-circle': ['world', 'heart'], 'still-water': ['spirit', 'heart'],
+    'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world']
+  };
+  function petalTags(id) {
+    var g = GROWS[id]; if (!g) return '';
+    return '<span class="grows">' + g.map(function (p) { return '<i style="--pc:' + GROW_PETALS[p][1] + '">' + GROW_PETALS[p][0] + '</i>'; }).join('') + '</span>';
+  }
   var root = document.getElementById('root');
   var dialog = document.getElementById('grownups');
   var state = { user: null, done: {}, lesson: null, slides: [], i: 0, timer: null, wake: null };
@@ -92,7 +104,7 @@
       '<div class="who"><span>' + (first ? 'Hi, ' + esc(first) : '') + '</span><button class="btn ghost" id="signout" type="button" style="min-height:44px;padding:0 16px">Sign out</button></div></header>' +
       (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
         '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +
-        (window.NectaraWorld.foundCount() ? window.NectaraWorld.foundCount() + ' drops of nectar gathered so far.' : '') + '</p><span class="btn">Explore</span></span></button>' : '') +
+        (function () { var m = window.NectaraWorld.memories ? window.NectaraWorld.memories() : []; return m.length ? 'Your memory jar remembers the ' + m.join(', the ').replace(/, the ([^,]*)$/, ' and the $1') + '.' : ''; })() + '</p><span class="btn">Explore</span></span></button>' : '') +
       '<section class="garden-card"><div><h1>' + (child ? esc(child) + '&rsquo;s garden' : 'Asal&rsquo;s garden') + '</h1>' +
       '<p>Every lesson you finish grows a flower. ' + (grown === series.lessons.length ? 'The whole garden is blooming! Lessons can be done again any time.' : grown + ' of ' + series.lessons.length + ' flowers grown this month.') + '</p>' +
       '<button class="btn" type="button" data-open="' + next.id + '">' + (grown ? 'Next: ' : 'Start: ') + esc(next.title) + '</button></div>' +
@@ -102,6 +114,7 @@
           (state.done[st.id] ? '<span class="done-badge">' + ICON.check + 'Read</span>' : '') +
           '<img src="/assets/stories/' + st.id + '/01.webp" alt="" width="1440" height="900" loading="lazy">' +
           '<span class="body"><span class="wk">' + esc(st.month) + ' story &middot; ' + st.pages.length + ' pages</span><h3>' + esc(st.title) + '</h3><span class="soft" style="font-size:0.95rem">' + esc(st.blurb) + '</span>' +
+          petalTags(st.id) +
           '<span class="go">' + (state.done[st.id] ? 'Read it again &rarr;' : 'Read the story &rarr;') + '</span></span></button>';
       }).join('') + '</div>' : '') +
       '<div class="section-title"><h2>' + esc(series.title) + '</h2><span>' + esc(series.month) + ' &middot; ' + esc(series.idea) + '</span></div>' +
@@ -110,6 +123,7 @@
           (state.done[l.id] ? '<span class="done-badge">' + ICON.check + 'Done</span>' : '') +
           '<img src="/assets/lessons/' + l.img + '.webp" alt="" width="1200" height="750" loading="lazy">' +
           '<span class="body"><span class="wk">Week ' + l.week + ' &middot; 30 min</span><h3>' + esc(l.title) + '</h3><span class="soft" style="font-size:0.95rem">' + esc(l.bigIdea) + '</span>' +
+          petalTags(l.id) +
           '<span class="go">' + (state.done[l.id] ? 'Do it again &rarr;' : 'Start lesson &rarr;') + '</span></span></button>';
       }).join('') + '</div>' +
       '<div class="section-title"><h2>Coming next</h2><span>A new series each month</span></div>' +

@@ -21,7 +21,7 @@ def page(fname, title, desc, body, artifact=False):
     head = f'''<title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="claude:viewport-fit-sides" content="cover">
-{"<meta name=\"robots\" content=\"noindex\">" if fname in NOINDEX else ""}
+{"<meta name=\"robots\" content=\"noindex, nofollow, noarchive\">" if (PRIVATE or fname in NOINDEX) else ""}
 <link rel="canonical" href="{SITE}/{'' if fname == 'index.html' else fname}">
 <meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:image" content="{SITE}/assets/asal.png"><meta property="og:type" content="website">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
@@ -49,6 +49,8 @@ def page(fname, title, desc, body, artifact=False):
 
 PAGES = {}
 NOINDEX = {'admin.html', 'login.html', 'reset.html', 'tv.html', 'link.html'}
+# Private until Nectara's name and work are legally protected: no search engines, no sitemap. Set False to launch publicly.
+PRIVATE = True
 EXTRA_JS = {'login.html': ['portal.js', 'qrcode.js', 'tv.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js'], 'tv.html': ['qrcode.js', 'tv.js'], 'link.html': ['link.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
@@ -466,7 +468,13 @@ if __name__ == '__main__':
     os.makedirs('preview', exist_ok=True)
     for f, (t, d, b) in PAGES.items():  # artifact preview copies: index without skeleton, others full pages
         open('preview/' + f, 'w').write(page(f, t, d, b, artifact=(f == 'index.html')))
-    pages = [f for f in PAGES if f != '404.html' and f not in NOINDEX]
-    open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{SITE}/{"" if p == "index.html" else p}</loc></url>\n' for p in pages) + '</urlset>\n')
-    open('robots.txt', 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
+    if PRIVATE:
+        open('robots.txt', 'w').write('User-agent: *\nDisallow: /\n')
+        open('_headers', 'w').write('/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n')
+        if os.path.exists('sitemap.xml'): os.remove('sitemap.xml')
+    else:
+        if os.path.exists('_headers'): os.remove('_headers')
+        pages = [f for f in PAGES if f != '404.html' and f not in NOINDEX]
+        open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'  <url><loc>{SITE}/{"" if p == "index.html" else p}</loc></url>\n' for p in pages) + '</urlset>\n')
+        open('robots.txt', 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
     print('built', len(PAGES), 'pages')

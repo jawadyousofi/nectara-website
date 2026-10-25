@@ -197,3 +197,9 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .story-line.reading { color: #A86514; background-color: rgba(247, 231, 180, 0.75); border-radius: 12px; box-shadow: 0 0 0 6px rgba(247, 231, 180, 0.75); }
 .story-line.say.reading { background: #F2C14E; color: #2A2118; }
 @media (prefers-reduced-motion: reduce) { .fx, .fx-ring, .story-frame { animation: none !important; } .story-fx { display: none; } }
+
+/* Petal tags: which of the Seven Petals a lesson or story grows */
+.grows { display: flex; flex-wrap: wrap; margin-top: 0.55rem; }
+.grows i { margin: 0 0.3rem 0.3rem 0; }
+.grows i { font-style: normal; font-size: 0.78rem; font-weight: 700; padding: 0.12rem 0.55rem 0.12rem 0.45rem; border-radius: 1rem; background: #FBF6EA; color: #3B3127; display: inline-flex; align-items: center; }
+.grows i::before { content: ''; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--pc); margin-right: 0.3rem; }

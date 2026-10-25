@@ -417,13 +417,14 @@
       '<div class="w-spots" id="w-spots"></div>' +
       '<div class="w-asal" id="w-asal">' + asalArt() + '</div>' +
       '<div class="w-top"><button class="w-btn w-nav" id="w-back" type="button"></button>' +
-      '<div class="w-jar" id="w-jar" aria-live="polite"></div>' +
+      '<button type="button" class="w-jar" id="w-jar" aria-label="Memory jar"></button>' +
       '<button class="w-btn w-nav" id="w-sound" type="button"></button></div>' +
       '<div class="w-panel" id="w-panel" hidden></div><div class="w-over" id="w-over" hidden></div>' +
       '</div><div class="w-rotate"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="6" width="20" height="36" rx="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 30 a18 18 0 0 0 10 12 M40 18 a18 18 0 0 0 -10 -12" stroke="#E9A23B" stroke-width="3" fill="none" stroke-linecap="round"/></svg>Turn your screen sideways to fly bigger!</div></div>';
     fit();
     document.getElementById('w-back').addEventListener('click', goBack);
     document.getElementById('w-sound').addEventListener('click', toggleSound);
+    document.getElementById('w-jar').addEventListener('click', function () { if (S.mode === 'world') openJar(); });
     soundLabel(); updateJar();
     if (S.a3d) attach3D();
   }
@@ -436,12 +437,55 @@
     S.sound = !S.sound; save(); soundLabel();
     if (!S.sound) { stopVoice(); stopAmbient(); } else startAmbient(S.place ? S.place.id : 'map');
   }
+  // The memory jar holds one little drop for every discovery, in the color of the place it came from. No number, no score.
+  function spotPlace(id) { var r = null; W.places.forEach(function (p) { p.spots.forEach(function (x) { if (x.id === id) r = p; }); }); return r; }
+  function spotDef(id) { var r = null; W.places.forEach(function (p) { p.spots.forEach(function (x) { if (x.id === id) r = x; }); }); return r; }
+  function foundIds() { return Object.keys(S.found).filter(spotDef).sort(function (a, b) { return S.found[a] < S.found[b] ? -1 : 1; }); }
   function updateJar() {
     var j = document.getElementById('w-jar'); if (!j) return;
-    var n = foundCount(), total = allSpots(), fill = Math.min(1, n / total);
-    j.innerHTML = '<svg viewBox="0 0 40 50" aria-hidden="true"><path d="M8 10 h24 v4 q6 4 6 12 v14 q0 8 -8 8 h-20 q-8 0 -8 -8 v-14 q0 -8 6 -12z" fill="#FFF6E0" stroke="#C9822A" stroke-width="2.5"/>' +
-      '<rect x="4" y="' + (48 - 34 * fill) + '" width="32" height="' + (34 * fill) + '" fill="#E9A23B" rx="6"/><rect x="7" y="5" width="26" height="6" rx="2" fill="#C9822A"/></svg>' +
-      '<span><b>' + n + '</b> ' + (n === 1 ? 'drop' : 'drops') + ' of nectar</span>';
+    var ids = foundIds(), drops = '';
+    ids.slice(0, 25).forEach(function (id, i) {
+      var c = i % 5, r = Math.floor(i / 5), pl = spotPlace(id);
+      drops += '<circle cx="' + (11 + c * 4.5) + '" cy="' + (43 - r * 5.6) + '" r="2.3" fill="' + (pl ? pl.color : '#E9A23B') + '"/>';
+    });
+    j.innerHTML = '<svg viewBox="0 0 40 50" aria-hidden="true"><path d="M8 10 h24 v4 q6 4 6 12 v14 q0 8 -8 8 h-20 q-8 0 -8 -8 v-14 q0 -8 6 -12z" fill="#FFFDF5" stroke="#C9822A" stroke-width="2.5"/>' +
+      drops + '<rect x="7" y="5" width="26" height="6" rx="2" fill="#C9822A"/><path d="M12 19 q-2 6 0 14" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/></svg>' +
+      '<span>Memory jar</span>';
+  }
+  function petalsGrown() {
+    var g = {}; foundIds().forEach(function (id) { (W.spotPetals[id] || []).forEach(function (p) { g[p] = true; }); }); return g;
+  }
+  function flowerArt(grown) {
+    var out = '<svg class="r-flower" viewBox="-100 -100 200 200" aria-hidden="true">';
+    W.petals.forEach(function (p, i) {
+      var a = i * 360 / W.petals.length, on = grown[p.id];
+      out += '<g transform="rotate(' + a + ')"><ellipse cx="0" cy="-52" rx="24" ry="40" fill="' + (on ? p.color : '#FFFFFF') + '" fill-opacity="' + (on ? 0.95 : 0.25) + '" stroke="' + (on ? '#FFFFFF' : 'rgba(255,255,255,0.7)') + '" stroke-width="3"' + (on ? '' : ' stroke-dasharray="6 6"') + '/></g>';
+    });
+    return out + '<circle r="26" fill="#F2C14E" stroke="#FFFFFF" stroke-width="4"/><circle r="10" fill="#E9A23B"/></svg>';
+  }
+  function openJar() {
+    var o = document.getElementById('w-over'); if (!o) return;
+    S.mode = 'jar';
+    var ids = foundIds(), grown = petalsGrown(), byPlace = '';
+    W.places.forEach(function (pl) {
+      var mine = ids.filter(function (id) { return spotPlace(id) === pl; });
+      if (!mine.length) return;
+      byPlace += mine.map(function (id) {
+        return '<button type="button" class="w-act chip" data-place="' + pl.id + '"><i style="background:' + pl.color + '"></i>' + spotDef(id).name + '</button>';
+      }).join('');
+    });
+    var legend = W.petals.map(function (p) { return '<span class="j-pet' + (grown[p.id] ? ' on' : '') + '"><i style="background:' + p.color + '"></i>' + p.name + '</span>'; }).join('');
+    o.innerHTML = '<div class="w-jarview"><h2>Our memory jar</h2><div class="j-row">' + flowerArt(grown) +
+      '<div class="j-side"><div class="j-legend">' + legend + '</div>' +
+      (ids.length ? '<div class="j-chips">' + byPlace + '</div>' : '<p class="j-empty">Our jar is waiting for its first memory. Tap something in Asal’s World to discover it!</p>') +
+      '</div></div><button type="button" class="w-act fun honey" id="w-jar-close"><span class="w-act-ico">' + ICONS.explore + '</span><span>Keep exploring</span></button></div>';
+    o.hidden = false;
+    function shut() { stopVoice(); o.hidden = true; o.innerHTML = ''; S.mode = 'world'; focusItem(S.focus >= 0 ? S.focus : 0); }
+    S.jarClose = shut;
+    [].forEach.call(o.querySelectorAll('.chip'), function (b) { b.addEventListener('click', function () { shut(); location.hash = '#/world/' + b.getAttribute('data-place'); }); });
+    document.getElementById('w-jar-close').addEventListener('click', shut);
+    document.getElementById('w-jar-close').focus();
+    speak(W.jar.id, W.jar.text);
   }
 
   function addSpot(def, opts) {
@@ -459,9 +503,10 @@
   }
   function collectItems() {
     S.items = [].slice.call(document.querySelectorAll('#w-spots .w-spot'));
-    var back = document.getElementById('w-back'), snd = document.getElementById('w-sound');
-    back._x = 80; back._y = 50; snd._x = 1520; snd._y = 50;
-    S.items.push(back, snd);
+    var back = document.getElementById('w-back'), snd = document.getElementById('w-sound'), jar = document.getElementById('w-jar');
+    back._x = 80; back._y = 50; snd._x = 1520; snd._y = 50; jar._x = 1330; jar._y = 50;
+    S.items.push(back, jar, snd);
+    jar.onfocus = function () { S.focus = S.items.indexOf(jar); };
   }
   // Asal flies: wings beat fast, she leans and turns toward where she is going, then turns to face us and waves.
   function asalTo(x, y, quick) {
@@ -500,18 +545,17 @@
     shell('map');
     document.getElementById('w-back').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span>';
     W.places.forEach(function (p) {
-      var have = placeSpots(p).filter(function (s) { return S.found[s.id]; }).length, total = placeSpots(p).length;
       addSpot({ id: 'place-' + p.id, name: p.name, x: p.x, y: p.y }, {
         cls: 'w-place', onPick: function () { sfx('whoosh'); location.hash = '#/world/' + p.id; },
         onFocus: function () { asalTo(p.x, p.y); sfx('step'); }
-      }).querySelector('.w-label').innerHTML = p.name + '<small>' + have + ' of ' + total + ' found</small>';
+      });
     });
     collectItems();
     asalTo(800, 470, true);
     startAmbient('map');
     var greeted = false; try { greeted = sessionStorage.getItem('nx_world_hi') === '1'; sessionStorage.setItem('nx_world_hi', '1'); } catch (e) {}
-    if (!greeted) showPanel({ name: 'Asal', text: W.intro.text, audio: W.intro.id, acts: [{ label: 'Let’s go!', icon: 'explore', fn: closePanel }] });
-    else focusItem(0);
+    if (!greeted) showPanel({ name: 'Asal', text: W.intro.text, audio: W.intro.id, acts: [{ label: 'Let’s go!', icon: 'explore', fn: function () { closePanel(); maybeOpen(); } }] });
+    else if (!maybeOpen()) focusItem(0);
   }
 
   // ---------- A place ----------
@@ -530,8 +574,11 @@
     startAmbient(p.id);
     var key = 'nx_world_seen_' + p.id, seen = false;
     try { seen = sessionStorage.getItem(key) === '1'; sessionStorage.setItem(key, '1'); } catch (e) {}
-    if (!seen) showPanel({ name: p.name, text: p.intro.text, audio: p.intro.id, acts: [{ label: 'Let’s look!', icon: 'explore', fn: closePanel }] });
-    else focusItem(0);
+    var afterOpen = function () {
+      if (!seen) showPanel({ name: p.name, text: p.intro.text, audio: p.intro.id, acts: [{ label: 'Let’s look!', icon: 'explore', fn: closePanel }] });
+      else focusItem(0);
+    };
+    if (!maybeOpen(afterOpen)) afterOpen();
     hint();
   }
 
@@ -681,7 +728,7 @@
     var done = function () {
       clearTimeout(S.moveTimer); stopVoice(); o.hidden = true; o.innerHTML = ''; sfx('chime'); S.mode = 'world';
       // After moving, Asal cheers and the next choices pop up.
-      showPanel({ name: s.name, text: 'Wonderful moving! What shall we do next?', acts: spotActs(s, used), spotY: s.y });
+      showPanel({ name: s.name, text: W.cheer.text, audio: W.cheer.id, acts: spotActs(s, used), spotY: s.y });
     };
     document.getElementById('w-move-done').addEventListener('click', done);
     document.getElementById('w-move-done').focus();
@@ -701,25 +748,81 @@
       if (Date.now() - S.sessionStart > S.limitMin * 60000) goodbye();
     }, 10000);
   }
-  function goodbye() {
-    S.mode = 'bye'; stopAmbient(); if (S.a3d) S.a3d.setMood('sleepy');
-    var wrap = document.getElementById('w-wrap'); if (wrap) wrap.classList.add('w-sleepy');
-    var p = document.getElementById('w-panel'); if (p) p.hidden = true;
+  // ---------- Opening and closing rituals: Breath, Gratitude, Food, Rest ----------
+  // A shuffled bag, so all four pillars come round before any repeats, across openings and closings alike.
+  function pickPillar() {
+    var bag = [], last = '';
+    try { bag = JSON.parse(localStorage.getItem('nx_pillar_bag') || '[]'); last = localStorage.getItem('nx_pillar_last') || ''; } catch (e) {}
+    bag = bag.filter(function (id) { return W.pillars.some(function (p) { return p.id === id; }); });
+    if (!bag.length) {
+      bag = W.pillars.map(function (p) { return p.id; });
+      for (var i = bag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+      if (bag[0] === last) bag.push(bag.shift());
+    }
+    var id = bag.shift();
+    try { localStorage.setItem('nx_pillar_bag', JSON.stringify(bag)); localStorage.setItem('nx_pillar_last', id); } catch (e) {}
+    return W.pillars.filter(function (p) { return p.id === id; })[0];
+  }
+  var PILLAR_ART = {
+    breath: '<svg viewBox="0 0 200 200" aria-hidden="true"><circle class="r-breath-ring" cx="100" cy="100" r="70" fill="#BFE3F5" fill-opacity="0.5" stroke="#FFFFFF" stroke-width="5"/><circle class="r-breath-core" cx="100" cy="100" r="42" fill="#FFFFFF" fill-opacity="0.85"/></svg>',
+    gratitude: '<svg viewBox="0 0 200 200" aria-hidden="true"><g class="r-heart"><path d="M100 168 C40 124 22 92 34 64 C46 38 82 36 100 62 C118 36 154 38 166 64 C178 92 160 124 100 168 Z" fill="#F7A8C0" stroke="#FFFFFF" stroke-width="6"/></g><g class="r-rise"><path d="M40 60 c-6 -8 4 -14 8 -6 c4 -8 14 -2 8 6 l-8 8z" fill="#FFFFFF"/><path d="M150 40 c-6 -8 4 -14 8 -6 c4 -8 14 -2 8 6 l-8 8z" fill="#FFFFFF"/></g></svg>',
+    food: '<svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="104" r="80" fill="#FFFFFF" stroke="#E8E1D0" stroke-width="5"/><circle cx="100" cy="104" r="62" fill="#FFFBF2"/><g class="r-bob"><circle cx="72" cy="80" r="16" fill="#E0503A"/><circle cx="114" cy="72" r="15" fill="#F28C28"/><circle cx="138" cy="106" r="14" fill="#F2C14E"/><ellipse cx="120" cy="140" rx="20" ry="11" fill="#5FA36A" transform="rotate(-25 120 140)"/><circle cx="80" cy="132" r="8" fill="#4A6FD1"/><circle cx="92" cy="138" r="8" fill="#4A6FD1"/><circle cx="66" cy="112" r="9" fill="#8E5BB8"/><circle cx="78" cy="108" r="9" fill="#8E5BB8"/></g></svg>',
+    rest: '<svg viewBox="0 0 200 200" aria-hidden="true"><defs><mask id="r-moon-m"><rect width="200" height="200" fill="#FFFFFF"/><circle cx="124" cy="82" r="56" fill="#000000"/></mask></defs><circle cx="96" cy="104" r="62" fill="#FFF3B0" mask="url(#r-moon-m)"/><g class="r-twinkle"><circle cx="150" cy="140" r="5" fill="#FFFFFF"/><circle cx="168" cy="60" r="4" fill="#FFFFFF"/><circle cx="40" cy="40" r="4" fill="#FFFFFF"/></g><g class="r-twinkle b"><circle cx="152" cy="30" r="3" fill="#FFFFFF"/><circle cx="30" cy="150" r="3" fill="#FFFFFF"/></g></svg>'
+  };
+  // kind: 'open' or 'close'. opts.acts: buttons shown after Asal finishes. Returns nothing.
+  function ritual(kind, opts) {
     var o = document.getElementById('w-over'); if (!o) return;
-    o.innerHTML = '<div class="w-move bye">' + asalArt('w-move-asal sleepy') + '<p>' + W.bye.text + '</p>' +
-      '<button type="button" class="w-act first" id="w-bye-home">Goodbye, Asal!</button>' +
-      '<button type="button" class="w-act grown" id="w-bye-more">Grown-ups: hold for 10 more minutes</button></div>';
+    var p = document.getElementById('w-panel'); if (p) { p.hidden = true; p.innerHTML = ''; }
+    var pil = pickPillar(), lines = pil[kind], line = lines[Math.floor(Math.random() * lines.length)];
+    S.mode = kind === 'open' ? 'ritual' : 'bye';
+    o.innerHTML = '<div class="w-move w-ritual r-' + pil.id + '"><div class="r-tag" style="background:' + pil.color + '">' + pil.name + '</div>' +
+      '<div class="r-row">' + asalArt('w-move-asal ' + (kind === 'open' ? 'excited' : 'sleepy')) + '<div class="r-art">' + PILLAR_ART[pil.id] + '</div></div>' +
+      '<p>' + line.text + '</p><div class="r-acts" id="r-acts"></div></div>';
     o.hidden = false;
-    document.getElementById('w-bye-home').addEventListener('click', function () { stopAll(); location.hash = '#/'; });
-    var more = document.getElementById('w-bye-more'), holdT = null;
-    function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; if (S.a3d) S.a3d.setMood('idle'); startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
-    function endHold() { more.classList.remove('holding'); clearTimeout(holdT); }
-    more.addEventListener('mousedown', startHold); more.addEventListener('touchstart', startHold, { passive: true });
-    more.addEventListener('mouseup', endHold); more.addEventListener('mouseleave', endHold); more.addEventListener('touchend', endHold);
-    more.addEventListener('keydown', function (e) { if ((e.keyCode === 13 || e.key === ' ') && !holdT) { e.preventDefault(); startHold(); } });
-    more.addEventListener('keyup', function () { endHold(); holdT = null; });
-    document.getElementById('w-bye-home').focus();
-    speak(W.bye.id, W.bye.text);
+    var shown = false;
+    function showActs() {
+      if (shown || !document.getElementById('r-acts')) return; shown = true;
+      var box = document.getElementById('r-acts');
+      opts.acts.forEach(function (a, i) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'w-act ' + (a.cls || 'fun honey'); b.id = a.id || '';
+        b.style.animationDelay = (i * 0.12) + 's';
+        b.innerHTML = (a.icon ? '<span class="w-act-ico">' + ICONS[a.icon] + '</span>' : '') + '<span>' + a.label + '</span>';
+        if (a.fn) b.addEventListener('click', function () { sfx('sparkle'); a.fn(); });
+        box.appendChild(b); if (a.setup) a.setup(b);
+      });
+      var f = box.querySelector('.w-act'); if (f) f.focus();
+    }
+    S.ritualSkip = showActs;
+    speak(line.id, line.text, showActs);
+  }
+  // The opening ritual plays once per visit. Returns true if it is playing; then() runs after.
+  function maybeOpen(then) {
+    var opened = false; try { opened = sessionStorage.getItem('nx_world_open') === '1'; sessionStorage.setItem('nx_world_open', '1'); } catch (e) {}
+    if (opened) return false;
+    ritual('open', { acts: [{ label: 'I’m ready!', icon: 'explore', fn: function () {
+      var o = document.getElementById('w-over'); if (o) { o.hidden = true; o.innerHTML = ''; }
+      S.mode = 'world'; if (then) then(); else focusItem(0);
+    } }] });
+    return true;
+  }
+  // Every visit ends calmly with a closing ritual: when time is up (timed) or when the child heads home.
+  function goodbye(timed) {
+    if (timed === undefined) timed = true;
+    stopVoice(); clearTimeout(S.hintTimer); stopAmbient(); if (S.a3d) S.a3d.setMood('sleepy');
+    var wrap = document.getElementById('w-wrap'); if (wrap) wrap.classList.add('w-sleepy');
+    var leave = function () { try { sessionStorage.removeItem('nx_world_open'); } catch (e) {} stopAll(); location.hash = '#/'; };
+    S.leave = leave;
+    var acts = [{ id: 'w-bye-home', label: 'Goodbye, Asal!', cls: 'fun honey', fn: leave }];
+    if (timed) acts.push({ id: 'w-bye-more', label: 'Grown-ups: hold for 10 more minutes', cls: 'grown', setup: function (more) {
+      var holdT = null, o = document.getElementById('w-over');
+      function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; if (S.a3d) S.a3d.setMood('idle'); startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
+      function endHold() { more.classList.remove('holding'); clearTimeout(holdT); }
+      more.addEventListener('mousedown', startHold); more.addEventListener('touchstart', startHold, { passive: true });
+      more.addEventListener('mouseup', endHold); more.addEventListener('mouseleave', endHold); more.addEventListener('touchend', endHold);
+      more.addEventListener('keydown', function (e) { if ((e.keyCode === 13 || e.key === ' ') && !holdT) { e.preventDefault(); startHold(); } });
+      more.addEventListener('keyup', function () { endHold(); holdT = null; });
+    } });
+    ritual('close', { acts: acts });
   }
 
   // ---------- Remote / keyboard navigation ----------
@@ -745,7 +848,9 @@
     var k = e.keyCode;
     if (isBack(e)) {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (S.mode === 'bye') { stopAll(); location.hash = '#/'; }
+      if (S.mode === 'bye') { if (S.leave) S.leave(); else { stopAll(); location.hash = '#/'; } }
+      else if (S.mode === 'ritual') { var r = document.querySelector('#r-acts .w-act'); if (r) r.click(); else if (S.ritualSkip) S.ritualSkip(); }
+      else if (S.mode === 'jar') { if (S.jarClose) S.jarClose(); }
       else if (S.mode === 'panel') closePanel();
       else if (S.mode === 'move') { var d = document.getElementById('w-move-done'); if (d) d.click(); }
       else goBack();
@@ -767,7 +872,7 @@
   window.addEventListener('resize', fit);
 
   // ---------- Open / close ----------
-  function goBack() { stopVoice(); if (S.place) location.hash = '#/world'; else { stopAll(); location.hash = '#/'; } }
+  function goBack() { stopVoice(); if (S.place) location.hash = '#/world'; else if (S.mode !== 'bye') goodbye(false); else if (S.leave) S.leave(); }
   function stopAll() { stopVoice(); stopAmbient(); clearTimeout(S.hintTimer); clearTimeout(S.moveTimer); }
   window.NectaraWorld = {
     open: function (placeId) {
@@ -781,6 +886,7 @@
     isActive: function () { return S.active; },
     preview: function () { return '<span class="wc-art t-' + phase() + '">' + sceneMap() + '</span>'; },
     foundCount: function () { load(); return foundCount(); },
+    memories: function () { load(); return foundIds().slice(-3).reverse().map(function (id) { return spotDef(id).name; }); },
     total: allSpots
   };
 })();

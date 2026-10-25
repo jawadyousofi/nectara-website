@@ -5,6 +5,53 @@
 window.NECTARA_WORLD = {
   intro: { id: 'intro-map', text: 'Hi, I’m Asal! Welcome to my world. There’s a garden, a pond, a hive and a big wide sky. Where shall we fly first?' },
   bye: { id: 'bye', text: 'What a wonderful adventure! My wings are getting sleepy. Let’s rest our eyes and go find something amazing outside. See you next time!' },
+  jar: { id: 'jar', text: 'This is our memory jar. It keeps everything we discovered together. Look, our flower grows a little each time we explore!' },
+  cheer: { id: 'cheer-move', text: 'Wonderful moving! What shall we do next?' },
+  // The four nourishing pillars. Every visit opens and closes with one, shuffled so all four come round evenly.
+  pillars: [
+    { id: 'breath', name: 'Breath', color: '#7FB3D5',
+      open: [
+        { id: 'o-breath-1', text: 'Before we fly, let’s breathe like a bee. Breathe in through your nose, and hum it out. Hmmmm. Again. Breathe in, and hmmmm. Now we’re ready to explore!' },
+        { id: 'o-breath-2', text: 'Put your hand on your tummy. Breathe in, and make it big like a balloon. Now breathe out slowly, like a feather floating down. One more time. Let’s fly!' } ],
+      close: [
+        { id: 'c-breath-1', text: 'Time to rest our wings. Let’s smell a flower: breathe in slowly. Now blow out a candle: whoosh. One more time. Go and find a real flower to smell outside. See you next time!' },
+        { id: 'c-breath-2', text: 'Let’s breathe like the ocean. Breathe in, and the wave comes in. Breathe out, and the wave goes back out. Shhh. Your body feels calm and strong. Bye for now, friend!' } ] },
+    { id: 'gratitude', name: 'Gratitude', color: '#E76F9A',
+      open: [
+        { id: 'o-grat-1', text: 'Before we fly, let’s fill our hearts. Think of one thing that makes you happy today. Hold it in your heart. Thank you, sun. Thank you, Earth. Let’s fly!' },
+        { id: 'o-grat-2', text: 'Put your hands on your heart. Who are you thankful for today? Whisper their name. Bees say thank you to the flowers by helping them grow. Now let’s explore!' } ],
+      close: [
+        { id: 'c-grat-1', text: 'What was your favorite thing we found today? Go and tell a grown-up all about it. Thank you for exploring with me. See you next time!' },
+        { id: 'c-grat-2', text: 'Let’s say thank you before we go. Thank you, garden. Thank you, pond. Thank you, sky. And thank you, friend, for flying with me. Bye for now!' } ] },
+    { id: 'food', name: 'Food', color: '#5FA36A',
+      open: [
+        { id: 'o-food-1', text: 'Bees need water, and so do you! If you have some water, take a little sip. Water helps your body and your brain grow. Ahh. Now let’s fly!' },
+        { id: 'o-food-2', text: 'Let’s play the rainbow game! Can you think of a red food that grows? A green one? An orange one? Colors from the garden give your body energy to grow. Let’s explore!' } ],
+      close: [
+        { id: 'c-food-1', text: 'All that exploring made me hungry! Next time you eat, look closely at your food. Did it grow on a tree, in the ground, or on a vine? See you next time!' },
+        { id: 'c-food-2', text: 'Bees bring nectar home to share. Can you help a grown-up make a snack today? Wash a fruit, or put some colors on a plate. Bye for now, little helper!' } ] },
+    { id: 'rest', name: 'Rest', color: '#9B7FD4',
+      open: [
+        { id: 'o-rest-1', text: 'Let’s wake up our bodies gently. Stretch your arms up high. Wiggle your fingers. Roll your shoulders. Sleep helps you grow, just like a seed in the night. Now let’s fly!' },
+        { id: 'o-rest-2', text: 'Let’s be still for a moment, like a pond with no wind. Close your eyes. What can you hear? Now open them. Your eyes and ears are ready to discover!' } ],
+      close: [
+        { id: 'c-rest-1', text: 'My wings are getting sleepy. Let’s rest our eyes. Look out the window, far, far away, at the sky or a tree. Your eyes love looking far away. See you next time!' },
+        { id: 'c-rest-2', text: 'Let’s float down slowly, like a leaf. Sway, sway, and land softly. Now stretch, and go and play. Rest and play both help you grow. Bye for now!' } ] },
+  ],
+  // The Seven Petals of the Nectara Whole-Child Framework, and the petals each discovery grows.
+  petals: [
+    { id: 'body', name: 'Body', color: '#E07A5F' }, { id: 'heart', name: 'Heart', color: '#E76F9A' },
+    { id: 'mind', name: 'Mind', color: '#5B8DEF' }, { id: 'voice', name: 'Voice', color: '#F2B23A' },
+    { id: 'earth', name: 'Earth', color: '#5FA36A' }, { id: 'world', name: 'World', color: '#3E9CA8' },
+    { id: 'spirit', name: 'Spirit', color: '#9B7FD4' } ],
+  spotPetals: {
+    sunflower: ['earth', 'body', 'mind'], mint: ['body', 'earth'], seed: ['earth', 'body', 'spirit'], ladybug: ['earth', 'mind'],
+    mushroom: ['earth', 'world', 'heart'], worm: ['earth', 'body'], frog: ['earth', 'body', 'heart'], lily: ['mind', 'earth'],
+    dragonfly: ['voice', 'body', 'spirit'], drop: ['earth', 'mind'], fish: ['body', 'mind'], ripple: ['heart', 'world'],
+    comb: ['mind', 'earth'], dance: ['voice', 'body', 'world'], baby: ['heart', 'world'], honey: ['world', 'heart'],
+    flower: ['earth', 'world'], water: ['body', 'heart'], cloud: ['voice', 'spirit'], sun: ['mind', 'body'],
+    moon: ['mind', 'spirit'], birds: ['world', 'heart', 'body'], rainbow: ['mind', 'spirit'], stars: ['voice', 'spirit'],
+    wind: ['body', 'spirit'] },
   places: [
     {
       id: 'garden', name: 'The Garden', x: 380, y: 560, color: '#5FA36A',
