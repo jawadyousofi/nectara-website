@@ -145,6 +145,25 @@ export function codeMatches(env, code) {
   return !!want && !!got && safeEqual(got, want);
 }
 
+// Founding-family codes made on the admin page live in KV as invite:<CODE> (no dashes).
+// A code can let in a set number of accounts (usually 1 family). The old FOUNDING_CODE secret still works too.
+export const normCode = c => clean(c || '', 100).toUpperCase().replace(/[^A-Z0-9]/g, '');
+export const showCode = k => k.length > 3 ? k.slice(0, 3) + '-' + k.slice(3, 6) + (k.length > 6 ? '-' + k.slice(6) : '') : k;
+export async function redeemInvite(env, code, email) {
+  if (codeMatches(env, code)) return true;
+  const key = normCode(code);
+  if (!key || !env.NECTARA_INTEREST) return false;
+  const inv = await env.NECTARA_INTEREST.get('invite:' + key, 'json');
+  if (!inv || inv.revoked) return false;
+  inv.used = inv.used || [];
+  if (inv.used.includes(email)) return true;
+  if (inv.used.length >= (inv.max || 1)) return false;
+  inv.used.push(email);
+  inv.lastUsed = new Date().toISOString();
+  await env.NECTARA_INTEREST.put('invite:' + key, JSON.stringify(inv));
+  return true;
+}
+
 // Same-origin check for state-changing requests (blocks cross-site form posts).
 export function sameOrigin(request) {
   const origin = request.headers.get('Origin');

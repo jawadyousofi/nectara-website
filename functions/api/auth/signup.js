@@ -1,7 +1,7 @@
 // POST /api/auth/signup  { name, email, password, code?, childName?, childAge? }
-// Creates a parent account. A valid founding invite code (FOUNDING_CODE secret) gives app access straight away;
+// Creates a parent account. A valid founding code (one made on the admin page, or the FOUNDING_CODE secret) gives app access straight away;
 // without one the account is created as 'waiting' until access is granted (or a paid membership starts).
-import { json, clean, validEmail, hashPassword, createSession, publicUser, codeMatches, sameOrigin, readJson } from '../../_lib/auth.js';
+import { json, clean, validEmail, hashPassword, createSession, publicUser, redeemInvite, sameOrigin, readJson } from '../../_lib/auth.js';
 
 export async function onRequestPost({ request, env }) {
   if (!sameOrigin(request)) return json({ error: 'not allowed' }, 403);
@@ -29,7 +29,7 @@ export async function onRequestPost({ request, env }) {
   const { salt, hash } = await hashPassword(password);
   const user = {
     email, name, salt, hash, children,
-    access: codeMatches(env, data.code) ? 'founding' : 'waiting',
+    access: (await redeemInvite(env, data.code, email)) ? 'founding' : 'waiting',
     created: new Date().toISOString(),
   };
   await env.NECTARA_INTEREST.put('user:' + email, JSON.stringify(user));

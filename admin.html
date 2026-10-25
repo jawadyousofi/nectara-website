@@ -24,14 +24,15 @@
 <main id="main">
 
 <div class="wrap" style="padding-block:40px 80px;display:grid;gap:24px">
-  <div class="stack"><span class="eyebrow">Admin</span><h1 style="font-size:var(--step-3)">Member access</h1>
-  <p class="lead">Choose who can open the Little Scientists app. <b>Founding</b>, <b>member</b> and <b>staff</b> can open it; <b>waiting</b> and <b>paused</b> can&rsquo;t.</p></div>
+  <div class="stack"><span class="eyebrow">Admin</span><h1 style="font-size:var(--step-3)">Founding families</h1>
+  <p class="lead">Make a founding code for each family, and choose who can open the app. <b>Founding</b>, <b>member</b> and <b>staff</b> can open it; <b>waiting</b> and <b>paused</b> can&rsquo;t.</p></div>
   <form id="admin-login" novalidate style="max-width:560px">
     <div class="field"><label for="ad-token">Admin key</label><input id="ad-token" type="password" autocomplete="off" required></div>
-    <button class="btn" type="submit" style="justify-self:start">Show members</button>
+    <button class="btn" type="submit" style="justify-self:start">Open</button>
     <p class="hint">The key is the ADMIN_TOKEN secret in Cloudflare. It stays in this browser tab only.</p>
   </form>
   <p class="status" id="admin-msg" role="status" hidden></p>
+  <div id="invite-area"></div>
   <div id="admin-list"></div>
 </div>
 </main>

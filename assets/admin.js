@@ -15,10 +15,71 @@
     return fetch('/api/admin/members', { method: method, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + input.value.trim() }, body: body ? JSON.stringify(body) : undefined })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'failed'); return j; }); });
   }
+  // ---------- Founding-family codes ----------
+  var inviteArea = document.getElementById('invite-area');
+  function callInv(method, body) {
+    return fetch('/api/admin/invites', { method: method, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + input.value.trim() }, body: body ? JSON.stringify(body) : undefined })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw new Error(j.error || 'failed'); return j; }); });
+  }
+  function inviteMessage(inv) {
+    return 'Hi! Here is your Nectara founding family code: ' + inv.code + '\n\nTo join: go to ' + location.origin + '/login.html, choose "Create account", and enter it as your invite code. On a TV, open ' + location.origin + '/tv and scan the code with your phone.\n\nWelcome to the hive!';
+  }
+  function copyText(text, btn) {
+    var done = function () { var t = btn.textContent; btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = t; }, 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    else fallback();
+    function fallback() { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); }
+  }
+  function loadInvites() {
+    callInv('GET').then(function (j) {
+      inviteArea.innerHTML = '<section class="invite-card"><h2>Founding family codes</h2>' +
+        '<p>Make one code per family. Send it to them, and they enter it when they create their account. Each code works for the number of accounts you choose (one per family is best), then stops.</p>' +
+        '<form id="invite-form" class="invite-form" novalidate><div class="field"><label for="inv-label">Family name</label><input id="inv-label" maxlength="80" required placeholder="e.g. The Rahimi family"></div>' +
+        '<div class="field"><label for="inv-max">Accounts</label><select id="inv-max"><option value="1">1 (one parent)</option><option value="2">2 (both parents)</option><option value="3">3</option><option value="5">5</option><option value="10">10</option></select></div>' +
+        '<button class="btn" type="submit">Make a code</button></form>' +
+        '<div id="inv-new" class="invite-new" hidden></div>' +
+        (j.invites.length ? '<div class="admin-wrap"><table class="admin-table"><thead><tr><th>Family</th><th>Code</th><th>Used</th><th>Made</th><th></th></tr></thead><tbody>' +
+          j.invites.map(function (v) {
+            var state = v.revoked ? '<span class="pill off">Turned off</span>' : (v.used.length >= v.max ? '<span class="pill done">Used</span>' : '<span class="pill">' + (v.max - v.used.length) + ' left</span>');
+            return '<tr><td>' + esc(v.label) + '</td><td><code>' + esc(v.code) + '</code></td><td>' + state + (v.used.length ? '<br><small>' + v.used.map(esc).join(', ') + '</small>' : '') + '</td><td>' + esc((v.created || '').slice(0, 10)) + '</td><td>' +
+              (v.revoked ? '' : '<button class="linklike" type="button" data-copy="' + esc(v.code) + '" data-label="' + esc(v.label) + '">Copy message</button> &middot; <button class="linklike" type="button" data-revoke="' + esc(v.code) + '">Turn off</button>') + '</td></tr>';
+          }).join('') + '</tbody></table></div>' : '<p class="hint">No codes yet.</p>') + '</section>';
+      document.getElementById('invite-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var lab = document.getElementById('inv-label');
+        if (!lab.value.trim()) { lab.focus(); return; }
+        callInv('POST', { label: lab.value.trim(), max: document.getElementById('inv-max').value }).then(function (r) {
+          var inv = r.invite;
+          loadInvites();
+          setTimeout(function () {
+            var box = document.getElementById('inv-new'); if (!box) return;
+            box.hidden = false;
+            box.innerHTML = '<p>Code for <b>' + esc(inv.label) + '</b>:</p><div class="big-code">' + esc(inv.code) + '</div>' +
+              '<textarea readonly rows="5" aria-label="Message to send">' + esc(inviteMessage(inv)) + '</textarea>' +
+              '<div class="row-btns"><button class="btn" type="button" id="inv-copy-msg">Copy message</button><button class="btn quiet" type="button" id="inv-copy-code">Copy code only</button></div>';
+            document.getElementById('inv-copy-msg').addEventListener('click', function () { copyText(inviteMessage(inv), this); });
+            document.getElementById('inv-copy-code').addEventListener('click', function () { copyText(inv.code, this); });
+            box.scrollIntoView({ block: 'nearest' });
+          }, 400);
+        }).catch(function (err) { say('Couldn’t make a code: ' + err.message, true); });
+      });
+      [].forEach.call(inviteArea.querySelectorAll('[data-copy]'), function (b) {
+        b.addEventListener('click', function () { copyText(inviteMessage({ code: b.getAttribute('data-copy'), label: b.getAttribute('data-label') }), b); });
+      });
+      [].forEach.call(inviteArea.querySelectorAll('[data-revoke]'), function (b) {
+        b.addEventListener('click', function () {
+          if (b.getAttribute('data-sure') !== '1') { b.setAttribute('data-sure', '1'); b.textContent = 'Tap again to turn off'; return; }
+          callInv('POST', { code: b.getAttribute('data-revoke'), revoke: true }).then(loadInvites).catch(function (err) { say('Couldn’t turn it off: ' + err.message, true); });
+        });
+      });
+    }).catch(function (err) { inviteArea.innerHTML = '<p class="status err">Couldn’t load founding codes: ' + esc(err.message) + '</p>'; });
+  }
+
   function load() {
     say('Loading…');
     call('GET').then(function (j) {
       try { sessionStorage.setItem('nx_admin', input.value.trim()); } catch (e) {}
+      loadInvites();
       var counts = {};
       j.members.forEach(function (m) { counts[m.access] = (counts[m.access] || 0) + 1; });
       var mailNote = j.lastMailError ? ' · Last email problem (' + j.lastMailError.at.slice(0, 16).replace('T', ' ') + ' UTC): ' + (j.lastMailError.status || '') + ' ' + j.lastMailError.detail : '';
