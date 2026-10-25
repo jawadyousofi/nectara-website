@@ -1,5 +1,9 @@
 """Builds the Nectara site pages from one shared template. Run: python3 build.py"""
 SITE = 'https://nectaraschool.org'
+# Private until Nectara's name and work are legally protected: a simple "coming soon" home page, members sign-in,
+# no search engines and no sitemap. The full site pages stay in this file; set False to launch them publicly.
+PRIVATE = True
+PRIVATE_PAGES = {'index.html', 'login.html', 'reset.html', 'admin.html', 'tv.html', 'link.html', '404.html'}
 NAV = [('index.html', 'Home'), ('approach.html', 'How we learn'), ('programs.html', 'Programs'),
        ('families.html', 'Families'), ('asal.html', 'Meet Asal'), ('about.html', 'Our story')]
 
@@ -17,13 +21,13 @@ def cta(title='Now welcoming founding families', text='Families with children ag
     return f'''<section><div class="wrap"><div class="cta"><div class="who"><img src="assets/asal.svg" alt="" width="84" height="112"><div class="stack" style="gap:6px"><h2>{title}</h2><p>{text}</p></div></div><a class="btn" href="join.html">Join the founding list</a></div><div class="stripe"></div></div></section>'''
 
 def page(fname, title, desc, body, artifact=False):
-    nav = ''.join(f'<li><a href="{h}"{" aria-current=\"page\"" if h == fname else ""}>{t}</a></li>' for h, t in NAV)
+    nav = '' if PRIVATE else ''.join(f'<li><a href="{h}"{" aria-current=\"page\"" if h == fname else ""}>{t}</a></li>' for h, t in NAV)
     head = f'''<title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="claude:viewport-fit-sides" content="cover">
 {"<meta name=\"robots\" content=\"noindex, nofollow, noarchive\">" if (PRIVATE or fname in NOINDEX) else ""}
 <link rel="canonical" href="{SITE}/{'' if fname == 'index.html' else fname}">
-<meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:image" content="{SITE}/assets/asal.png"><meta property="og:type" content="website">
+<meta property="og:title" content="{title}"><meta property="og:description" content="{desc}">{"" if PRIVATE else f'<meta property="og:image" content="{SITE}/assets/asal.png">'}<meta property="og:type" content="website">
 <link rel="icon" href="assets/logo-mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
@@ -32,14 +36,14 @@ def page(fname, title, desc, body, artifact=False):
 <header class="site-head"><div class="wrap">
   <a class="brand" href="index.html" aria-label="Nectara home"><img src="assets/logo-mark.svg" alt="" width="62" height="44"><span class="wordmark">nectara</span></a>
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
-  <ul class="nav" id="nav">{nav}<li><a href="login.html"{" aria-current=\"page\"" if fname == "login.html" else ""}>Members</a></li><li><a class="btn" href="join.html">Join us</a></li></ul>
+  <ul class="nav" id="nav">{nav}<li><a href="login.html"{" aria-current=\"page\"" if fname == "login.html" else ""}>Members</a></li>{"" if PRIVATE else '<li><a class="btn" href="join.html">Join us</a></li>'}</ul>
 </div></header>
 <main id="main">
 {body}
 </main>
 <footer class="site-foot"><div class="wrap">
   <span>&copy; 2026 Nectara &middot; Gather. Grow. Give.</span>
-  <nav aria-label="Footer">{''.join(f'<a href="{h}">{t}</a>' for h, t in NAV)}<a href="join.html">Join</a></nav>
+  {"" if PRIVATE else '<nav aria-label="Footer">' + ''.join(f'<a href="{h}">{t}</a>' for h, t in NAV) + '<a href="join.html">Join</a></nav>'}
   <span>nectaraschool.org</span>
 </div></footer>
 <script src="assets/site.js"></script>{''.join(f'<script src="assets/{x}"></script>' for x in EXTRA_JS.get(fname, []))}'''
@@ -49,8 +53,7 @@ def page(fname, title, desc, body, artifact=False):
 
 PAGES = {}
 NOINDEX = {'admin.html', 'login.html', 'reset.html', 'tv.html', 'link.html'}
-# Private until Nectara's name and work are legally protected: no search engines, no sitemap. Set False to launch publicly.
-PRIVATE = True
+
 EXTRA_JS = {'login.html': ['portal.js', 'qrcode.js', 'tv.js'], 'admin.html': ['admin.js'], 'reset.html': ['reset.js'], 'tv.html': ['qrcode.js', 'tv.js'], 'link.html': ['link.js']}
 
 PAGES['index.html'] = ('Nectara', 'Nectara is a nature-rooted learning community for children ages 2 to 7, where every child blooms. Now welcoming founding families.', f'''
@@ -285,7 +288,7 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
     <span class="eyebrow">Members</span>
     <h1>Little Scientists, at home or on the big screen.</h1>
     <p class="lead">Hands-on lessons with Asal that work on a phone, iPad, computer or TV. Watch together, do it with your hands, then share what you noticed.</p>
-    <p>Founding families get a free invite code during our pilot. Not on the list yet? <a href="join.html">Join the founding list</a> and choose Little Scientists.</p>
+    <p>Founding families get a free invite code during our pilot. Not on the list yet? <a href="index.html">Leave your email</a> and we&rsquo;ll be in touch.</p>
     <img src="assets/lessons/1-rain-cloud.webp" alt="Asal flies beside a cup of water with a foam cloud and blue rain" width="1200" height="750" style="border-radius:22px;margin-top:8px;height:auto">
   </div>
   <div class="portal-box">
@@ -343,7 +346,7 @@ PAGES['login.html'] = ('Members · Nectara', 'Sign in to the Nectara Little Scie
         <p>The Little Scientists app opens with an invite code during our founding pilot. Paid memberships are coming soon.</p>
         <div class="field"><label for="cd-code">Invite code</label><input id="cd-code" name="code" autocomplete="off" autocapitalize="characters" required maxlength="100"></div>
         <button class="btn" type="submit">Open the app</button>
-        <p class="hint">No code yet? <a href="join.html">Join the founding list</a> and we&rsquo;ll send one. <button class="linklike" type="button" data-signout>Sign out</button></p>
+        <p class="hint">No code yet? Founding codes come from Nectara directly. <a href="index.html">Leave your email</a> and we&rsquo;ll be in touch. <button class="linklike" type="button" data-signout>Sign out</button></p>
       </form>
     </section>
 
@@ -461,13 +464,42 @@ PAGES['404.html'] = ('Page Not Found · Nectara', 'This page flew away.', '''
 <div class="wrap hero"><div class="stack"><span class="eyebrow">404</span><h1>This page flew away.</h1><p class="lead">Asal looked everywhere, but couldn&rsquo;t find it. Let&rsquo;s head back to the garden.</p><a class="btn" href="index.html" style="justify-self:start">Back home</a></div>
 <figure class="asal-fig"><div class="asal-sun"><img src="assets/asal.svg" alt="Asal the bee kid" width="300" height="400"></div><span class="hello">Oops!</span></figure></div>''')
 
+COMING_SOON = ('Nectara', 'Something new is growing.', '''
+<div class="wrap hero soon">
+  <div class="stack"><span class="eyebrow">Coming soon</span><h1>Something new is growing.</h1>
+  <p class="lead">Nectara is a new kind of learning community for young children, rooted in nature and wonder. We&rsquo;re planting it carefully, and we&rsquo;ll open the gate soon.</p>
+  <p>Founding families: <a href="login.html">sign in here</a>.</p></div>
+  <form id="interest-form" novalidate>
+    <h2 style="margin:0">Hear when we open</h2>
+    <input type="hidden" name="role" value="family"><input type="hidden" name="interest" value="not-sure">
+    <div class="field"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required maxlength="120"></div>
+    <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="200"></div>
+    <div class="field"><label for="city">City or area</label><input id="city" name="city" autocomplete="address-level2" required maxlength="120"></div>
+    <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+    <button class="btn" type="submit" style="justify-self:start">Let me know</button>
+    <p class="status" id="form-status" role="status" tabindex="-1" hidden></p>
+    <p class="hint">We use your details only to tell you about Nectara. We never sell or share them.</p>
+  </form>
+</div>''')
+
 if __name__ == '__main__':
-    import os
+    import os, shutil
+    if PRIVATE:
+        PAGES['index.html'] = COMING_SOON
+        hidden = [f for f in PAGES if f not in PRIVATE_PAGES]
+        for f in hidden:
+            if os.path.exists(f): os.remove(f)
+        for f in hidden: del PAGES[f]
+        # Old links to the hidden pages land on the coming-soon page.
+        open('_redirects', 'w').write(''.join(f'/{f} / 302\n/{f[:-5]} / 302\n' for f in hidden) + '/preview/* / 302\n')
+        if os.path.exists('preview'): shutil.rmtree('preview')
+    elif os.path.exists('_redirects'): os.remove('_redirects')
     for f, (t, d, b) in PAGES.items():
         open(f, 'w').write(page(f, t, d, b))
-    os.makedirs('preview', exist_ok=True)
-    for f, (t, d, b) in PAGES.items():  # artifact preview copies: index without skeleton, others full pages
-        open('preview/' + f, 'w').write(page(f, t, d, b, artifact=(f == 'index.html')))
+    if not PRIVATE:
+        os.makedirs('preview', exist_ok=True)
+        for f, (t, d, b) in PAGES.items():  # artifact preview copies: index without skeleton, others full pages
+            open('preview/' + f, 'w').write(page(f, t, d, b, artifact=(f == 'index.html')))
     if PRIVATE:
         open('robots.txt', 'w').write('User-agent: *\nDisallow: /\n')
         open('_headers', 'w').write('/*\n  X-Robots-Tag: noindex, nofollow, noarchive\n')
