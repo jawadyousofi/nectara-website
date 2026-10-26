@@ -220,7 +220,7 @@
       '<g fill="#F28C28"><circle cx="-30" cy="-50" r="11"/><circle cx="20" cy="-70" r="11"/><circle cx="30" cy="-20" r="11"/><circle cx="-10" cy="-10" r="10"/><circle cx="-50" cy="-14" r="9"/></g></g>';
     // inside me
     b += '<path d="M1440 335 C1400 420 1320 480 1250 520" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
-    b += '<g transform="translate(1440 335)"><circle r="78" fill="#FDF1E3" stroke="#F2C9A8" stroke-width="5"/>' + child(0, 6, 0.8, '#FFE3CF') +
+    b += '<g transform="translate(1440 335)"><circle r="78" fill="#FDF1E3" stroke="#F2C9A8" stroke-width="5"/>' + child(0, 4, 0.72, 0) +
       '<path d="M-4 18 c-8 -6 -14 -11 -14 -17 c0 -4 3 -7 7 -7 c3 0 5 2 7 5 c2 -3 4 -5 7 -5 c4 0 7 3 7 7 c0 6 -6 11 -14 17z" fill="#E0503A"/></g>';
     b += bee(560, 420, 1, 'w-fly3');
     return svg(b);
@@ -408,14 +408,19 @@
     for (var i = 0; i < 5; i++) p += '<ellipse cx="0" cy="-9" rx="6" ry="9" fill="#FFFFFF" transform="rotate(' + (i * 72) + ')"/>';
     return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')">' + p + '<circle r="4.5" fill="#F2C14E"/></g>';
   }
-  function child(x, y, s, shirt) {
-    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')">' +
-      '<path d="M-26 40 L-34 92 M26 40 L34 92" stroke="#8A5A3B" stroke-width="12" stroke-linecap="round"/>' +
-      '<path d="M-30 -6 C-60 -20 -70 -46 -66 -60 M30 -6 C60 -20 70 -46 66 -60" stroke="#E8B48C" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-      '<rect x="-34" y="-20" width="68" height="70" rx="26" fill="' + (shirt || '#7FB3D5') + '"/>' +
-      '<circle cx="0" cy="-50" r="30" fill="#E8B48C"/><path d="M-30 -58 C-28 -86 28 -86 30 -58 C20 -70 -20 -70 -30 -58Z" fill="#3B2A1E"/>' +
-      '<circle cx="-10" cy="-50" r="3.5" fill="#2A2118"/><circle cx="10" cy="-50" r="3.5" fill="#2A2118"/><path d="M-9 -38 Q0 -31 9 -38" stroke="#2A2118" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="-18" cy="-42" r="5" fill="#F4A6A6" opacity="0.6"/><circle cx="18" cy="-42" r="5" fill="#F4A6A6" opacity="0.6"/></g>';
+  // Nectara's cast: a different child each visit (3D renders from tools/kids.html, same style as Asal).
+  var KIDS = ['amara', 'liam', 'saoirse', 'keon', 'mei', 'noor', 'ravi', 'eli'];
+  var kidTurn = -1;
+  function nextKid() {
+    var n = 0;
+    try { n = (parseInt(localStorage.getItem('nx_kid') || '', 10) || 0) + 1; localStorage.setItem('nx_kid', String(n)); } catch (e) { n = Math.floor(Math.random() * KIDS.length); }
+    kidTurn = n % KIDS.length; return kidTurn;
+  }
+  function kidName(offset) { if (kidTurn < 0) nextKid(); return KIDS[(kidTurn + (offset || 0)) % KIDS.length]; }
+  function kidImg(src, x, y, w, h) { return '<image href="' + src + '" xlink:href="' + src + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/>'; }
+  function child(x, y, s, offset) {   // a standing child, about 190 tall at scale 1, feet near y + 92
+    var h = 200 * (s || 1), w = h * 2 / 3;
+    return kidImg('/assets/world/kids/' + kidName(offset) + '.webp', x - w / 2, y + 96 * (s || 1) - h, w, h);
   }
   function sceneOrchard() {
     var b = skyAndSun(1440, 130);
@@ -443,7 +448,7 @@
     // you are a seed: a child beside a young orange tree, with a heart
     b += '<g transform="translate(1000 610)"><g id="w-youseed">' +
       '<path d="M70 110 V20" stroke="#8A5A3B" stroke-width="10"/><circle cx="70" cy="10" r="36" fill="#6DB25A"/>' + orange(58, 4, 9) + orange(84, 18, 8) +
-      child(-10, 30, 0.95, '#F2C14E') +
+      child(-14, 30, 1.25, 3) +
       '<path d="M-10 -78 c-10 -14 -30 -4 -20 10 l20 18 l20 -18 c10 -14 -10 -24 -20 -10z" fill="#E76F9A"/></g></g>';
     // compost
     b += '<g transform="translate(1150 735)"><g id="w-peel"><rect x="-80" y="-30" width="160" height="90" rx="10" fill="#A8754E" stroke="#7A5235" stroke-width="5"/>' +
@@ -484,7 +489,8 @@
       '<g id="w-glass"><path d="M-32 -60 L-24 64 H24 L32 -60Z" fill="#EAF5FB" stroke="#9BC7E4" stroke-width="4"/><path d="M-29 -20 L-24 60 H24 L29 -20Z" fill="#7FB3D5" opacity="0.85"/>' +
       '<ellipse cx="-10" cy="10" rx="5" ry="16" fill="#FFFFFF" opacity="0.6"/></g></g>';
     // the child: rendered in 3D in the same style as Asal (tools/inside_kid.html), with see-through skin over the organs
-    b += '<image href="/assets/world/inside-kid.png" xlink:href="/assets/world/inside-kid.png" x="160" y="-79" width="800" height="1200"/>';
+    nextKid();   // a new friend shows us their insides on each visit
+    b += kidImg('/assets/world/kids/' + kidName(0) + '-inside.webp', 160, -81, 800, 1200);
     // a soft glow lights up each part of the journey when it is tapped
     b += '<g id="w-mouth"><circle class="w-glow" cx="538" cy="313" r="50" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
       '<g id="w-tube"><circle class="w-glow" cx="558" cy="449" r="36" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
