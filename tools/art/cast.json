@@ -1,0 +1,14 @@
+{
+  "style": "Soft 3D cartoon character for a preschool learning app, in the same style as the reference image of Asal: rounded chunky shapes, big dark expressive eyes with one white sparkle, rosy cheeks, small nose, warm open smile, soft even daylight, matte velvety surfaces, warm natural colors. Full body, standing, facing the viewer, arms relaxed and slightly out, friendly and calm. Transparent background. No text, no logos.",
+  "inside": "The child's chest and tummy are shown as a gentle see-through window, like clear glass, revealing simple, friendly, cartoon organs in their correct places: pink lungs, a small red heart slightly to the child's left, a soft pink food tube from the throat down to a J-shaped pink stomach on the child's left side, a reddish-brown liver on the child's right, the long coiled pale-pink small intestine in the middle, framed by the bumpy tan large intestine that ends at the bottom. Clean and cute, not gory, suitable for 3-year-olds.",
+  "children": [
+    { "id": "kid-amara", "desc": "a girl with deep brown skin and black hair in neat braids with yellow beads, wearing a leaf-green t-shirt and blue shorts" },
+    { "id": "kid-liam", "desc": "a boy with light skin, freckles and straight blonde hair, wearing a sky-blue t-shirt and khaki shorts" },
+    { "id": "kid-saoirse", "desc": "a girl with fair skin, freckles and wavy red hair in a ponytail, wearing a coral t-shirt and denim shorts" },
+    { "id": "kid-keon", "desc": "a boy with brown skin and tight black curls cut short, wearing a honey-yellow t-shirt and green shorts" },
+    { "id": "kid-mei", "desc": "a girl with light-medium skin and straight black hair in a bob with bangs, wearing a lavender t-shirt and blue shorts" },
+    { "id": "kid-noor", "desc": "a girl with olive skin wearing a soft teal headscarf, a cream long-sleeve top and green trousers" },
+    { "id": "kid-ravi", "desc": "a boy with medium-brown skin and wavy dark hair, wearing an orange t-shirt and navy shorts" },
+    { "id": "kid-eli", "desc": "a boy with light-brown skin and loose brown curls, wearing a white t-shirt with a small green leaf and blue shorts" }
+  ]
+}
