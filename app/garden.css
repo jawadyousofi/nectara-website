@@ -1,0 +1,105 @@
+/* Growth Garden: the family journal, sorted by the Seven Petals. */
+
+/* Home card */
+.gg-home { display: flex; align-items: center; gap: clamp(14px, 3vw, 34px); margin-bottom: 22px; padding: clamp(16px, 2.6vw, 30px); border-radius: 28px; background: linear-gradient(135deg, #FDF3DC 0%, #EEF3EB 100%); text-decoration: none; color: inherit; box-shadow: 0 6px 24px rgba(42, 33, 24, 0.08); }
+.gg-home:focus-visible, .gg-home:hover { outline: 4px solid var(--honey); outline-offset: 3px; }
+.gg-flower-mini { width: clamp(110px, 18vw, 190px); height: auto; flex: none; animation: ggbreathe 6s ease-in-out infinite; }
+.gg-home h2 { font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.8rem); font-weight: 800; }
+.gg-home p { color: var(--ink-soft); margin-top: 4px; max-width: 52ch; }
+.gg-home .btn { margin-top: 12px; }
+
+/* Garden page */
+.gg-hero { display: grid; grid-template-columns: minmax(180px, 320px) minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); align-items: center; background: var(--pollen); border-radius: 28px; padding: clamp(18px, 3vw, 34px); }
+.gg-flower { width: 100%; height: auto; animation: ggbreathe 6s ease-in-out infinite; }
+.gg-hero h1 { font-size: clamp(1.9rem, 1.2rem + 3vw, 3.4rem); font-weight: 800; }
+.gg-hero p { color: var(--ink-soft); margin-top: 8px; max-width: 54ch; }
+.gg-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.gg-chip { --pc: var(--forest); display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px 0 12px; border-radius: 999px; border: 2px solid var(--line); background: #FFFFFF; color: var(--ink); font-weight: 700; font-size: 0.95em; cursor: pointer; }
+.gg-chip::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--pc); }
+.gg-chip[data-filter=""]::before { display: none; }
+.gg-chip.on { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 16%, #FFFFFF); }
+.gg-chip.quiet { color: var(--ink-soft); }
+@media (max-width: 720px) { .gg-hero { grid-template-columns: 1fr; } .gg-flower { max-width: 260px; margin: 0 auto; } }
+
+.gg-add { margin-top: 26px; }
+.gg-add h2 { font-size: clamp(1.3rem, 1rem + 1.2vw, 1.9rem); margin-bottom: 12px; }
+.gg-add-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.gg-add-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 120px; border-radius: 22px; background: #FFFFFF; border: 2px solid var(--line); color: var(--forest); font-family: var(--display); font-weight: 800; font-size: 1.2em; text-decoration: none; }
+.gg-add-btn svg { width: 46px; height: 46px; }
+.gg-add-btn:hover, .gg-add-btn:focus-visible { border-color: var(--honey); background: #FFF8E6; }
+@media (max-width: 560px) { .gg-add-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.gg-tvnote { margin-top: 22px; color: var(--ink-soft); }
+
+.gg-invite { --pc: var(--honey); margin-top: 18px; padding: 14px 18px; border-radius: 18px; background: color-mix(in srgb, var(--pc) 12%, #FFFFFF); border-left: 6px solid var(--pc); color: var(--ink); }
+.gg-empty { margin-top: 26px; padding: 28px; text-align: center; color: var(--ink-soft); border: 2px dashed var(--line); border-radius: 22px; }
+
+.gg-grid { margin-top: 26px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.gg-card { display: flex; flex-direction: column; text-align: left; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #FFFFFF; box-shadow: 0 4px 16px rgba(42, 33, 24, 0.08); cursor: pointer; }
+.gg-card:hover, .gg-card:focus-visible { outline: 4px solid var(--honey); outline-offset: 2px; }
+.gg-card.gg-new { animation: ggpop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.gg-media { display: grid; place-items: center; aspect-ratio: 4 / 3; background: var(--mist); overflow: hidden; }
+.gg-media img { width: 100%; height: 100%; object-fit: cover; }
+.gg-voice svg { width: 64px; height: 64px; color: #B5577A; }
+.k-voice .gg-media { background: #FBE7EE; }
+.k-note .gg-media { background: #EEF6E9; place-items: start; }
+.gg-note { padding: 16px; font-size: 0.95em; color: var(--ink); line-height: 1.45; }
+.gg-meta { display: grid; gap: 2px; padding: 12px 14px 14px; }
+.gg-meta b { font-family: var(--display); color: var(--forest); font-size: 1.05em; }
+.gg-meta small { color: var(--ink-soft); }
+.gg-dots { display: flex; gap: 5px; margin-top: 4px; }
+.gg-dots i { width: 12px; height: 12px; border-radius: 50%; }
+
+/* Sheets: viewing and adding */
+.gg-sheet { position: fixed; inset: 0; z-index: 40; background: rgba(42, 33, 24, 0.45); display: flex; align-items: flex-start; justify-content: center; overflow-y: auto; padding: calc(16px + var(--safe-t)) 12px calc(16px + var(--safe-b)); }
+.gg-sheet[hidden] { display: none; }
+.gg-panel { width: min(860px, 100%); background: var(--ground); border-radius: 26px; padding: clamp(16px, 3vw, 28px); display: grid; gap: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); animation: ggup 0.3s ease-out; }
+.gg-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gg-panel-head h2 { display: flex; align-items: center; gap: 10px; font-size: clamp(1.4rem, 1rem + 1.5vw, 2rem); }
+.gg-panel-head h2 svg { width: 36px; height: 36px; color: var(--forest); }
+.gg-big { width: 100%; max-height: 62vh; object-fit: contain; border-radius: 18px; background: var(--mist); }
+.gg-audio { width: 100%; }
+.gg-text { white-space: pre-wrap; font-size: 1.1em; }
+.gg-petals-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.gg-when { color: var(--ink-soft); font-size: 0.9em; }
+.linklike { background: none; border: 0; padding: 0; color: var(--rain-deep); text-decoration: underline; cursor: pointer; font: inherit; }
+.gg-del { justify-self: start; color: #A2412F; }
+.gg-adding .field { display: grid; gap: 6px; }
+.gg-adding label, .gg-adding legend { font-weight: 700; color: var(--forest); }
+.gg-adding input, .gg-adding textarea { width: 100%; font: inherit; padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: #FFFFFF; }
+.gg-adding input:focus, .gg-adding textarea:focus { border-color: var(--honey); outline: none; }
+.gg-pick-petals { border: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.gg-pick-petals legend { margin-bottom: 8px; }
+.gg-save-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.gg-status { color: var(--ink-soft); }
+.gg-status.err { color: #A2412F; font-weight: 600; }
+.hint { color: var(--ink-soft); font-weight: 400; font-size: 0.9em; }
+
+/* Drawing */
+.gg-draw { display: grid; gap: 10px; }
+#gg-canvas { width: 100%; aspect-ratio: 4 / 3; background: #FFFFFF; border-radius: 18px; border: 2px solid var(--line); touch-action: none; cursor: crosshair; }
+.gg-tools { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+.gg-colors { display: flex; flex-wrap: wrap; gap: 8px; }
+.gg-color { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #FFFFFF; box-shadow: 0 0 0 2px var(--line); }
+.gg-color.on { box-shadow: 0 0 0 3px var(--forest); transform: scale(1.1); }
+.gg-sizes { display: flex; flex-wrap: wrap; gap: 6px; }
+.gg-size { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--line); background: #FFFFFF; font-weight: 700; color: var(--forest); }
+.gg-size.on { border-color: var(--honey); background: #FFF3D6; }
+
+/* Photo */
+.gg-pick { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 180px; border-radius: 18px; border: 2px dashed var(--sage); background: #FFFFFF; cursor: pointer; font-weight: 700; color: var(--forest); font-size: 1.1em; }
+.gg-pick svg { width: 64px; height: 64px; }
+
+/* Voice */
+.gg-rec { display: grid; justify-items: center; gap: 12px; padding: 18px; border-radius: 18px; background: #FFFFFF; }
+.gg-recbtn { display: inline-flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 28px; border-radius: 999px; border: 0; background: #FBE0E9; color: #5E1D35; font-weight: 800; font-size: 1.15em; }
+.gg-recbtn .gg-dot { width: 18px; height: 18px; border-radius: 50%; background: #D8436B; }
+.gg-recbtn.on { background: #D8436B; color: #FFFFFF; }
+.gg-recbtn.on .gg-dot { background: #FFFFFF; animation: ggblink 1s steps(2) infinite; }
+.gg-clock { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+.gg-rec audio { width: 100%; }
+
+@keyframes ggbreathe { 0%, 100% { transform: scale(0.97); } 50% { transform: scale(1.03); } }
+@keyframes ggpop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes ggup { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ggblink { 50% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .gg-flower, .gg-flower-mini, .gg-card.gg-new, .gg-panel { animation: none; } }

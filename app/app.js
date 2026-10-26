@@ -11,6 +11,7 @@
     'little-breath': ['body', 'spirit'], 'one-little-bee': ['earth', 'world'], 'one-circle': ['world', 'heart'], 'still-water': ['spirit', 'heart'],
     'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world']
   };
+  window.NECTARA_GROWS = GROWS;
   function petalTags(id) {
     var g = GROWS[id]; if (!g) return '';
     return '<span class="grows">' + g.map(function (p) { return '<i style="--pc:' + GROW_PETALS[p][1] + '">' + GROW_PETALS[p][0] + '</i>'; }).join('') + '</span>';
@@ -91,7 +92,7 @@
 
   // ---------- Home ----------
   function renderHome() {
-    stopLesson();
+    stopLesson(); if (window.NectaraGarden) window.NectaraGarden.preload();
     var series = DATA.series.filter(function (s) { return s.ready; })[0];
     var grown = series.lessons.filter(function (l) { return state.done[l.id]; }).length;
     var next = series.lessons.filter(function (l) { return !state.done[l.id]; })[0] || series.lessons[0];
@@ -105,6 +106,8 @@
       (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
         '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +
         (function () { var m = window.NectaraWorld.memories ? window.NectaraWorld.memories() : []; return m.length ? 'Your memory jar remembers the ' + m.join(', the ').replace(/, the ([^,]*)$/, ' and the $1') + '.' : ''; })() + '</p><span class="btn">Explore</span></span></button>' : '') +
+      (window.NectaraGarden ? '<a class="gg-home" href="#/garden">' + window.NectaraGarden.flower() +
+        '<span class="gg-home-text"><h2>Growth Garden</h2><p>' + (child ? esc(child) + '&rsquo;s' : 'Your child&rsquo;s') + ' drawings, photos and voice notes from every adventure, kept for your family and sorted by petal.</p><span class="btn">Open the garden</span></span></a>' : '') +
       '<section class="garden-card"><div><h1>' + (child ? esc(child) + '&rsquo;s garden' : 'Asal&rsquo;s garden') + '</h1>' +
       '<p>Every lesson you finish grows a flower. ' + (grown === series.lessons.length ? 'The whole garden is blooming! Lessons can be done again any time.' : grown + ' of ' + series.lessons.length + ' flowers grown this month.') + '</p>' +
       '<button class="btn" type="button" data-open="' + next.id + '">' + (grown ? 'Next: ' : 'Start: ') + esc(next.title) + '</button></div>' +
@@ -372,6 +375,9 @@
     var w = location.hash.match(/^#\/world(?:\/([a-z]+))?/);
     if (w && window.NectaraWorld) { stopLesson(); state.lesson = null; window.NectaraWorld.open(w[1]); return; }
     if (window.NectaraWorld) window.NectaraWorld.close();
+    var gm = location.hash.match(/^#\/garden(?:\/(.+))?$/);
+    if (gm && window.NectaraGarden) { stopLesson(); state.lesson = null; window.NectaraGarden.open(gm[1], { user: state.user, done: state.done }); return; }
+    if (window.NectaraGarden) window.NectaraGarden.close();
     var m = location.hash.match(/^#\/lesson\/([a-z0-9-]+)(?:\/(\d+))?/);
     if (m) renderLesson(m[1], m[2] ? parseInt(m[2], 10) : 0); else renderHome();
   }

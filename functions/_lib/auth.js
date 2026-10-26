@@ -12,7 +12,7 @@
 //   mail:last-error       the most recent email that failed to send { at, status, detail } (shown on the admin page)
 // access: 'waiting' (signed up, no access yet) | 'founding' (invite code) | 'member' (paid) | 'staff' | 'paused'
 
-export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:', 'ecode:', 'elim:', 'pair:', 'mail:', 'tvfail:'];
+export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:', 'ecode:', 'elim:', 'pair:', 'mail:', 'tvfail:', 'invite:', 'gg:', 'ggm:'];
 export const COOKIE = 'nx_session';
 const SESSION_DAYS = 30;
 const enc = new TextEncoder();
