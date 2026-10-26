@@ -103,3 +103,5 @@
 @keyframes ggup { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes ggblink { 50% { opacity: 0.2; } }
 @media (prefers-reduced-motion: reduce) { .gg-flower, .gg-flower-mini, .gg-card.gg-new, .gg-panel { animation: none; } }
+.gg-from { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); }
+.gg-from-ico { width: 24px; height: 24px; color: var(--forest); }

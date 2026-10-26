@@ -125,9 +125,18 @@
         .catch(function (err) { del.textContent = 'Couldn’t remove it: ' + err.message; });
     });
   }
+  // Came from an "I found it!" in Asal's World? Then go back to that place afterwards.
+  function worldBack(saved) {
+    var back = null; try { back = JSON.parse(sessionStorage.getItem('nx_found_back') || 'null'); sessionStorage.removeItem('nx_found_back'); } catch (e) {}
+    if (!back || !back.place) return false;
+    try { if (saved) sessionStorage.setItem('nx_found_done', back.spot); } catch (e) {}
+    location.hash = '#/world/' + back.place;
+    return true;
+  }
   function closeSheet() {
     var sheet = document.getElementById('gg-sheet'); if (!sheet) return;
     stopRecording(); sheet.hidden = true; sheet.innerHTML = '';
+    if (/^#\/garden\/add\/[a-z]+\/mission/.test(location.hash) && worldBack(false)) return;
     if (/^#\/garden\/add/.test(location.hash)) location.hash = '#/garden';
   }
 
@@ -142,6 +151,8 @@
     if (!KIND[kind]) { location.hash = '#/garden'; return; }
     var sheet = document.getElementById('gg-sheet');
     var draft = { kind: kind, blob: null, mime: '', source: source || '', petals: suggestPetals(source) };
+    var spotName = '';
+    if (/^(mission|world):/.test(draft.source) && window.NECTARA_WORLD) window.NECTARA_WORLD.places.forEach(function (pl) { pl.spots.forEach(function (x) { if (x.id === draft.source.split(':')[1]) spotName = x.name; }); });
     var capture = {
       drawing: '<div class="gg-draw"><canvas id="gg-canvas" width="1200" height="900" aria-label="Drawing space"></canvas>' +
         '<div class="gg-tools"><div class="gg-colors">' + ['#2A2118', '#E0503A', '#F28C28', '#F2C14E', '#5FA36A', '#3E7CA8', '#8E5BB8', '#E76F9A', '#8A5A2B', '#FFFFFF'].map(function (c, i) { return '<button type="button" class="gg-color' + (i === 0 ? ' on' : '') + '" data-color="' + c + '" style="background:' + c + '" aria-label="Color"></button>'; }).join('') + '</div>' +
@@ -155,7 +166,8 @@
     sheet.innerHTML = '<div class="gg-panel gg-adding" role="dialog" aria-modal="true" aria-label="Add ' + KIND[kind].title + '">' +
       '<div class="gg-panel-head"><h2>' + KIND[kind].icon + ' ' + KIND[kind].title + '</h2><button type="button" class="btn quiet" data-close>Cancel</button></div>' +
       capture +
-      '<div class="field"><label for="gg-title">What is it? <span class="hint">(optional)</span></label><input id="gg-title" maxlength="80" placeholder="' + ({ drawing: 'e.g. Me as a frog', photo: 'e.g. A snail on the path', voice: 'e.g. The story of the brave seed', note: 'e.g. First time she noticed the moon' })[kind] + '"></div>' +
+      (spotName ? '<p class="gg-from">' + KIND.photo.icon.replace('<svg', '<svg class="gg-from-ico"') + ' From Asal&rsquo;s World: <b>' + esc(spotName) + '</b> mission</p>' : '') +
+      '<div class="field"><label for="gg-title">What is it? <span class="hint">(optional)</span></label><input id="gg-title" maxlength="80"' + (spotName ? ' value="I found it: ' + esc(spotName) + '"' : '') + ' placeholder="' + ({ drawing: 'e.g. Me as a frog', photo: 'e.g. A snail on the path', voice: 'e.g. The story of the brave seed', note: 'e.g. First time she noticed the moon' })[kind] + '"></div>' +
       '<fieldset class="gg-pick-petals"><legend>Which petals did it grow?</legend>' + PETALS.map(function (p) { return '<button type="button" class="gg-chip' + (draft.petals.indexOf(p.id) >= 0 ? ' on' : '') + '" data-petal="' + p.id + '" aria-pressed="' + (draft.petals.indexOf(p.id) >= 0) + '" style="--pc:' + p.color + '">' + p.name + '</button>'; }).join('') + '</fieldset>' +
       '<div class="gg-save-row"><button type="button" class="btn" id="gg-save">Add to the garden</button><span class="gg-status" id="gg-status" role="status"></span></div></div>';
     sheet.hidden = false;
@@ -293,6 +305,7 @@
       .then(function (j) {
         S.entries = j.entries; stopRecording();
         var sheet = document.getElementById('gg-sheet'); sheet.hidden = true; sheet.innerHTML = '';
+        if (/^mission:/.test(draft.source) && worldBack(true)) return;
         location.hash = '#/garden';
         render();
         var first = root.querySelector('.gg-card'); if (first) { first.classList.add('gg-new'); first.focus(); }

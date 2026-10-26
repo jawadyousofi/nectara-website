@@ -575,6 +575,8 @@
     var key = 'nx_world_seen_' + p.id, seen = false;
     try { seen = sessionStorage.getItem(key) === '1'; sessionStorage.setItem(key, '1'); } catch (e) {}
     var afterOpen = function () {
+      var done = null; try { done = sessionStorage.getItem('nx_found_done'); sessionStorage.removeItem('nx_found_done'); } catch (e) {}
+      if (done) { var fs = null; p.spots.forEach(function (x) { if (x.id === done) fs = x; }); sfx('sparkle'); showPanel({ name: 'Growth Garden', text: W.foundDone.text, audio: W.foundDone.id, spotY: fs ? fs.y : 500, acts: [{ label: 'Explore', icon: 'explore', fn: closePanel }] }); return; }
       if (!seen) showPanel({ name: p.name, text: p.intro.text, audio: p.intro.id, acts: [{ label: 'Let’s look!', icon: 'explore', fn: closePanel }] });
       else focusItem(0);
     };
@@ -643,6 +645,8 @@
     var acts = [];
     if (s.move && !used.move) acts.push({ label: 'Move with me', icon: 'move', cls: 'rose', fn: function () { startMove(s, used); } });
     if (s.mission && !used.outside) acts.push({ label: 'Try it outside', icon: 'outside', cls: 'leaf', fn: function () { used.outside = true; showMission(s, used); } });
+    // After the mission: the child goes and finds it for real, then adds a photo or drawing to the Growth Garden.
+    if (s.mission && used.outside && !used.found && window.NectaraGarden && !IS_TV) acts.unshift({ label: 'I found it!', icon: 'found', cls: 'leaf', fn: function () { used.found = true; foundIt(s, used); } });
     acts.push({ label: 'Explore', icon: 'explore', fn: closePanel });
     acts.push({ label: 'Go back', icon: 'back', cls: 'sky', fn: function () { closePanel(); goBack(); } });
     return acts;
@@ -654,6 +658,18 @@
     setTimeout(function () { d.setAttribute('style', 'left:76%;top:5%;transform:scale(0.4);opacity:0.2'); }, 30);
     setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); updateJar(); sfx('sparkle'); var j = document.getElementById('w-jar'); if (j) { j.classList.remove('bump'); void j.offsetWidth; j.classList.add('bump'); } }, 1300);
   }
+  var IS_TV = /Web0S|webOS|SmartTV|Tizen|NetCast|BRAVIA|HbbTV/i.test(navigator.userAgent);
+  function foundIt(s, used) {
+    function go(kind) {
+      try { sessionStorage.setItem('nx_found_back', JSON.stringify({ place: S.place ? S.place.id : '', spot: s.id })); } catch (e) {}
+      closePanel();
+      location.hash = '#/garden/add/' + kind + '/' + encodeURIComponent('mission:' + s.id);
+    }
+    showPanel({ name: 'I found it!', text: W.foundAsk.text, audio: W.foundAsk.id, spotY: s.y, acts: [
+      { label: 'Take a photo', icon: 'camera', cls: 'leaf', fn: function () { go('photo'); } },
+      { label: 'Draw it', icon: 'draw', cls: 'rose', fn: function () { go('drawing'); } },
+      { label: 'Not yet', icon: 'back', cls: 'sky', fn: function () { used.found = false; closePanel(); } }] });
+  }
   function showMission(s, used) {
     showPanel({ name: 'Try it outside', text: s.mission, audio: 'm-' + s.id, acts: spotActs(s, used || { outside: true }), leaf: true, spotY: s.y });
   }
@@ -661,6 +677,9 @@
   // ---------- Panel (what Asal says) ----------
   var ICONS = {
     explore: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 L27 9.5 L27 22.5 L16 29 L5 22.5 L5 9.5 Z" fill="#FFF3B0" stroke="#2A2118" stroke-width="2.2"/><circle cx="14.5" cy="14.5" r="5" fill="none" stroke="#2A2118" stroke-width="2.6"/><path d="M18 18 L22.5 22.5" stroke="#2A2118" stroke-width="3" stroke-linecap="round"/></svg>',
+    found: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFF3B0" stroke="#2F5E36" stroke-width="2.2"/><path d="M16 7l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6-4.5-4.1 6-.7z" fill="#F2B23A" stroke="#2F5E36" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    camera: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#E4F5DD" stroke="#2F5E36" stroke-width="2.2"/><rect x="8" y="12" width="16" height="11" rx="2.5" fill="#FFFFFF" stroke="#2F5E36" stroke-width="2"/><path d="M12.5 12l1.5-2.5h4l1.5 2.5" fill="none" stroke="#2F5E36" stroke-width="2" stroke-linejoin="round"/><circle cx="16" cy="17.5" r="3" fill="#BFE3F5" stroke="#2F5E36" stroke-width="1.8"/></svg>',
+    draw: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFE1EA" stroke="#8A2E4E" stroke-width="2.2"/><path d="M10 23l1.6-4.8 8-8 3.2 3.2-8 8z" fill="#FFF3B0" stroke="#8A2E4E" stroke-width="1.8" stroke-linejoin="round"/><path d="M18 11.8l3.2 3.2" stroke="#8A2E4E" stroke-width="1.8"/></svg>',
     move: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFE1EA" stroke="#8A2E4E" stroke-width="2.2"/><circle cx="16" cy="9" r="2.6" fill="#8A2E4E"/><path d="M16 12 L16 19 M9.5 12.5 L16 14.5 L22.5 11 M16 19 L11.5 25 M16 19 L21 24.5" fill="none" stroke="#8A2E4E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     outside: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#E4F5DD" stroke="#2F5E36" stroke-width="2.2"/><circle cx="21.5" cy="10.5" r="3" fill="#F2B23A"/><path d="M10 24 C10 17 13 13 17 12 C16.5 17 14 21 10 24 Z" fill="#5FA36A" stroke="#2F5E36" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 24 L14.5 17.5" stroke="#2F5E36" stroke-width="1.6" stroke-linecap="round"/></svg>',
     back: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFFFFF" stroke="#1F4E73" stroke-width="2.2"/><path d="M18.5 9.5 L11.5 16 L18.5 22.5" fill="none" stroke="#1F4E73" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'

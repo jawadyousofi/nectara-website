@@ -7,6 +7,8 @@ window.NECTARA_WORLD = {
   bye: { id: 'bye', text: 'What a wonderful adventure! My wings are getting sleepy. Let’s rest our eyes and go find something amazing outside. See you next time!' },
   jar: { id: 'jar', text: 'This is our memory jar. It keeps everything we discovered together. Look, our flower grows a little each time we explore!' },
   cheer: { id: 'cheer-move', text: 'Wonderful moving! What shall we do next?' },
+  foundAsk: { id: 'found-ask', text: 'Hooray, you found it! Do you want to take a photo, or draw what you found?' },
+  foundDone: { id: 'found-done', text: 'I tucked it into your Growth Garden. What a wonderful explorer you are!' },
   // The four nourishing pillars. Every visit opens and closes with one, shuffled so all four come round evenly.
   pillars: [
     { id: 'breath', name: 'Breath', color: '#7FB3D5',
