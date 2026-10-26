@@ -328,3 +328,26 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 @keyframes wpopin { 0% { opacity: 0; transform: scale(0.3) translateY(1em); } 70% { opacity: 1; transform: scale(1.12) translateY(-0.1em); } 100% { transform: none; } }
 @keyframes wbtnbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.12em); } }
 @keyframes wbtnwiggle { 0%, 100% { transform: scale(1.08) rotate(0); } 25% { transform: scale(1.1) rotate(-3deg); } 75% { transform: scale(1.1) rotate(3deg); } }
+
+/* The Orange Tree and Inside Me */
+#w-orange, #w-blossom, #w-oseed, #w-sprout, #w-peel, #w-sort, #w-youseed, #w-mouth, #w-tube, #w-tummy, #w-twisty, #w-blood, #w-poop, #w-toilet, #w-glass { transform-origin: 50% 50%; }
+#w-sprout, #w-oseed, #w-youseed, #w-peel, #w-sort, #w-glass { transform-origin: 50% 100%; }
+#w-orange.play { animation: wjiggle 0.9s ease-in-out 2; }
+#w-blossom.play { animation: wbloom 1.8s ease-out; }
+#w-oseed.play, #w-sprout.play, #w-sort.play { animation: wpop 0.8s ease-out; }
+#w-peel.play { animation: wjiggle 0.7s ease-in-out 2; }
+#w-youseed.play { animation: wgrowup 2.2s ease-in-out; }
+#w-mouth.play { animation: wchew 0.35s ease-in-out 6; }
+#w-tube.play, #w-twisty.play, #w-poop.play { animation: wsqueeze 1.6s ease-in-out; }
+#w-tummy.play { animation: wjiggle 0.6s ease-in-out 3; }
+#w-blood.play { animation: wbeat 0.55s ease-in-out 5; }
+#w-glass.play { animation: wjiggle 0.5s ease-in-out 3; }
+#w-toilet.play .w-bubble circle { animation: wbubbleup 2.4s ease-out; }
+.w-rain ellipse { animation: wraindrop 1.6s linear infinite; }
+.w-rain ellipse:nth-child(2) { animation-delay: 0.5s; } .w-rain ellipse:nth-child(3) { animation-delay: 1s; }
+@keyframes wchew { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.45); } }
+@keyframes wsqueeze { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.06, 0.94); } 60% { transform: scale(0.95, 1.05); } }
+@keyframes wbeat { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.12); } }
+@keyframes wgrowup { 0% { transform: scale(0.6); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+@keyframes wbubbleup { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
+@keyframes wraindrop { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }

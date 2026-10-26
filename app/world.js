@@ -131,7 +131,8 @@
     S.ambientTimer = setInterval(function () {
       if (!S.sound || S.mode === 'bye') return;
       var r = Math.random();
-      if (id === 'garden' || id === 'map') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
+      if (id === 'inside') { tone(72, 0, 0.14, 'sine', 0.06, 52); tone(72, 0.28, 0.14, 'sine', 0.045, 52); }
+      else if (id === 'garden' || id === 'map' || id === 'orchard') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
       else if (id === 'pond') { tone(500 + r * 400, 0, 0.2, 'sine', 0.025, 220); }
       else if (id === 'sky') { noise(1.6, 0.03, 500); }
     }, 3500);
@@ -213,6 +214,14 @@
       bee(-110, -120, 1.1, 'w-fly1') + bee(-60, -10, 0.9, 'w-fly2') + '</g>';
     // sky
     b += '<g transform="translate(800 215)"><g opacity="0.85">' + rainbowArcs(0, 80, 150, 12) + '</g>' + cloud(-40, 40, 1.1, '') + cloud(100, 70, 0.7, '') + '</g>';
+    // orange tree
+    b += '<path d="M185 365 C220 420 300 520 380 560" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
+    b += '<g transform="translate(185 365)"><path d="M-8 70 L-6 -10 L6 -10 L8 70Z" fill="#8A5A3B"/><circle cx="0" cy="-50" r="70" fill="#5E9E4E"/><circle cx="-40" cy="-20" r="46" fill="#6DB25A"/><circle cx="40" cy="-24" r="46" fill="#6DB25A"/>' +
+      '<g fill="#F28C28"><circle cx="-30" cy="-50" r="11"/><circle cx="20" cy="-70" r="11"/><circle cx="30" cy="-20" r="11"/><circle cx="-10" cy="-10" r="10"/><circle cx="-50" cy="-14" r="9"/></g></g>';
+    // inside me
+    b += '<path d="M1440 335 C1400 420 1320 480 1250 520" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
+    b += '<g transform="translate(1440 335)"><circle r="78" fill="#FDF1E3" stroke="#F2C9A8" stroke-width="5"/>' + child(0, 6, 0.8, '#FFE3CF') +
+      '<path d="M-4 18 c-8 -6 -14 -11 -14 -17 c0 -4 3 -7 7 -7 c3 0 5 2 7 5 c2 -3 4 -5 7 -5 c4 0 7 3 7 7 c0 6 -6 11 -14 17z" fill="#E0503A"/></g>';
     b += bee(560, 420, 1, 'w-fly3');
     return svg(b);
   }
@@ -388,7 +397,108 @@
       '<path d="M0 60 q14 20 0 40 q-14 20 0 40" stroke="#5B4C3A" stroke-width="2.5" fill="none"/><path d="M-10 92 l20 8 M-10 132 l20 8" stroke="#7FB3D5" stroke-width="8" stroke-linecap="round"/></g></g>';
     return svg(b);
   }
-  var SCENES = { map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky };
+
+  // ---------- The Orange Tree: from seed to fruit, and back to the soil ----------
+  function orange(x, y, r) {
+    return '<g transform="translate(' + x + ' ' + y + ')"><circle r="' + r + '" fill="#F28C28"/><circle cx="' + (-r * 0.35) + '" cy="' + (-r * 0.35) + '" r="' + (r * 0.28) + '" fill="#FFB766" opacity="0.8"/>' +
+      '<path d="M0 ' + (-r) + ' q' + (r * 0.5) + ' ' + (-r * 0.6) + ' ' + (r * 1.1) + ' ' + (-r * 0.35) + '" fill="#5E9E4E" stroke="#4F8F45" stroke-width="2"/></g>';
+  }
+  function blossom(x, y, s) {
+    var p = '';
+    for (var i = 0; i < 5; i++) p += '<ellipse cx="0" cy="-9" rx="6" ry="9" fill="#FFFFFF" transform="rotate(' + (i * 72) + ')"/>';
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')">' + p + '<circle r="4.5" fill="#F2C14E"/></g>';
+  }
+  function child(x, y, s, shirt) {
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')">' +
+      '<path d="M-26 40 L-34 92 M26 40 L34 92" stroke="#8A5A3B" stroke-width="12" stroke-linecap="round"/>' +
+      '<path d="M-30 -6 C-60 -20 -70 -46 -66 -60 M30 -6 C60 -20 70 -46 66 -60" stroke="#E8B48C" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+      '<rect x="-34" y="-20" width="68" height="70" rx="26" fill="' + (shirt || '#7FB3D5') + '"/>' +
+      '<circle cx="0" cy="-50" r="30" fill="#E8B48C"/><path d="M-30 -58 C-28 -86 28 -86 30 -58 C20 -70 -20 -70 -30 -58Z" fill="#3B2A1E"/>' +
+      '<circle cx="-10" cy="-50" r="3.5" fill="#2A2118"/><circle cx="10" cy="-50" r="3.5" fill="#2A2118"/><path d="M-9 -38 Q0 -31 9 -38" stroke="#2A2118" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="-18" cy="-42" r="5" fill="#F4A6A6" opacity="0.6"/><circle cx="18" cy="-42" r="5" fill="#F4A6A6" opacity="0.6"/></g>';
+  }
+  function sceneOrchard() {
+    var b = skyAndSun(1440, 130);
+    b += cloud(300, 140, 0.8) + cloud(1120, 110, 0.6, 'w-drift w-slow');
+    b += '<path d="M0 540 Q360 450 760 520 T1600 500 V900 H0Z" fill="#CFE3B8"/>';
+    b += '<path d="M0 640 Q420 580 840 630 T1600 610 V900 H0Z" fill="#A9CF8E"/>';
+    b += '<path d="M0 790 Q260 772 520 788 T1040 784 T1600 790 V900 H0Z" fill="#8A5A3B"/>';
+    b += '<g fill="#A57452"><ellipse cx="120" cy="850" rx="16" ry="9"/><ellipse cx="760" cy="870" rx="20" ry="10"/><ellipse cx="1300" cy="855" rx="14" ry="8"/></g>';
+    for (var t = 0; t < 13; t++) b += tuft(40 + t * 125, 700 + (t % 3) * 28);
+    b += daisy(150, 690, '#FFFFFF', 1.1) + daisy(1270, 680, '#F4A6C0', 1.1) + daisy(860, 720, '#FFFFFF', 1);
+    // the big orange tree
+    b += '<path d="M612 800 C620 700 616 600 628 500 L652 500 C664 600 660 700 668 800Z" fill="#8A5A3B"/>' +
+      '<path d="M636 560 C600 520 560 500 520 470 M644 540 C690 500 730 480 770 460" stroke="#8A5A3B" stroke-width="18" stroke-linecap="round" fill="none"/>';
+    b += '<g fill="#5E9E4E"><circle cx="640" cy="330" r="175"/><circle cx="480" cy="380" r="128"/><circle cx="800" cy="380" r="128"/></g>' +
+      '<g fill="#6DB25A"><circle cx="560" cy="230" r="118"/><circle cx="730" cy="230" r="118"/><circle cx="640" cy="300" r="120"/></g>';
+    b += '<g id="w-orange">' + orange(560, 300, 24) + orange(705, 270, 24) + orange(625, 405, 26) + orange(770, 385, 23) + orange(495, 405, 22) + orange(655, 195, 21) + orange(810, 300, 21) + orange(450, 320, 20) + '</g>';
+    b += '<g id="w-blossom">' + blossom(880, 290, 1.3) + blossom(912, 322, 1.1) + blossom(862, 332, 1.2) + blossom(902, 260, 1) + bee(950, 250, 1, '') + '</g>';
+    b += orange(560, 805, 20) + orange(720, 812, 18);
+    // seed in the soil
+    b += '<g transform="translate(250 770)"><g id="w-oseed"><ellipse cx="0" cy="18" rx="80" ry="22" fill="#6B4423"/><path d="M-70 14 Q0 -26 70 14" fill="#7A5235"/>' +
+      '<ellipse cx="0" cy="8" rx="16" ry="10" fill="#F5E6C4" stroke="#C9A06A" stroke-width="3"/><path d="M0 18 q-6 14 -2 26" stroke="#E8D2A8" stroke-width="3" fill="none" stroke-linecap="round"/></g></g>';
+    // sprout
+    b += '<g transform="translate(455 735)"><g id="w-sprout"><ellipse cx="0" cy="40" rx="64" ry="18" fill="#7A5235"/><path d="M0 40 C-4 10 4 -20 0 -50" stroke="#5E9E4E" stroke-width="8" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="-22" cy="-30" rx="22" ry="10" fill="#7BC25A" transform="rotate(-25 -22 -30)"/><ellipse cx="22" cy="-50" rx="22" ry="10" fill="#7BC25A" transform="rotate(25 22 -50)"/></g></g>';
+    // you are a seed: a child beside a young orange tree, with a heart
+    b += '<g transform="translate(1000 610)"><g id="w-youseed">' +
+      '<path d="M70 110 V20" stroke="#8A5A3B" stroke-width="10"/><circle cx="70" cy="10" r="36" fill="#6DB25A"/>' + orange(58, 4, 9) + orange(84, 18, 8) +
+      child(-10, 30, 0.95, '#F2C14E') +
+      '<path d="M-10 -78 c-10 -14 -30 -4 -20 10 l20 18 l20 -18 c10 -14 -10 -24 -20 -10z" fill="#E76F9A"/></g></g>';
+    // compost
+    b += '<g transform="translate(1150 735)"><g id="w-peel"><rect x="-80" y="-30" width="160" height="90" rx="10" fill="#A8754E" stroke="#7A5235" stroke-width="5"/>' +
+      '<path d="M-80 0 H80 M-80 28 H80" stroke="#7A5235" stroke-width="4"/><ellipse cx="0" cy="-30" rx="76" ry="16" fill="#5B3A22"/>' +
+      '<path d="M-44 -40 q14 -20 30 -4 q-16 4 -30 4z" fill="#F28C28"/><path d="M6 -44 q18 -14 30 2 q-16 2 -30 -2z" fill="#F7A440"/><path d="M-12 -36 q4 -16 16 -12" stroke="#7BC25A" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="40" cy="-34" rx="7" ry="4" fill="#F5E6C4"/><path d="M-60 -24 q10 -12 20 0 t20 0" stroke="#E89A9A" stroke-width="8" fill="none" stroke-linecap="round"/></g></g>';
+    // soil or not: two bins
+    b += '<g transform="translate(1410 700)"><g id="w-sort">' +
+      '<path d="M-100 -20 H-12 L-20 80 H-92Z" fill="#8A5A3B" stroke="#5B3A22" stroke-width="4"/><rect x="-106" y="-30" width="100" height="14" rx="5" fill="#6B4423"/>' +
+      '<path d="M-56 30 c-18 -4 -24 -24 -6 -34 c4 18 14 24 6 34z" fill="#7BC25A"/>' +
+      '<path d="M12 -20 H100 L92 80 H20Z" fill="#3E7CA8" stroke="#245A82" stroke-width="4"/><rect x="6" y="-30" width="100" height="14" rx="5" fill="#2F6A96"/>' +
+      '<g fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"><path d="M44 18 l12 -16 l12 16"/><path d="M76 34 l-8 18 h-24"/><path d="M38 52 l-6 -20"/></g>' +
+      '<path d="M-90 -60 q20 -30 40 -6" stroke="#F2C14E" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+      '<rect x="40" y="-92" width="22" height="50" rx="8" fill="#BFE3F5" stroke="#7FB3D5" stroke-width="3"/><rect x="45" y="-100" width="12" height="10" rx="3" fill="#7FB3D5"/></g></g>';
+    b += bee(1300, 420, 0.9, 'w-fly1') + bee(260, 470, 0.8, 'w-fly2');
+    return svg(b);
+  }
+
+  // ---------- Inside Me: the journey of food and water ----------
+  function sceneInside() {
+    var b = '<rect width="1600" height="900" fill="#FDF1E3"/>' +
+      '<circle cx="1180" cy="160" r="260" fill="#FCE6CF"/><circle cx="160" cy="760" r="220" fill="#FBE9D6"/>';
+    // the outside world on the right: rain cloud, river, cleaning plant, farm
+    b += cloud(1380, 170, 0.75, 'w-drift w-slow') + '<g class="w-rain" fill="#7FB3D5"><ellipse cx="1340" cy="250" rx="4" ry="9"/><ellipse cx="1380" cy="270" rx="4" ry="9"/><ellipse cx="1420" cy="245" rx="4" ry="9"/></g>';
+    b += '<path d="M900 760 Q1150 700 1600 730 V900 H900Z" fill="#A9CF8E"/>';
+    b += '<path d="M1330 740 C1400 760 1480 790 1600 790 V830 C1480 830 1400 810 1320 780Z" fill="url(#wwater)"/>';
+    for (var f = 0; f < 4; f++) b += '<g transform="translate(' + (1430 + f * 42) + ' ' + (700 - f * 6) + ')"><path d="M0 10 V-24" stroke="#5E9E4E" stroke-width="5"/><ellipse cx="-8" cy="-18" rx="9" ry="5" fill="#7BC25A"/><ellipse cx="8" cy="-26" rx="9" ry="5" fill="#7BC25A"/></g>';
+    // toilet, pipe and the water-cleaning plant with its tiny helpers
+    b += '<g id="w-toilet">' +
+      '<path d="M1030 760 C1040 800 1120 800 1160 760 C1180 740 1190 700 1200 680" stroke="#B8B2A6" stroke-width="16" fill="none" stroke-linecap="round"/>' +
+      '<g transform="translate(1000 700)"><rect x="-40" y="-90" width="80" height="56" rx="10" fill="#FFFFFF" stroke="#C9C2B3" stroke-width="4"/><path d="M-50 -30 H50 C50 10 30 30 0 30 C-30 30 -50 10 -50 -30Z" fill="#FFFFFF" stroke="#C9C2B3" stroke-width="4"/><rect x="-22" y="28" width="44" height="34" rx="6" fill="#FFFFFF" stroke="#C9C2B3" stroke-width="4"/></g>' +
+      '<g transform="translate(1250 620)"><rect x="-90" y="20" width="180" height="70" rx="12" fill="#D8D2C4"/><ellipse cx="-40" cy="20" rx="46" ry="16" fill="#7FB3D5" stroke="#5B8FB8" stroke-width="4"/><ellipse cx="45" cy="20" rx="40" ry="14" fill="#9BCBE6" stroke="#5B8FB8" stroke-width="4"/>' +
+      '<g class="w-bubble" fill="#7BC25A"><circle cx="-56" cy="14" r="7"/><circle cx="-30" cy="22" r="6"/><circle cx="-44" cy="6" r="5"/><circle cx="40" cy="16" r="6"/><circle cx="58" cy="22" r="5"/></g>' +
+      '<g fill="#2A2118"><circle cx="-58" cy="12" r="1.6"/><circle cx="-54" cy="12" r="1.6"/><circle cx="38" cy="14" r="1.4"/><circle cx="42" cy="14" r="1.4"/></g>' +
+      '<path d="M90 50 C120 60 120 100 140 120" stroke="#7FB3D5" stroke-width="12" fill="none" stroke-linecap="round"/></g></g>';
+    // a glass of water on a little table
+    b += '<g transform="translate(880 430)"><rect x="-60" y="70" width="120" height="12" rx="6" fill="#C9A06A"/><path d="M-44 82 V170 M44 82 V170" stroke="#A8754E" stroke-width="8"/>' +
+      '<g id="w-glass"><path d="M-32 -60 L-24 64 H24 L32 -60Z" fill="#EAF5FB" stroke="#9BC7E4" stroke-width="4"/><path d="M-29 -20 L-24 60 H24 L29 -20Z" fill="#7FB3D5" opacity="0.85"/>' +
+      '<ellipse cx="-10" cy="10" rx="5" ry="16" fill="#FFFFFF" opacity="0.6"/></g></g>';
+    // the body
+    b += '<rect x="520" y="300" width="80" height="50" fill="#F3C9A0"/>';
+    b += '<rect x="370" y="330" width="380" height="460" rx="130" fill="#FFE3CF" stroke="#E8B48C" stroke-width="6"/>';
+    b += '<circle cx="560" cy="195" r="118" fill="#F3C9A0" stroke="#E8B48C" stroke-width="6"/><path d="M446 170 C450 60 670 60 674 170 C640 120 480 120 446 170Z" fill="#3B2A1E"/>';
+    b += '<circle cx="520" cy="200" r="9" fill="#2A2118"/><circle cx="600" cy="200" r="9" fill="#2A2118"/><circle cx="496" cy="232" r="14" fill="#F4A6A6" opacity="0.6"/><circle cx="624" cy="232" r="14" fill="#F4A6A6" opacity="0.6"/>';
+    b += '<g id="w-mouth"><path d="M520 245 Q560 290 600 245 Z" fill="#B8434D"/><path d="M528 248 h64" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><ellipse cx="560" cy="268" rx="16" ry="7" fill="#F28C9A"/></g>';
+    b += '<g id="w-blood" opacity="0.9"><g stroke="#E2725B" stroke-width="5" fill="none" opacity="0.55" stroke-linecap="round"><path d="M470 430 C430 480 410 560 412 700"/><path d="M470 430 C520 360 650 350 720 420"/><path d="M470 430 C500 520 600 560 700 760"/></g>' +
+      '<path d="M470 452 c-30 -24 -54 -42 -54 -64 c0 -16 12 -26 26 -26 c12 0 22 8 28 18 c6 -10 16 -18 28 -18 c14 0 26 10 26 26 c0 22 -24 40 -54 64z" fill="#E0503A" stroke="#B83A28" stroke-width="3"/></g>';
+    b += '<g id="w-tube"><path d="M560 290 C560 340 570 380 610 425" stroke="#E9A0A0" stroke-width="24" fill="none" stroke-linecap="round"/></g>';
+    b += '<g id="w-tummy"><path d="M600 420 C650 395 720 420 712 470 C704 515 640 520 610 498 C590 484 600 460 620 462 C640 466 650 470 660 460" fill="#F4A6A6" stroke="#D97C7C" stroke-width="5"/></g>';
+    b += '<g id="w-poop"><path d="M440 720 V555 Q440 535 460 535 H670 Q690 535 690 555 V700 Q690 720 670 722" stroke="#D99A6C" stroke-width="34" fill="none" stroke-linecap="round"/></g>';
+    b += '<g id="w-twisty"><path d="M485 580 C520 560 600 560 630 580 C660 600 620 620 590 610 C550 598 500 600 495 630 C490 660 560 660 600 650 C640 640 660 670 620 690 C580 705 520 700 500 680" stroke="#F2B8A0" stroke-width="16" fill="none" stroke-linecap="round"/></g>';
+    b += '<path d="M370 420 C320 470 300 540 310 600 M750 420 C800 470 820 540 810 600" stroke="#F3C9A0" stroke-width="44" fill="none" stroke-linecap="round"/>';
+    return svg(b);
+  }
+  var SCENES = { map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
 
   // ---------- Layout ----------
   function fit() {
@@ -621,7 +731,7 @@
     if (id === 'baby') { var cb = document.getElementById('w-comb'); cb.classList.remove('larva-play'); void cb.getBoundingClientRect(); cb.classList.add('larva-play'); }
     if (id === 'ripple') { var r = document.getElementById('w-rings'); r.classList.remove('play'); void r.getBoundingClientRect(); r.classList.add('play'); }
     if (id === 'wind') { var wr = document.getElementById('w-wrap'); wr.classList.add('windy'); setTimeout(function () { wr.classList.remove('windy'); }, 4000); }
-    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop' };
+    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step' };
     sfx(sounds[id] || 'chime');
   }
   function discover(s, btn) {
