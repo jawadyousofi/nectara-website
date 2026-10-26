@@ -351,3 +351,7 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 @keyframes wgrowup { 0% { transform: scale(0.6); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
 @keyframes wbubbleup { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-60px); opacity: 0; } }
 @keyframes wraindrop { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
+
+.w-glow { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.play > .w-glow { animation: wglow 2s ease-out; }
+@keyframes wglow { 0% { opacity: 0; transform: scale(0.6); } 30% { opacity: 0.55; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1.4); } }

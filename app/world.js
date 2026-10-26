@@ -483,50 +483,16 @@
     b += '<g transform="translate(880 430)"><rect x="-60" y="70" width="120" height="12" rx="6" fill="#C9A06A"/><path d="M-44 82 V170 M44 82 V170" stroke="#A8754E" stroke-width="8"/>' +
       '<g id="w-glass"><path d="M-32 -60 L-24 64 H24 L32 -60Z" fill="#EAF5FB" stroke="#9BC7E4" stroke-width="4"/><path d="M-29 -20 L-24 60 H24 L29 -20Z" fill="#7FB3D5" opacity="0.85"/>' +
       '<ellipse cx="-10" cy="10" rx="5" ry="16" fill="#FFFFFF" opacity="0.6"/></g></g>';
-    // the body: a cartoon child with a see-through tummy window, organs in their real places
-    var skin = '#F3C9A0', skinLine = '#E3AE84';
-    b += '<path d="M400 355 C360 392 340 470 334 560 M720 355 C760 392 780 470 786 560" stroke="' + skin + '" stroke-width="46" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="332" cy="586" r="27" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="3"/><circle cx="788" cy="586" r="27" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="3"/>';
-    b += '<rect x="455" y="780" width="52" height="88" rx="20" fill="' + skin + '"/><rect x="613" y="780" width="52" height="88" rx="20" fill="' + skin + '"/>' +
-      '<ellipse cx="476" cy="874" rx="44" ry="18" fill="#E2725B"/><ellipse cx="644" cy="874" rx="44" ry="18" fill="#E2725B"/>';
-    b += '<path d="M420 330 C452 312 668 312 700 330 C742 352 750 402 742 452 C734 520 714 562 710 622 C708 682 718 722 718 772 L402 772 C402 722 412 682 410 622 C406 562 386 520 378 452 C370 402 378 352 420 330 Z" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="5"/>';
-    b += '<rect x="533" y="262" width="54" height="62" rx="14" fill="' + skin + '"/>';
-    // head and face
-    b += '<circle cx="454" cy="182" r="24" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="4"/><circle cx="666" cy="182" r="24" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="4"/>' +
-      '<circle cx="560" cy="175" r="108" fill="' + skin + '" stroke="' + skinLine + '" stroke-width="5"/>' +
-      '<path d="M452 172 C446 70 674 70 668 172 C652 128 612 112 560 120 C508 112 468 128 452 172Z" fill="#3B2A1E"/>' +
-      '<g fill="#3B2A1E"><circle cx="478" cy="122" r="22"/><circle cx="512" cy="96" r="24"/><circle cx="556" cy="86" r="26"/><circle cx="602" cy="94" r="24"/><circle cx="640" cy="118" r="22"/></g>' +
-      '<path d="M500 150 q20 -12 40 -2 M580 148 q20 -10 40 2" stroke="#3B2A1E" stroke-width="6" fill="none" stroke-linecap="round"/>' +
-      '<ellipse cx="522" cy="182" rx="17" ry="20" fill="#FFFFFF"/><ellipse cx="598" cy="182" rx="17" ry="20" fill="#FFFFFF"/>' +
-      '<circle cx="525" cy="186" r="11" fill="#3B2A1E"/><circle cx="595" cy="186" r="11" fill="#3B2A1E"/><circle cx="529" cy="181" r="4" fill="#FFFFFF"/><circle cx="599" cy="181" r="4" fill="#FFFFFF"/>' +
-      '<path d="M554 200 q6 10 12 0" stroke="' + skinLine + '" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="492" cy="216" r="15" fill="#F4A6A6" opacity="0.55"/><circle cx="628" cy="216" r="15" fill="#F4A6A6" opacity="0.55"/>';
-    b += '<g id="w-mouth"><path d="M526 222 Q560 266 594 222 Z" fill="#9E3B45"/><path d="M532 225 h56" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"/><ellipse cx="560" cy="246" rx="15" ry="7" fill="#F28C9A"/></g>';
-    // the see-through window
-    b += '<rect x="424" y="338" width="272" height="420" rx="100" fill="#FFF6EE" stroke="#F2C9A8" stroke-width="4" stroke-dasharray="10 8"/>';
-    // lungs and liver (for a true picture; not stops on the journey)
-    b += '<path d="M502 356 C460 362 446 420 451 468 C456 494 486 498 512 488 C524 448 522 392 502 356Z" fill="#F9CAD3" stroke="#EFA3B1" stroke-width="3"/>' +
-      '<path d="M618 356 C660 362 674 420 669 468 C664 494 634 498 608 488 C596 448 598 392 618 356Z" fill="#F9CAD3" stroke="#EFA3B1" stroke-width="3"/>' +
-      '<path d="M442 492 C470 476 560 478 592 494 C584 524 522 540 458 534 C442 524 436 506 442 492Z" fill="#C9705E" stroke="#A85A4A" stroke-width="3"/>';
-    // blood vessels and heart
-    b += '<g id="w-blood"><g stroke="#E2725B" stroke-width="4" fill="none" opacity="0.6" stroke-linecap="round">' +
-      '<path d="M592 430 C520 400 440 380 400 380 C370 420 345 500 336 570"/><path d="M592 430 C650 400 700 380 724 384 C756 424 776 500 784 570"/>' +
-      '<path d="M592 430 C560 520 500 640 480 840"/><path d="M592 430 C620 540 640 660 640 840"/></g>' +
-      '<g transform="translate(593 432) scale(0.62)"><path d="M0 40 c-30 -24 -54 -42 -54 -64 c0 -16 12 -26 26 -26 c12 0 22 8 28 18 c6 -10 16 -18 28 -18 c14 0 26 10 26 26 c0 22 -24 40 -54 64z" fill="#E0503A" stroke="#B83A28" stroke-width="4"/><ellipse cx="-24" cy="-22" rx="7" ry="4" fill="#FFFFFF" opacity="0.5"/></g></g>';
-    // food tube, from the throat down behind the heart into the stomach
-    b += '<g id="w-tube"><path d="M560 300 C558 370 560 440 568 474 C576 498 600 504 622 500" stroke="#E39C9C" stroke-width="20" fill="none" stroke-linecap="round"/><path d="M560 300 C558 370 560 440 568 474 C576 498 600 504 622 500" stroke="#F2B8B8" stroke-width="10" fill="none" stroke-linecap="round"/></g>';
-    // stomach: a J-shaped bag on the body's left side
-    b += '<g id="w-tummy"><path d="M616 492 C650 470 702 482 704 524 C706 568 672 594 630 592 C604 591 588 578 582 564 C598 568 612 570 628 568 C652 564 668 546 664 524 C660 502 640 498 624 508 Z" fill="#F4A6A6" stroke="#D97C7C" stroke-width="4"/>' +
-      '<path d="M640 520 q14 6 18 22 M624 540 q12 8 12 22" stroke="#E58C8C" stroke-width="3" fill="none" stroke-linecap="round"/></g>';
-    // large intestine framing the twisty tube, ending at the bottom
-    var colon = 'M462 712 C454 690 454 624 462 608 C472 598 520 604 565 607 C612 610 652 600 672 612 C684 642 680 694 670 714 C656 734 604 726 584 738 L582 756';
-    b += '<g id="w-poop"><path d="' + colon + '" stroke="#C88A5C" stroke-width="30" fill="none" stroke-linecap="round"/><path d="' + colon + '" stroke="#DDA477" stroke-width="22" fill="none" stroke-linecap="round"/>' +
-      '<path d="' + colon + '" stroke="#C88A5C" stroke-width="22" fill="none" stroke-dasharray="3 20"/></g>';
-    // small intestine: the long twisty tube
-    var coil = 'M500 634 C530 620 600 620 630 634 C652 646 632 662 600 657 C565 652 520 652 505 668 C495 684 525 696 560 692 C600 688 640 680 645 696 C648 710 610 716 576 712';
-    b += '<g id="w-twisty"><path d="' + coil + '" stroke="#E39C82" stroke-width="18" fill="none" stroke-linecap="round"/><path d="' + coil + '" stroke="#F6C3AD" stroke-width="11" fill="none" stroke-linecap="round"/></g>';
-    // shorts
-    b += '<path d="M402 750 L718 750 L722 800 L606 800 L560 772 L514 800 L398 800 Z" fill="#7FB3D5" stroke="#5B8FB8" stroke-width="4"/>';
+    // the child: rendered in 3D in the same style as Asal (tools/inside_kid.html), with see-through skin over the organs
+    b += '<image href="/assets/world/inside-kid.png" xlink:href="/assets/world/inside-kid.png" x="160" y="-79" width="800" height="1200"/>';
+    // a soft glow lights up each part of the journey when it is tapped
+    b += '<g id="w-mouth"><circle class="w-glow" cx="538" cy="313" r="50" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '<g id="w-tube"><circle class="w-glow" cx="558" cy="449" r="36" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '<g id="w-blood"><circle class="w-glow" cx="576" cy="531" r="44" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '<g id="w-tummy"><circle class="w-glow" cx="624" cy="601" r="54" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '<g id="w-twisty"><circle class="w-glow" cx="546" cy="691" r="60" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '<g id="w-poop"><circle class="w-glow" cx="578" cy="753" r="48" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
+      '';
     return svg(b);
   }
   var SCENES = { map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
