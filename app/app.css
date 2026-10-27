@@ -13,7 +13,10 @@ html, body { height: 100%; }
 body { font-family: var(--body); color: var(--ink); background: var(--ground); font-size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem); line-height: 1.55; -webkit-tap-highlight-color: transparent; }
 img, svg { max-width: 100%; height: auto; display: block; }
 button { font: inherit; color: inherit; cursor: pointer; }
-:focus-visible { outline: 4px solid var(--rain-deep); outline-offset: 3px; border-radius: 10px; }
+/* Focus: TV browsers drew a square default box around rounded buttons. No outlines; a ring that follows each button's own shape. */
+:focus { outline: none; }
+button:focus, a:focus, [tabindex]:focus, summary:focus, input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px #FFFDF5, 0 0 0 7px var(--rain-deep); }
+button:focus:not(:focus-visible), a:focus:not(:focus-visible), [tabindex]:focus:not(:focus-visible) { box-shadow: none; }
 h1, h2, h3 { font-family: var(--display); color: var(--forest); line-height: 1.1; text-wrap: balance; }
 .loading { padding: 40px; text-align: center; color: var(--ink-soft); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 999px; border: 0; background: var(--honey); color: #2A2118; font-weight: 700; text-decoration: none; font-size: 1.05em; }
@@ -134,6 +137,7 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 /* ---------- Story read-along ---------- */
 .stage.story { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
 .story-frame { width: 100%; border-radius: clamp(14px, 1.6vw, 28px); overflow: hidden; box-shadow: 0 10px 30px rgba(42, 33, 24, 0.12); }
+.story-frame.sq { max-width: calc(100vh - 230px); margin: 0 auto; }
 .story-art { width: 100%; height: auto; display: block; animation: drift 16s ease-in-out infinite alternate; transform-origin: 50% 60%; }
 @keyframes drift { from { transform: scale(1); } to { transform: scale(1.07) translate(-1.2%, -1%); } }
 .story-text { display: grid; gap: clamp(4px, 0.8vw, 14px); }

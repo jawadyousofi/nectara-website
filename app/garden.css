@@ -2,7 +2,7 @@
 
 /* Home card */
 .gg-home { display: flex; align-items: center; gap: clamp(14px, 3vw, 34px); margin-bottom: 22px; padding: clamp(16px, 2.6vw, 30px); border-radius: 28px; background: linear-gradient(135deg, #FDF3DC 0%, #EEF3EB 100%); text-decoration: none; color: inherit; box-shadow: 0 6px 24px rgba(42, 33, 24, 0.08); }
-.gg-home:focus-visible, .gg-home:hover { outline: 4px solid var(--honey); outline-offset: 3px; }
+.gg-home:focus, .gg-home:hover { box-shadow: 0 0 0 4px #FFFDF5, 0 0 0 9px var(--honey); }
 .gg-flower-mini { width: clamp(110px, 18vw, 190px); height: auto; flex: none; animation: ggbreathe 6s ease-in-out infinite; }
 .gg-home h2 { font-size: clamp(1.6rem, 1.1rem + 2.2vw, 2.8rem); font-weight: 800; }
 .gg-home p { color: var(--ink-soft); margin-top: 4px; max-width: 52ch; }
@@ -35,7 +35,7 @@
 
 .gg-grid { margin-top: 26px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .gg-card { display: flex; flex-direction: column; text-align: left; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #FFFFFF; box-shadow: 0 4px 16px rgba(42, 33, 24, 0.08); cursor: pointer; }
-.gg-card:hover, .gg-card:focus-visible { outline: 4px solid var(--honey); outline-offset: 2px; }
+.gg-card:hover, .gg-card:focus { box-shadow: 0 0 0 3px #FFFDF5, 0 0 0 8px var(--honey); }
 .gg-card.gg-new { animation: ggpop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1); }
 .gg-media { display: grid; place-items: center; aspect-ratio: 4 / 3; background: var(--mist); overflow: hidden; }
 .gg-media img { width: 100%; height: 100%; object-fit: cover; }

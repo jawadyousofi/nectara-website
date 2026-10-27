@@ -283,7 +283,7 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 .world-card h2 { font-size: clamp(1.7rem, 1.1rem + 2.6vw, 3.2rem); font-weight: 800; }
 .world-card p { color: var(--ink-soft); margin-top: 4px; max-width: 52ch; }
 .world-card .btn { margin-top: 12px; }
-.world-card:focus-visible, .world-card:hover { outline: 4px solid var(--honey); outline-offset: 3px; }
+.world-card:focus, .world-card:hover { box-shadow: 0 0 0 4px #FFFDF5, 0 0 0 9px var(--honey); }
 
 /* Portrait phones: the world is wide, so suggest turning the screen */
 .w-rotate { display: none; position: absolute; left: 16px; right: 16px; top: 24px; text-align: center; color: #2F4A35; font-family: var(--display); font-weight: 700; font-size: 1.15rem; }

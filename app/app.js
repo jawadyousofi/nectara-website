@@ -53,12 +53,15 @@
   }
   function playPage(st, i) {
     stopVoice();
-    if (!st.audio || !aloudOn()) return;
+    if (!st.audio) return;
+    loadTiming(st.id);
+    if (!aloudOn()) return;
     if (!voice) { voice = new Audio(); voice.preload = 'auto'; }
     voice.onended = function () { var n = document.getElementById('next'); if (n) n.classList.add('nudge'); };
     voice.src = '/assets/stories/' + st.id + '/audio/' + (i < 9 ? '0' : '') + (i + 1) + '.mp3';
     voice.ontimeupdate = null;
-    followReading([].slice.call(document.querySelectorAll('.story-line')));
+    var t = storyTiming[st.id] || {};
+    followReading([].slice.call(document.querySelectorAll('.story-line')), t[(i < 9 ? '0' : '') + (i + 1)]);
     var pr = voice.play();
     if (pr && pr.then) pr.then(function () { voiceBlocked = false; aloudButton(); }, function () { voiceBlocked = true; aloudButton(); }); // the browser wants a tap first; keep the saved choice
   }
@@ -178,8 +181,23 @@
     } catch (err) {}
   }
   // Light up each line as it is read aloud (timed by line length across the recording).
-  function followReading(lines) {
+  var storyTiming = {};   // id -> { '02': [start of each line in seconds], ... } from audio/timing.json
+  function loadTiming(id) {
+    if (storyTiming[id]) return;
+    storyTiming[id] = {};
+    fetch('/assets/stories/' + id + '/audio/timing.json').then(function (r) { return r.ok ? r.json() : {}; }).then(function (t) { storyTiming[id] = t || {}; }).catch(function () {});
+  }
+  function followReading(lines, starts) {
     if (!voice || !lines.length) return;
+    if (starts && starts.length === lines.length) {   // real start times: the light follows her voice exactly
+      voice.ontimeupdate = function () {
+        var at = voice.currentTime, cur = -1;
+        for (var k = 0; k < starts.length; k++) if (at >= starts[k] - 0.1) cur = k;
+        lines.forEach(function (p, k) { p.classList.toggle('reading', k === cur); p.classList.toggle('read', k < cur); });
+      };
+      voice.addEventListener('ended', function () { lines.forEach(function (p) { p.classList.remove('reading'); p.classList.add('read'); }); }, { once: true });
+      return;
+    }
     var weights = lines.map(function (p) { return Math.max(8, p.textContent.length); }), total = weights.reduce(function (a, b) { return a + b; }, 0);
     function tick() {
       if (!voice.duration || isNaN(voice.duration)) return;
@@ -194,7 +212,8 @@
   function buildStorySlides(st) {
     var n = st.pages.length;
     return st.pages.map(function (lines, i) {
-      var img = '<div class="story-frame" id="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="1440" height="900">' + storyFx(st.id, i) + '</div>';
+      var sq = st.id === 'i-am-grand';   // the picture book's pages are square: show them whole, no side bands
+      var img = '<div class="story-frame' + (sq ? ' sq' : '') + '" id="story-frame"><img class="story-art" src="/assets/stories/' + st.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.webp" alt="" width="' + (sq ? 896 : 1440) + '" height="' + (sq ? 896 : 900) + '">' + storyFx(st.id, i) + '</div>';
       var words = i === 0
         ? '<span class="phase watch">Story time</span><h1 class="big">' + esc(lines[0]) + '</h1><p class="mid">' + esc(lines[1] || '') + '</p><p class="soft">' + (st.id === 'i-am-grand' ? 'The Grand series picture book by Jawad Yousofi.' : 'A children&rsquo;s story from the Grand series book <i>' + esc(st.from) + '</i>.') + '</p>'
         : '<div class="story-text">' + lines.map(function (t, k) {

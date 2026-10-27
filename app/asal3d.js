@@ -67,8 +67,10 @@
     var EYE = toon(0x2a1a12), SPARK = new T.MeshBasicMaterial({ color: 0xffffff });
     [[132, 136], [168, 136]].forEach(function (p) {
       var x = ax(p[0]), y = ay(p[1]);
-      var e = mesh(new T.SphereGeometry(0.2, 20, 16), EYE); e.scale.set(0.9, 1.1, 0.42); e.position.set(x, y, onHead(x, y) - 0.03); eyes.add(e);
-      var h = new T.Mesh(new T.SphereGeometry(0.066, 10, 8), SPARK); h.scale.z = 0.4; h.position.set(x + 0.06, y + 0.08, onHead(x, y) + 0.04); eyes.add(h);
+      x *= 1.06; y -= 0.02;   // big, bright eyes (Jawad: they had looked too small on the TV)
+      var e = mesh(new T.SphereGeometry(0.27, 24, 18), EYE); e.scale.set(0.88, 1.12, 0.42); e.position.set(x, y, onHead(x, y) - 0.04); eyes.add(e);
+      var h = new T.Mesh(new T.SphereGeometry(0.085, 12, 10), SPARK); h.scale.z = 0.4; h.position.set(x + 0.08, y + 0.11, onHead(x, y) + 0.05); eyes.add(h);
+      var h2 = new T.Mesh(new T.SphereGeometry(0.04, 10, 8), SPARK); h2.scale.z = 0.4; h2.position.set(x - 0.07, y - 0.1, onHead(x, y) + 0.05); eyes.add(h2);
     });
     // Rosy cheeks, small nose, the same smile
     [[120, 153], [180, 153]].forEach(function (p) {
