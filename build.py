@@ -1,3 +1,12 @@
+import os
+import hashlib as _hashlib
+def ver(name):
+    # Short content hash, so browsers fetch a script again whenever it changes (they cache /assets for hours).
+    try:
+        return _hashlib.sha1(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', name), 'rb').read()).hexdigest()[:8]
+    except OSError:
+        return '1'
+
 """Builds the Nectara site pages from one shared template. Run: python3 build.py"""
 SITE = 'https://nectaraschool.org'
 # Private until Nectara's name and work are legally protected: a simple "coming soon" home page, members sign-in,
@@ -46,7 +55,7 @@ def page(fname, title, desc, body, artifact=False):
   {"" if PRIVATE else '<nav aria-label="Footer">' + ''.join(f'<a href="{h}">{t}</a>' for h, t in NAV) + '<a href="join.html">Join</a></nav>'}
   <span>nectaraschool.org</span>
 </div></footer>
-<script src="assets/site.js"></script>{''.join(f'<script src="assets/{x}"></script>' for x in EXTRA_JS.get(fname, []))}'''
+<script src="assets/site.js?v={ver('site.js')}"></script>{''.join(f'<script src="assets/{x}?v={ver(x)}"></script>' for x in EXTRA_JS.get(fname, []))}'''
     if artifact:  # the artifact viewer supplies doctype/head/body
         return head + '\n' + content
     return f'<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n{head}\n</head>\n<body>\n{content}\n</body>\n</html>\n'
@@ -400,7 +409,7 @@ PAGES['reset.html'] = ('Reset Password · Nectara', 'Choose a new password for y
 PAGES['admin.html'] = ('Members Admin · Nectara', 'Nectara member access.', '''
 <div class="wrap" style="padding-block:40px 80px;display:grid;gap:24px">
   <div class="stack"><span class="eyebrow">Admin</span><h1 style="font-size:var(--step-3)">Founding families</h1>
-  <p class="lead">Make a founding code for each family, and choose who can open the app. <b>Founding</b>, <b>member</b> and <b>staff</b> can open it; <b>waiting</b> and <b>paused</b> can&rsquo;t.</p></div>
+  <p class="lead">Make a founding code for each family, and choose who can open the app. <b>Founding</b>, <b>member</b>, <b>staff</b> and <b>owner</b> can open it; <b>waiting</b> and <b>paused</b> can&rsquo;t. <b>Owner</b> also sees the private Documents library in the app (set it on your own account only).</p></div>
   <form id="admin-login" novalidate style="max-width:560px">
     <div class="field"><label for="ad-token">Admin key</label><input id="ad-token" type="password" autocomplete="off" required></div>
     <button class="btn" type="submit" style="justify-self:start">Open</button>
