@@ -84,12 +84,12 @@
       j.members.forEach(function (m) { counts[m.access] = (counts[m.access] || 0) + 1; });
       var mailNote = j.lastMailError ? ' · Last email problem (' + j.lastMailError.at.slice(0, 16).replace('T', ' ') + ' UTC): ' + (j.lastMailError.status || '') + ' ' + j.lastMailError.detail : '';
       say(j.members.length + ' accounts · ' + LEVELS.filter(function (l) { return counts[l]; }).map(function (l) { return counts[l] + ' ' + l; }).join(' · ') + mailNote, !!j.lastMailError);
-      list.innerHTML = '<div class="admin-wrap"><table class="admin-table"><thead><tr><th>Parent</th><th>Email</th><th>Child</th><th>Joined</th><th>Access</th><th>Password</th></tr></thead><tbody>' +
+      list.innerHTML = '<div class="admin-wrap"><table class="admin-table"><thead><tr><th>Parent</th><th>Email</th><th>Child</th><th>Joined</th><th>Access</th><th>Account</th></tr></thead><tbody>' +
         j.members.map(function (m) {
           var kid = (m.children || []).map(function (c) { return esc(c.name || '') + (c.age ? ' (' + esc(c.age) + ')' : ''); }).join(', ');
           return '<tr><td>' + esc(m.name) + '</td><td>' + esc(m.email) + '</td><td>' + kid + '</td><td>' + esc((m.created || '').slice(0, 10)) + '</td><td><select data-email="' + esc(m.email) + '" aria-label="Access for ' + esc(m.email) + '">' +
             LEVELS.map(function (l) { return '<option' + (l === m.access ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></td>' +
-            '<td><button class="linklike" type="button" data-reset="' + esc(m.email) + '">Reset link</button></td></tr>';
+            '<td><button class="linklike" type="button" data-reset="' + esc(m.email) + '">Reset link</button> &middot; <button class="linklike" type="button" data-move="' + esc(m.email) + '">Change email</button></td></tr>';
         }).join('') + '</tbody></table></div>' +
         '<div id="reset-box" class="status" hidden style="margin-top:16px;display:grid;gap:10px"><p></p><div style="display:flex;gap:10px;flex-wrap:wrap"><input readonly aria-label="Reset link" style="flex:1 1 280px"><button class="btn" type="button" id="copy-reset">Copy</button></div></div>';
       var copy = document.getElementById('copy-reset');
@@ -111,6 +111,16 @@
               box.scrollIntoView({ block: 'nearest' });
             })
             .catch(function (e) { say('Couldn’t make a link: ' + e.message, true); });
+        });
+      });
+      list.querySelectorAll('[data-move]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var from = b.getAttribute('data-move');
+          var to = window.prompt('New email for ' + from + '. The account, lesson progress and Growth Garden move with it. They sign in again with the new email and the same password.', '');
+          if (!to) return;
+          call('POST', { email: from, newEmail: to.trim() })
+            .then(function (r) { say('Saved: the account now uses ' + r.email + '.'); load(); })
+            .catch(function (e) { say('Couldn’t change the email: ' + e.message, true); });
         });
       });
       list.querySelectorAll('select[data-email]').forEach(function (sel) {
