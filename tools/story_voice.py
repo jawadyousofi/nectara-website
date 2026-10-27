@@ -1,14 +1,17 @@
 """Story narration tools (offline Kokoro voice af_heart, same voice as the rest of the app).
 
-  python3 tools/story_voice.py doit     # I Am Grand: rebuild each DO IT! move as
-                                        #   narration, pause, chime, "It's your turn now. Let's do it together.", pause, Asal leads the move
-  python3 tools/story_voice.py timing   # write assets/stories/<id>/audio/timing.json (when each line starts) for every story
+  python3 tools/story_voice.py build [story-id ...]
+      Records every page line by line and writes assets/stories/<id>/audio/timing.json (when each line starts).
+      DO IT! pages: story lines, pause, chime, "It's your turn now. Let's do it together.", pause, then Asal leads the move.
+      Sounds like shhh, hmmm and bzzz are hand-written phonemes (never spelled out); "live/lives" rhyme with "give";
+      ALL-CAPS words are lower-cased; each … is a real pause.
+  python3 tools/story_voice.py timing   # re-measure timing.json from existing recordings
 
 Needs: pip install kokoro-onnx soundfile numpy, ffmpeg, and the model files in $KOKORO_DIR
 (kokoro-v1.0.onnx, voices-v1.0.bin). Story text comes from app/lessons.js (via node).
 When ElevenLabs replaces Kokoro, keep the same timing.json format so the reading highlight stays in step.
 """
-import json, os, subprocess, sys, tempfile
+import json, os, re, subprocess, sys, tempfile
 import numpy as np
 import soundfile as sf
 
@@ -73,59 +76,112 @@ def kokoro():
     return _k
 
 
-# Words the voice gets wrong, fixed in the phonemes (checked one by one).
-PHON_FIX = [('sˈuːuː', 'sˈoʊːːː'),            # "Soooo brave" (not "soo-oo")
-            ('ˌɛsˌeɪtʃˈeɪtʃ', 'ʃːːː')]       # "shhh" (not spelled out)
+# Words the voice gets wrong. Sounds (shhh, hmmm, bzzz, whoooosh) get hand-written phonemes so they are
+# not spelled out letter by letter; verbs "live/lives" are respelled so they rhyme with "give".
+SOUNDS = [(r"^s+h+$", 'ʃːːːː'),                 # shh, shhh, shhhhh
+          (r"^h+m+$", 'mːːːːː'),                # hmmmm (a hum)
+          (r"^b+z+$", 'bzːːːː'),                # bzzz
+          (r"^w+h+o+o+s+h+$", 'wˈuːːːʃ'),       # whoooosh
+          (r"^s+o+o+o+$", 'sˈoʊːːː'),           # soooo
+          (r"^g+r+a+a+n+d+$", 'ɡɹˈæːːːnd')]     # graaand
+RESPELL = [(r"\blives\b", 'livs'), (r"\bLives\b", 'Livs'), (r"\blive\b", 'liv'), (r"\bLive\b", 'Liv')]
+ELLIPSIS_PAUSE = 0.45
 
 
-def speakable(t):
-    t = t.lstrip('*>').replace('“', '').replace('”', '').replace('’', "'")
+def speakable(t, asal=False):
+    t = t.lstrip('*>').replace('“', '').replace('”', '').replace('’', "'").replace('...', '…')
+    if asal: t = t.replace('Asal', 'Asahl')   # world lines: a-SAHL
+    for a, b in RESPELL: t = re.sub(a, b, t)
     # ALL-CAPS words are read as letters: lower-case them (keep "I")
-    return ' '.join(w if not (w.strip('!?.,:;').isupper() and len(w.strip('!?.,:;')) > 1) else w.lower() for w in t.split(' '))
+    return ' '.join(w if not (re.sub(r'[^A-Za-z]', '', w).isupper() and len(re.sub(r'[^A-Za-z]', '', w)) > 1) else w.lower() for w in t.split(' '))
 
 
-def synth(text, speed=0.9):
-    k = kokoro()
-    ph = k.tokenizer.phonemize(text, 'en-us')
-    for a, b in PHON_FIX: ph = ph.replace(a, b)
-    s, sr = k.create(ph, voice='af_heart', speed=speed, lang='en-us', is_phonemes=True)
-    a = os.path.join(TMP, 's.wav'); b = os.path.join(TMP, 's48.wav'); sf.write(a, s, sr)
-    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a, '-ar', str(SR), b], check=True)
-    y, _ = sf.read(b)
-    idx = np.where(np.abs(y) > 0.01)[0]
-    return y[max(0, idx[0] - 240):idx[-1] + 480] if len(idx) else y
+def phonemes(text):
+    """Phonemes for one chunk, with the sound words swapped for hand-written ones."""
+    k = kokoro(); out = []; buf = []
+    def flush():
+        if buf: out.append(k.tokenizer.phonemize(' '.join(buf), 'en-us')); buf[:] = []
+    for w in text.split(' '):
+        core = re.sub(r'[^A-Za-z]', '', w); hit = None
+        for pat, ph in SOUNDS:
+            if core and re.match(pat, core, re.I): hit = ph; break
+        if hit:
+            flush(); tail = re.sub(r'^.*?([!?.,:;]*)$', r'\1', w); out.append(hit + tail)
+        else:
+            buf.append(w)
+    flush()
+    return ' '.join(o for o in out if o)
+
+
+def synth(text, speed=0.87):
+    """Speak one line. Pauses for each … are real silence (the voice used to stumble on the word after one)."""
+    k = kokoro(); parts = [p.strip() for p in text.split('…')]; pieces = []
+    for n, part in enumerate(parts):
+        if not part: continue
+        ph = phonemes(part)
+        s, sr = k.create(ph, voice='af_heart', speed=speed, lang='en-us', is_phonemes=True)
+        a = os.path.join(TMP, 's.wav'); b = os.path.join(TMP, 's48.wav'); sf.write(a, s, sr)
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', a, '-ar', str(SR), b], check=True)
+        y, _ = sf.read(b)
+        idx = np.where(np.abs(y) > 0.01)[0]
+        if len(idx): y = y[max(0, idx[0] - 240):idx[-1] + 480]
+        if pieces: pieces.append(np.zeros(int(ELLIPSIS_PAUSE * SR)))
+        pieces.append(y)
+    return np.concatenate(pieces) if pieces else np.zeros(1)
 
 
 def rms(v): return np.sqrt((v ** 2).mean()) if len(v) else 0
 
 
+def fit(y, level):
+    """Same loudness for every line, without clipping."""
+    y = y * (level / max(rms(y), 1e-6)); pk = np.abs(y).max()
+    return y * (0.95 / pk) if pk > 0.95 else y
+
+
 def quiet(sec): return np.zeros(int(sec * SR))
 
 
-def doit():
-    st = [s for s in stories() if s['id'] == 'i-am-grand'][0]
-    timing = {}
-    for i, lines in enumerate(st['pages']):
-        if not lines or not lines[-1].startswith('>'): continue
-        path = os.path.join(ROOT, 'assets/stories/i-am-grand/audio/%02d.mp3' % (i + 1))
-        backup = os.path.join(ROOT, 'tools/.audio-backup/i-am-grand-%02d.mp3' % (i + 1))
-        os.makedirs(os.path.dirname(backup), exist_ok=True)
-        if not os.path.exists(backup): subprocess.run(['cp', path, backup], check=True)
-        x = load(backup); segs = segments(x); ci = chime_index(x, segs)
-        assert ci is not None, 'no chime on page %d' % (i + 1)
-        story_end = segs[ci - 1][1]
-        story = x[:story_end]; chime = x[segs[ci][0]:segs[ci][1] + int(0.15 * SR)]
-        level = rms(x[segs[0][0]:story_end])
-        turn = synth(TURN_LINE, 0.88); turn *= level / rms(turn)
-        move = synth(speakable(lines[-1]), 0.9); move *= level / rms(move)
-        out = np.concatenate([story, quiet(PAUSE_BEFORE_CHIME), chime, quiet(PAUSE_AFTER_CHIME), turn, quiet(PAUSE_AFTER_TURN)])
-        do_at = len(out) / SR
-        out = np.concatenate([out, move, quiet(0.8)])
-        write(out, path)
-        timing[i + 1] = {'storyEnd': story_end / SR, 'turnAt': (story_end / SR) + PAUSE_BEFORE_CHIME, 'doAt': do_at}
-        print('page %d: %.1fs (move starts %.1fs)' % (i + 1, len(out) / SR, do_at))
-    json.dump(timing, open(os.path.join(TMP, 'doit.json'), 'w'))
-    return timing
+LEAD, GAP, TAIL = 0.6, 0.75, 1.0   # seconds: before the first line, between lines, after the last
+
+
+def chime_clip():
+    """The soft chime before each DO IT! move (kept from the original recordings)."""
+    src = os.path.join(ROOT, 'tools/.audio-backup/i-am-grand-02.mp3')
+    if not os.path.exists(src): src = os.path.join(ROOT, 'assets/stories/i-am-grand/audio/02.mp3')
+    x = load(src); segs = segments(x); ci = chime_index(x, segs)
+    if ci is not None: return x[segs[ci][0]:segs[ci][1] + int(0.15 * SR)]
+    t = np.arange(int(0.7 * SR)) / SR   # fallback: a soft 880 Hz bell
+    return 0.12 * np.sin(2 * np.pi * 880 * t) * np.exp(-t * 5)
+
+
+def build(only=None):
+    """Re-record every story page line by line, with exact timing for the reading light."""
+    chime = None; level = 0.12
+    for st in stories():
+        if not st.get('audio') or (only and st['id'] not in only): continue
+        timing = {}
+        for i, lines in enumerate(st['pages']):
+            path = os.path.join(ROOT, 'assets/stories/%s/audio/%02d.mp3' % (st['id'], i + 1))
+            story = lines[:-1] if lines and lines[-1].startswith('>') else lines
+            move = lines[-1] if len(story) < len(lines) else None
+            out = [quiet(LEAD)]; starts = []; t = LEAD
+            for n, line in enumerate(story):
+                y = fit(synth(speakable(line)), level)
+                if n: out.append(quiet(GAP)); t += GAP
+                starts.append(round(t, 2)); out.append(y); t += len(y) / SR
+            if move:
+                if chime is None: chime = fit(chime_clip(), level * 0.8)
+                turn = fit(synth(TURN_LINE, 0.85), level)
+                lead_in = fit(synth(speakable(move)), level)
+                for piece in [quiet(PAUSE_BEFORE_CHIME), chime, quiet(PAUSE_AFTER_CHIME), turn, quiet(PAUSE_AFTER_TURN)]:
+                    out.append(piece); t += len(piece) / SR
+                starts.append(round(t, 2)); out.append(lead_in)
+            out.append(quiet(TAIL))
+            write(np.concatenate(out), path)
+            if i: timing['%02d' % (i + 1)] = starts
+            print(st['id'], i + 1, '%.1fs' % (sum(len(o) for o in out) / SR))
+        json.dump(timing, open(os.path.join(ROOT, 'assets/stories/%s/audio/timing.json' % st['id']), 'w'), separators=(',', ':'))
 
 
 def line_starts(x, lines, story_end=None):
@@ -173,6 +229,6 @@ def timing():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else ''
-    if cmd == 'doit': doit()
+    if cmd == 'build': build(sys.argv[2:] or None)
     elif cmd == 'timing': timing()
     else: print(__doc__)

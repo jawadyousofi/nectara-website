@@ -1,9 +1,7 @@
 """Makes Asal's World narration (assets/world/audio/*.mp3) from app/world-data.js.
 Needs: pip install kokoro-onnx soundfile, ffmpeg, and the kokoro-v1.0.onnx + voices-v1.0.bin model files
-(github.com/thewh1teagle/kokoro-onnx releases). Run: python3 tools/world_voice.py MODEL_DIR [--force]"""
+(github.com/thewh1teagle/kokoro-onnx releases). Run: python3 tools/world_voice.py MODEL_DIR [--force | --fix]  (--fix remakes only lines with sounds, live/lives, … or capitals)"""
 import json, os, re, subprocess, sys
-import soundfile as sf
-from kokoro_onnx import Kokoro
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 src = open(os.path.join(root, 'app/world-data.js'), encoding='utf-8').read()
@@ -20,17 +18,23 @@ for m in re.finditer(r"\{ id: '([a-z]+)', name: '[^']*'.*?say: '((?:[^'\\]|\\.)*
     lines['d-' + m.group(1)] = m.group(2)
     lines['m-' + m.group(1)] = 'Try it outside! ' + m.group(3)
 
-def speakable(t):
-    t = t.replace('’', "'").replace('Asal', 'Asahl')   # say a-SAL
-    return t
+# Same voice and the same word fixes as the stories (tools/story_voice.py): sounds like shhh/hmmm/bzzz are never
+# spelled out, "live/lives" rhyme with "give", each … is a real pause, and "Asal" is said a-SAHL.
+os.environ.setdefault('KOKORO_DIR', model_dir)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import story_voice as sv
+import numpy as np
 
-k = Kokoro(os.path.join(model_dir, 'kokoro-v1.0.onnx'), os.path.join(model_dir, 'voices-v1.0.bin'))
+NEEDS_FIX = re.compile(r"\b(?i:s+h+|h+m+|b+z+|w+h+o+o+s+h+|s+o+o+o+|lives?)\b|…|\.\.\.|\b[A-Z]{2,}\b")
+fix_only = '--fix' in sys.argv
 for lid, text in sorted(lines.items()):
     mp3 = os.path.join(out, lid + '.mp3')
-    if os.path.exists(mp3) and not force:
+    if fix_only:
+        if not NEEDS_FIX.search(text.replace('I ', '')): continue
+    elif os.path.exists(mp3) and not force:
         continue
-    samples, rate = k.create(speakable(text), voice='af_heart', speed=0.9, lang='en-us')
-    wav = mp3[:-4] + '.wav'; sf.write(wav, samples, rate)
-    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-ac', '1', '-b:a', '64k', mp3], check=True)
-    os.remove(wav); print('made', lid)
+    y = sv.synth(sv.speakable(text.replace("\\'", "'"), asal=True), 0.9)
+    y = sv.fit(y, 0.12)
+    sv.write(np.concatenate([np.zeros(int(0.1 * sv.SR)), y, np.zeros(int(0.2 * sv.SR))]), mp3)
+    print('made', lid)
 print(len(lines), 'lines')
