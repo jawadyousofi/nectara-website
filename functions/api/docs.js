@@ -28,15 +28,24 @@ const STARTERS = [
   ['Whole-Child Framework (v3)', 'Curriculum', 'https://docs.google.com/document/d/1YC6-6spY5oH_SwtdPC6BNlRS5wleZX8nyYeO-rolPgY/edit', 'The Seven Petals and the four roots.'],
   ['Legal & business action list', 'Legal & business', 'https://docs.google.com/document/d/1XE2IEtyQV6jgqoUFc_HQcBU779fMH9vyHUHaoO5P3vE/edit', 'Trademark first, corporation on Jan 4, 2027.'],
   ['NECTARA trademark prep', 'Legal & business', 'https://docs.google.com/document/d/1a33sdjrJLaFg2cSDEuGnxRgDk_ZNWg6dedo5N7RWRks/edit', ''],
+  ['The Nectara Morning: a guide for teachers and parents', 'Curriculum', 'https://claude.ai/artifact/Ajv76eiPgX82Zf71FfGwVi', 'How to run a morning the Nectara way: rhythm, rituals, mixed ages, what to do when it goes sideways.'],
+  ['The Nectara Morning (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1v24QFjmEweiU1E-DGDz0AajoN7JuhBJISiyh8H_7KwY/edit', ''],
 ];
 
+// New documents Claude makes are added to STARTERS; each is put on the shelf once (idx.seeded remembers which),
+// so one you archive or delete for good never comes back.
 async function load(env) {
-  const idx = await env.NECTARA_INTEREST.get('docs:index', 'json');
-  if (idx) return idx;
+  const idx = (await env.NECTARA_INTEREST.get('docs:index', 'json')) || { docs: [] };
+  if (!idx.seeded) idx.seeded = idx.docs.filter(d => d.url).map(d => d.url);
   const now = new Date().toISOString();
-  const seeded = { docs: STARTERS.map(([title, category, url, note], i) => ({ id: 's' + i + shortCode(4).toLowerCase(), kind: 'link', title, category, url, note, created: now })) };
-  await env.NECTARA_INTEREST.put('docs:index', JSON.stringify(seeded));
-  return seeded;
+  const fresh = STARTERS.filter(([, , url]) => !idx.seeded.includes(url));
+  if (!fresh.length) return idx;
+  fresh.forEach(([title, category, url, note]) => {
+    idx.docs.push({ id: 's' + Date.now().toString(36) + shortCode(4).toLowerCase(), kind: 'link', title, category, url, note, created: now });
+    idx.seeded.push(url);
+  });
+  await env.NECTARA_INTEREST.put('docs:index', JSON.stringify(idx));
+  return idx;
 }
 const save = (env, idx) => env.NECTARA_INTEREST.put('docs:index', JSON.stringify(idx));
 const cat = c => (CATEGORIES.includes(c) ? c : 'Other');
