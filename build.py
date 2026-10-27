@@ -494,6 +494,12 @@ COMING_SOON = ('Nectara', 'Something new is growing.', '''
 
 if __name__ == '__main__':
     import os, shutil
+    # The app shell: stamp each /app script and stylesheet with its content hash so phones and TVs load new versions.
+    import re as _re
+    _app = open('app/index.html').read()
+    _app = _re.sub(r'(src|href)="/app/([a-z0-9-]+\.(?:js|css))(?:\?v=[a-f0-9]+)?"',
+                   lambda m: '%s="/app/%s?v=%s"' % (m.group(1), m.group(2), _hashlib.sha1(open('app/' + m.group(2), 'rb').read()).hexdigest()[:8]), _app)
+    open('app/index.html', 'w').write(_app)
     if PRIVATE:
         PAGES['index.html'] = COMING_SOON
         hidden = [f for f in PAGES if f not in PRIVATE_PAGES]

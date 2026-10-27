@@ -34,6 +34,7 @@
       '<small>' + esc(d.category) + ' · ' + esc(meta) + ' · added ' + day(d.created) + (d.archived ? ' · archived ' + day(d.archived) : '') + '</small></a>' +
       '<span class="dc-acts">' +
       (d.kind === 'file' && !d.archived ? '<a class="btn ghost small" href="' + esc(open) + '&download=1">Download</a>' : '') +
+      (!d.archived ? '<button class="btn ghost small" type="button" data-print="' + esc(d.id) + '">Print</button><button class="btn ghost small" type="button" data-email="' + esc(d.id) + '">Email</button>' : '') +
       (d.archived
         ? '<button class="btn ghost small" type="button" data-restore="' + esc(d.id) + '">Restore</button><button class="linkbtn" type="button" data-forever="' + esc(d.id) + '">Delete for good</button>'
         : '<button class="linkbtn" type="button" data-edit="' + esc(d.id) + '">Edit</button><button class="linkbtn" type="button" data-archive="' + esc(d.id) + '">Archive</button>') +
@@ -90,6 +91,8 @@
         act({ id: d.id, title: t, note: n, category: c }, 'Saved.');
       });
     });
+    [].forEach.call(root.querySelectorAll('[data-print]'), function (b) { b.addEventListener('click', function () { printDoc(find(b.getAttribute('data-print'))); }); });
+    [].forEach.call(root.querySelectorAll('[data-email]'), function (b) { b.addEventListener('click', function () { emailDoc(find(b.getAttribute('data-email'))); }); });
     var tg = document.getElementById('dc-toggle'); if (tg) tg.addEventListener('click', function () { S.showArchive = !S.showArchive; render(); });
     var fl = document.getElementById('dc-link');
     if (fl) fl.addEventListener('submit', function (e) {
@@ -110,6 +113,38 @@
       rd.onerror = function () { S.msg = 'That file could not be read.'; render(); };
       rd.readAsDataURL(f);
     });
+  }
+
+  function find(id) { return (S.docs || []).filter(function (x) { return x.id === id; })[0]; }
+  var PRINTABLE = /^(application\/pdf|image\/|text\/)/;
+  // Print: PDFs, pictures and text print right here; Word, Excel and links open in a new tab to print from there.
+  function printDoc(d) {
+    if (!d) return;
+    if (d.kind === 'file' && PRINTABLE.test(d.mime || '')) {
+      var old = document.getElementById('dc-print'); if (old) old.parentNode.removeChild(old);
+      var f = document.createElement('iframe');
+      f.id = 'dc-print'; f.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0';
+      f.onload = function () { try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) { window.open(f.src, '_blank'); } };
+      f.src = '/api/docs/file?id=' + encodeURIComponent(d.id);
+      document.body.appendChild(f);
+      S.msg = 'Opening the print window for “' + d.title + '”…'; render();
+      return;
+    }
+    window.open(d.kind === 'file' ? '/api/docs/file?id=' + encodeURIComponent(d.id) : d.url, '_blank', 'noopener');
+    S.msg = 'Opened “' + d.title + '” in a new tab. Print it from there (Cmd+P on a Mac, Ctrl+P on Windows).'; render();
+  }
+  // Email: opens your email app with the title and a link filled in; you choose who it goes to.
+  // Uploaded files get a link that anyone can open for 7 days. Google Docs keep their own sharing settings.
+  function emailDoc(d) {
+    if (!d) return;
+    var go = function (url, extra) {
+      var body = d.title + (d.note ? '\n' + d.note : '') + '\n\n' + url + (extra ? '\n\n' + extra : '');
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(d.title) + '&body=' + encodeURIComponent(body);
+    };
+    if (d.kind !== 'file') { go(d.url, /docs\.google\.com|drive\.google\.com/.test(d.url) ? 'Make sure this Google Doc is shared with you.' : ''); return; }
+    if (!window.confirm('Email “' + d.title + '”? This makes a link anyone with it can open for 7 days.')) return;
+    api('POST', { id: d.id, share: true }).then(function (j) { go(j.url, 'This link works for 7 days.'); })
+      .catch(function (e) { S.msg = e.message; render(); });
   }
 
   function open() { S.active = true; S.msg = ''; document.title = 'Documents · Nectara'; render(); load(); window.scrollTo(0, 0); }

@@ -6,6 +6,7 @@
 // POST /api/docs { id, title?, category?, note? }                  → edit the details
 // POST /api/docs { id, archive: true } / { id, restore: true }     → move to or from the Archive (nothing is lost)
 // POST /api/docs { id, deleteForever: true }                       → only for archived items: removes it for good
+// POST /api/docs { id, share: true }                                → a 7-day link anyone can open, for emailing an uploaded file
 // Stored in KV: docs:index (the list) and docf:<id> (each file's bytes).
 import { json, clean, getUser, isOwner, sameOrigin, readJson, shortCode } from '../_lib/auth.js';
 
@@ -58,6 +59,12 @@ export async function onRequestPost({ request, env }) {
   if (data.id) {
     const d = idx.docs.find(x => x.id === clean(data.id, 40));
     if (!d) return json({ error: 'not found' }, 404);
+    if (data.share) {
+      if (d.kind !== 'file') return json({ url: d.url });
+      const token = shortCode(10) + shortCode(10);
+      await env.NECTARA_INTEREST.put('docshare:' + token, JSON.stringify({ id: d.id, by: user.email }), { expirationTtl: 7 * 24 * 3600 });
+      return json({ url: new URL(request.url).origin + '/api/docs/shared?t=' + token, days: 7 });
+    }
     if (data.deleteForever) {
       if (!d.archived) return json({ error: 'move it to the Archive first' }, 409);
       idx.docs = idx.docs.filter(x => x !== d);
