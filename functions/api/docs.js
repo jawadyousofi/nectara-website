@@ -30,6 +30,8 @@ const STARTERS = [
   ['NECTARA trademark prep', 'Legal & business', 'https://docs.google.com/document/d/1a33sdjrJLaFg2cSDEuGnxRgDk_ZNWg6dedo5N7RWRks/edit', ''],
   ['The Nectara Morning: a guide for teachers and parents', 'Curriculum', 'https://claude.ai/artifact/Ajv76eiPgX82Zf71FfGwVi', 'How to run a morning the Nectara way: rhythm, rituals, mixed ages, what to do when it goes sideways.'],
   ['The Nectara Morning (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1v24QFjmEweiU1E-DGDz0AajoN7JuhBJISiyh8H_7KwY/edit', ''],
+  ['Where did your child learn all of this? (one-pager for families)', 'Families', 'https://claude.ai/artifact/Sg8JGvCsMrCGc2Fj2zbTHy', 'Seven things Nectara children do, what parents notice at home, and what we never do.'],
+  ['Where did your child learn all of this? (Google Drive copy)', 'Families', 'https://docs.google.com/document/d/1Aoxp1GVvqJX4mRMo2GWKWPa3rBlro-qP0g-ducGiXwY/edit', ''],
 ];
 
 // New documents Claude makes are added to STARTERS; each is put on the shelf once (idx.seeded remembers which),
