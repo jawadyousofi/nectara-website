@@ -49,3 +49,4 @@ An open world children explore freely: the Garden, the Pond, the Hive and the Sk
 - Works with touch, mouse, keyboard and TV remotes (arrows, OK, Back). Day, dusk and night follow the device clock; the seed bed grows over real days.
 - Sessions end gently after 20 minutes (grown-ups can hold a button for 10 more). Discoveries are saved as `w-<id>` in lesson progress.
 - Asal in 3D: `app/asal3d.js` (built with three.js r128 in `assets/three.min.js`, loaded only when the world opens). If a device can't show 3D, the drawn Asal is used instead.
+- Documents (`#/docs` in the app): the owner's private library of school documents (links and uploaded files up to 20 MB, sorted by category, with an Archive). Only accounts set to access **owner** on the admin page see the Documents button or can reach `/api/docs`; the list lives in KV `docs:index`, files in `docf:<id>`.

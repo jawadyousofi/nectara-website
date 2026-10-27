@@ -6,7 +6,7 @@
   var list = document.getElementById('admin-list');
   var msg = document.getElementById('admin-msg');
   var input = document.getElementById('ad-token');
-  var LEVELS = ['waiting', 'founding', 'member', 'staff', 'paused'];
+  var LEVELS = ['waiting', 'founding', 'member', 'staff', 'owner', 'paused'];
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   try { input.value = sessionStorage.getItem('nx_admin') || ''; } catch (e) {}
 

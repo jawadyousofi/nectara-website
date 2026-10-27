@@ -129,7 +129,9 @@ export function shortCode(len = 6) {
 }
 export const randomToken = () => hex(crypto.getRandomValues(new Uint8Array(32)));
 
-export const hasAccess = u => !!u && ['founding', 'member', 'staff'].includes(u.access);
+export const hasAccess = u => !!u && ['founding', 'member', 'staff', 'owner'].includes(u.access);
+// The owner (Jawad) also sees the private Documents library. Set from the admin page.
+export const isOwner = u => !!u && u.access === 'owner';
 
 export const publicUser = u => ({
   email: u.email,

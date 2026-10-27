@@ -1,9 +1,9 @@
 // Admin: manage who can open the app. Requires the ADMIN_TOKEN secret, sent as "Authorization: Bearer <token>".
 // GET  /api/admin/members                    → every account (no passwords)
-// POST /api/admin/members { email, access }  → set access: waiting | founding | member | staff | paused
+// POST /api/admin/members { email, access }  → set access: waiting | founding | member | staff | owner | paused
 import { json, clean, safeEqual } from '../../_lib/auth.js';
 
-const ACCESS = ['waiting', 'founding', 'member', 'staff', 'paused'];
+const ACCESS = ['waiting', 'founding', 'member', 'staff', 'owner', 'paused'];
 
 function authorized(request, env) {
   const header = request.headers.get('Authorization') || '';
