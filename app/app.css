@@ -231,3 +231,19 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .dc-form input, .dc-form select { font: inherit; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 2px solid var(--line); background: #FFFFFF; flex: 1 1 180px; }
 .dc-form small { flex-basis: 100%; color: var(--ink-soft); }
 .dc-archive { margin: 30px 0 40px; }
+/* Documents buttons: one shape for all, soft colors, a little lift and wiggle */
+.dc-btn { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 16px 0 13px; border-radius: 999px; border: 2px solid var(--bc, #E2D8C3); background: var(--bg, #FFFFFF); color: var(--fg, #2F4A35); font: inherit; font-weight: 700; font-size: 0.95rem; text-decoration: none; cursor: pointer; box-shadow: 0 2px 0 var(--bc, #E2D8C3); transition: transform 0.18s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.18s, background 0.18s; }
+.dc-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.25s; }
+.dc-btn:hover, .dc-btn:focus-visible { transform: translateY(-2px) scale(1.04); box-shadow: 0 5px 0 var(--bc, #E2D8C3), 0 8px 18px rgba(42, 33, 24, 0.12); }
+.dc-btn:hover svg, .dc-btn:focus-visible svg { transform: rotate(-10deg) scale(1.15); }
+.dc-btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 1px 0 var(--bc, #E2D8C3); }
+.dc-btn[disabled] { opacity: 0.6; cursor: default; transform: none; }
+.dc-btn.big { min-height: 46px; padding: 0 20px 0 16px; font-size: 1rem; }
+.dc-btn.c-sky { --bg: #E6F2FA; --bc: #A9CDE6; --fg: #2B5F82; }
+.dc-btn.c-honey { --bg: #FFF1D2; --bc: #EBC277; --fg: #7A5212; }
+.dc-btn.c-leaf { --bg: #E8F4E2; --bc: #A9D29A; --fg: #2F5E2A; }
+.dc-btn.c-lilac { --bg: #F0EAFA; --bc: #C8B6EA; --fg: #5A3F8E; }
+.dc-btn.c-rose { --bg: #FCEBEF; --bc: #EDB3C3; --fg: #8E3550; }
+.dc-btn.c-red { --bg: #FDECE8; --bc: #E8A99A; --fg: #A2412F; }
+.dc-acts { gap: 8px; }
+@media (prefers-reduced-motion: reduce) { .dc-btn, .dc-btn svg { transition: none; } .dc-btn:hover { transform: none; } .dc-btn:hover svg { transform: none; } }

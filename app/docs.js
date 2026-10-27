@@ -25,6 +25,22 @@
       .catch(function (e) { S.busy = false; S.msg = e.message; render(); });
   }
 
+  // Every button on this page shares one shape: a soft colored pill with a little icon that lifts on hover.
+  var I = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; };
+  var ICO = {
+    print: I('M7 9V4h10v5M6 18H4v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7h-2M7 14h10v6H7z'),
+    email: I('M3 6h18v12H3zM3 7l9 7 9-7'),
+    download: I('M12 4v11M7 10l5 5 5-5M5 20h14'),
+    edit: I('M4 20l1-5L16 4l4 4L9 19zM14 6l4 4'),
+    archive: I('M3 5h18v4H3zM5 9v10h14V9M10 13h4'),
+    restore: I('M4 12a8 8 0 1 0 3-6.2M4 4v5h5'),
+    trash: I('M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'),
+    link: I('M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1'),
+    upload: I('M12 20V9M7 14l5-5 5 5M5 4h14'),
+    box: I('M3 5h18v4H3zM5 9v10h14V9')
+  };
+  function btn(kind, id, color, icon, label) { return '<button class="dc-btn ' + color + '" type="button" data-' + kind + '="' + esc(id) + '">' + icon + label + '</button>'; }
+
   function row(d) {
     var open = d.kind === 'file' ? '/api/docs/file?id=' + encodeURIComponent(d.id) : d.url;
     var meta = d.kind === 'file' ? (d.type || 'File') + ' · ' + size(d.size) : where(d.url);
@@ -33,11 +49,11 @@
       (d.note ? '<span class="dc-note">' + esc(d.note) + '</span>' : '') +
       '<small>' + esc(d.category) + ' · ' + esc(meta) + ' · added ' + day(d.created) + (d.archived ? ' · archived ' + day(d.archived) : '') + '</small></a>' +
       '<span class="dc-acts">' +
-      (d.kind === 'file' && !d.archived ? '<a class="btn ghost small" href="' + esc(open) + '&download=1">Download</a>' : '') +
-      (!d.archived ? '<button class="btn ghost small" type="button" data-print="' + esc(d.id) + '">Print</button><button class="btn ghost small" type="button" data-email="' + esc(d.id) + '">Email</button>' : '') +
+      (d.kind === 'file' && !d.archived ? '<a class="dc-btn c-leaf" href="' + esc(open) + '&download=1">' + ICO.download + 'Download</a>' : '') +
+      (!d.archived ? btn('print', d.id, 'c-sky', ICO.print, 'Print') + btn('email', d.id, 'c-honey', ICO.email, 'Email') : '') +
       (d.archived
-        ? '<button class="btn ghost small" type="button" data-restore="' + esc(d.id) + '">Restore</button><button class="linkbtn" type="button" data-forever="' + esc(d.id) + '">Delete for good</button>'
-        : '<button class="linkbtn" type="button" data-edit="' + esc(d.id) + '">Edit</button><button class="linkbtn" type="button" data-archive="' + esc(d.id) + '">Archive</button>') +
+        ? btn('restore', d.id, 'c-leaf', ICO.restore, 'Restore') + btn('forever', d.id, 'c-red', ICO.trash, 'Delete for good')
+        : btn('edit', d.id, 'c-lilac', ICO.edit, 'Edit') + btn('archive', d.id, 'c-rose', ICO.archive, 'Archive')) +
       '</span></li>';
   }
 
@@ -52,7 +68,7 @@
     root.innerHTML =
       '<div class="home dc">' +
       '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>Documents</small></span></a>' +
-      '<div class="who"><a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Back to the app</a></div></header>' +
+      '<div class="who"><a class="dc-btn c-sky" href="#/">Back to the app</a></div></header>' +
       '<section class="dc-head"><h1>Documents</h1><p>Your private Nectara library: plans, curriculum, partners and legal papers. Only you can see this page; families and staff can&rsquo;t.</p></section>' +
       (S.msg ? '<p class="dc-msg" role="status">' + esc(S.msg) + '</p>' : '') +
       '<div class="dc-filter">' + ['', ].concat(S.cats).map(function (c) {
@@ -64,12 +80,12 @@
       '<section class="dc-add"><h2>Add a document</h2>' +
       '<form id="dc-link" class="dc-form"><b>A link</b><input name="url" type="url" placeholder="https://docs.google.com/…" required>' +
       '<input name="title" placeholder="Title (optional)" maxlength="120"><select name="category">' + opts + '</select>' +
-      '<input name="note" placeholder="Note (optional)" maxlength="500"><button class="btn" type="submit"' + (S.busy ? ' disabled' : '') + '>Add link</button></form>' +
+      '<input name="note" placeholder="Note (optional)" maxlength="500"><button class="dc-btn c-honey big" type="submit"' + (S.busy ? ' disabled' : '') + '>' + ICO.link + 'Add link</button></form>' +
       '<form id="dc-file" class="dc-form"><b>A file</b><input name="file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.pptx,.jpg,.jpeg,.png,.webp,.txt,.csv" required>' +
       '<input name="title" placeholder="Title (optional)" maxlength="120"><select name="category">' + opts + '</select>' +
-      '<input name="note" placeholder="Note (optional)" maxlength="500"><button class="btn" type="submit"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Saving…' : 'Upload') + '</button>' +
+      '<input name="note" placeholder="Note (optional)" maxlength="500"><button class="dc-btn c-honey big" type="submit"' + (S.busy ? ' disabled' : '') + '>' + ICO.upload + (S.busy ? 'Saving…' : 'Upload') + '</button>' +
       '<small>PDF, Word, Excel, PowerPoint, images or text, up to 20 MB.</small></form></section>' +
-      '<section class="dc-archive"><button type="button" class="linkbtn" id="dc-toggle">' + (S.showArchive ? 'Hide the Archive' : 'Archive (' + archived.length + ')') + '</button>' +
+      '<section class="dc-archive"><button type="button" class="dc-btn c-rose" id="dc-toggle">' + ICO.box + '' + (S.showArchive ? 'Hide the Archive' : 'Archive (' + archived.length + ')') + '</button>' +
       (S.showArchive ? (archived.length ? '<p class="dc-note">Archived documents are kept until you delete them for good, and can be restored any time.</p><ul class="dc-list">' + archived.map(row).join('') + '</ul>' : '<p class="dc-empty">Nothing archived.</p>') : '') +
       '</section></div>';
     wire();
