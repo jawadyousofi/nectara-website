@@ -109,6 +109,8 @@
       (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
         '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +
         (function () { var m = window.NectaraWorld.memories ? window.NectaraWorld.memories() : []; return m.length ? 'Your memory jar remembers the ' + m.join(', the ').replace(/, the ([^,]*)$/, ' and the $1') + '.' : ''; })() + '</p><span class="btn">Explore</span></span></button>' : '') +
+      (window.NectaraWonder && (function () { try { return JSON.parse(localStorage.getItem('nx_settings') || '{}').weeklyNote !== false; } catch (e) { return true; } })() ?
+        '<a class="wonder-home" href="#/settings"><span class="wonder-kicker">For grown-ups</span><b>This week&rsquo;s Weekly Wonder is ready</b><span>What your child explored, and one thing to try together outside &rarr;</span></a>' : '') +
       (window.NectaraMe ? (function () {
         var pic = window.NectaraMe.img(), nick = window.NectaraMe.nick();
         return '<a class="me-home" href="#/me">' + (pic ? '<img src="' + pic + '" alt="" width="160" height="240">' : '<img src="/assets/world/kids/eli.webp" alt="" width="160" height="240" class="me-ghost">') +

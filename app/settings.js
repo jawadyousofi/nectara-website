@@ -11,7 +11,7 @@
   var MINUTES = [10, 15, 20, 30, 45, 60];
   var QUIET = [['', 'Off'], ['18:30', '6:30 pm'], ['19:00', '7:00 pm'], ['19:30', '7:30 pm'], ['20:00', '8:00 pm'], ['20:30', '8:30 pm']];
   var BANDS = [['seeds', 'Seeds', '2 to 3'], ['sprouts', 'Sprouts', '4 to 5'], ['blossoms', 'Blossoms', '6 to 7']];
-  var S = { open: false, ok: false, q: null, set: null, kids: null, user: null, msg: '', saved: '' };
+  var S = { open: false, ok: false, q: null, set: null, kids: null, user: null, msg: '', saved: '', done: null, garden: null, week: 0 };
 
   function api(path, method, body) {
     return fetch(path, { method: method || 'GET', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
@@ -70,6 +70,7 @@
     if (!S.set) { root.innerHTML = html + '<p class="loading">Opening family settings&hellip;</p></div>'; return; }
     var s = S.set, kids = (S.kids && S.kids.kids) || [];
     html += '<div class="me-head"><h1>Family settings</h1><p>These follow your family to every screen you sign in on: phone, tablet, computer and TV.</p></div>' +
+      (s.weeklyNote && window.NectaraWonder && S.done ? window.NectaraWonder.html({ done: S.done, garden: S.garden, nick: activeNick() }, S.week) : '') +
       (S.saved ? '<p class="set-saved" role="status">' + esc(S.saved) + '</p>' : '') + (S.msg ? '<p class="set-msg" role="alert">' + esc(S.msg) + '</p>' : '') +
       '<div class="set-grid">' +
       section('Play time in Asal&rsquo;s World', 'After this long, Asal gets sleepy and says goodbye. A grown-up can hold the goodbye button for 10 more minutes.',
@@ -127,7 +128,15 @@
         setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 1000);
       }).catch(function (e) { S.msg = e.message; render(); });
   }
+  function activeNick() {
+    var d = S.kids, ks = (d && d.kids) || [];
+    if (ks.length > 1) return '';                       // more than one child: "your little ones"
+    return ks[0] ? ks[0].nick : ((S.user && S.user.children && S.user.children[0] && S.user.children[0].name) || '');
+  }
   function bind() {
+    [].forEach.call(root.querySelectorAll('[data-week]'), function (b) {
+      b.addEventListener('click', function () { S.week = parseInt(b.getAttribute('data-week'), 10) || 0; render(); });
+    });
     [].forEach.call(root.querySelectorAll('[data-k]'), function (b) {
       b.addEventListener('click', function () {
         var k = b.getAttribute('data-k'), v = JSON.parse(b.getAttribute('data-v')), p = {};
@@ -140,8 +149,9 @@
     if (lk) lk.addEventListener('click', function () { S.ok = false; S.q = null; try { sessionStorage.removeItem('nx_grownup'); } catch (e) {} location.hash = '#/'; });
   }
   function load() {
-    Promise.all([api('/api/settings'), api('/api/kids').catch(function () { return { kids: [], active: null }; }), api('/api/auth/me').catch(function () { return {}; })])
-      .then(function (r) { S.set = r[0]; S.kids = r[1]; S.user = r[2].user; apply(r[0]); render(); })
+    Promise.all([api('/api/settings'), api('/api/kids').catch(function () { return { kids: [], active: null }; }), api('/api/auth/me').catch(function () { return {}; }),
+      api('/api/progress').catch(function () { return { done: {} }; }), api('/api/garden').catch(function () { return { entries: [] }; })])
+      .then(function (r) { S.set = r[0]; S.kids = r[1]; S.user = r[2].user; S.done = r[3].done || {}; S.garden = r[4].entries || []; apply(r[0]); render(); })
       .catch(function (e) { S.set = null; S.msg = e.message; render(); });
   }
 

@@ -294,3 +294,21 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .set-card .dc-chip small { font-weight: 600; opacity: 0.75; }
 .set-kid { display: grid; gap: 6px; padding: 8px 0; border-top: 1px solid var(--line); }
 .set-card > .btn, .set-card > a.btn { justify-self: start; }
+
+/* Weekly Wonder (app/wonder.js) */
+.wonder { margin-top: 16px; padding: clamp(18px, 2.6vw, 28px); border-radius: 28px; background: linear-gradient(135deg, #FDF3DC 0%, #EEF6FB 100%); box-shadow: 0 6px 24px rgba(42, 33, 24, 0.08); display: grid; gap: 14px; }
+.wonder-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px; }
+.wonder-kicker { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #B5762B; }
+.wonder h2 { font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem); font-weight: 800; color: var(--forest); }
+.wonder > p, .wonder-list { color: var(--ink-soft); max-width: 70ch; }
+.wonder-list { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.wonder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+.wonder-box { padding: 16px; border-radius: 20px; background: #FFFFFF; display: grid; gap: 6px; align-content: start; border-top: 5px solid var(--honey); }
+.wonder-box.ask { border-top-color: #7FB3D5; }
+.wonder-box.pil { border-top-color: #8DB580; }
+.wonder-box h3 { font-size: 1.08rem; font-weight: 800; color: var(--forest); }
+.wonder-box p { color: var(--ink); }
+.wonder-box small { color: var(--ink-soft); }
+.wonder-home { display: grid; gap: 2px; margin-bottom: 22px; padding: 16px 22px; border-radius: 22px; background: #FFFFFF; border: 2px dashed #E8D3A8; text-decoration: none; color: var(--ink-soft); }
+.wonder-home b { color: var(--forest); font-size: 1.15rem; }
+.wonder-home:focus, .wonder-home:hover { border-style: solid; border-color: var(--honey); }
