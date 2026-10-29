@@ -29,6 +29,7 @@ const STARTERS = [
   ['Legal & business action list', 'Legal & business', 'https://docs.google.com/document/d/1XE2IEtyQV6jgqoUFc_HQcBU779fMH9vyHUHaoO5P3vE/edit', 'Trademark first, corporation on Jan 4, 2027.'],
   ['NECTARA trademark prep', 'Legal & business', 'https://docs.google.com/document/d/1a33sdjrJLaFg2cSDEuGnxRgDk_ZNWg6dedo5N7RWRks/edit', ''],
   ['NECTARA trademark filing package', 'Legal & business', 'https://claude.ai/artifact/R17pz9rEAKmgCU3JSif17B', 'Filed Oct 29, 2026, serial 50189307 (Classes 41 and 9). Clearance search, every form answer, classes and fees.'],
+  ['NECTARA trademark filed: serial 50189307 (Google Drive)', 'Legal & business', 'https://docs.google.com/document/d/1hxhOFPDWftWsPrMH2LGStaaZYzfOHrriO5BGxmd64Qo/edit', 'Filed Oct 29, 2026. What was filed, public contact details, and what to do next.'],
   ['NECTARA trademark filing package (Google Drive copy)', 'Legal & business', 'https://docs.google.com/document/d/12YHRV6C5Ri2dNxiHX8sM4ui4P6bRYdeKWhNMRyEidOM/edit', ''],
   ['The Nectara Morning: a guide for teachers and parents', 'Curriculum', 'https://claude.ai/artifact/Ajv76eiPgX82Zf71FfGwVi', 'How to run a morning the Nectara way: rhythm, rituals, mixed ages, what to do when it goes sideways.'],
   ['The Nectara Morning (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1v24QFjmEweiU1E-DGDz0AajoN7JuhBJISiyh8H_7KwY/edit', ''],
