@@ -79,7 +79,7 @@
     var list = (S.entries || []).filter(function (e) { return !S.filter || (e.petals || []).indexOf(S.filter) >= 0; });
     document.title = 'Growth Garden · Nectara';
     root.innerHTML = '<div class="home gg">' +
-      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>Growth Garden</small></span></a>' +
+      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara<sup class="tm">&trade;</sup></b><small>Growth Garden</small></span></a>' +
       '<a class="btn ghost" href="#/" style="min-height:44px;padding:0 18px">Home</a></header>' +
       '<section class="gg-hero">' + flower(g) + '<div><h1>' + (child ? esc(child) + '&rsquo;s' : 'Our') + ' Growth Garden</h1>' +
       '<p>Everything your child explores, makes and notices, kept here for your family. Each petal blooms a little more as it grows. A quiet petal is simply an invitation.</p>' +

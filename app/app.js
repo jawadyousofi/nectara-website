@@ -104,7 +104,7 @@
     document.title = 'Nectara · Little Scientists';
     root.innerHTML =
       '<div class="home">' +
-      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>Little Scientists</small></span></a>' +
+      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara<sup class="tm">&trade;</sup></b><small>Little Scientists</small></span></a>' +
       '<div class="who"><span>' + (first ? 'Hi, ' + esc(first) : '') + '</span>' + (state.user && state.user.access === 'owner' && window.NectaraDocs ? '<a class="btn ghost" href="#/docs" style="min-height:44px;padding:0 16px">Documents</a>' : '') + '<button class="btn ghost" id="signout" type="button" style="min-height:44px;padding:0 16px">Sign out</button></div></header>' +
       (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
         '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +

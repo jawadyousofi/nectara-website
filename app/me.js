@@ -67,7 +67,7 @@
   function render() {
     if (!S.open) return;
     var d = S.data, kids = (d && d.kids) || [];
-    var html = '<div class="home me"><header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>My character</small></span></a>' +
+    var html = '<div class="home me"><header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara<sup class="tm">&trade;</sup></b><small>My character</small></span></a>' +
       '<a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Back</a></header>';
     if (!d) { root.innerHTML = html + '<p class="loading">Opening the character maker…</p></div>'; return; }
     html += '<div class="me-head"><h1>Make your character</h1><p>Choose together how you look. Your character joins Asal in Asal&rsquo;s World on the phone, tablet and TV.</p></div>';

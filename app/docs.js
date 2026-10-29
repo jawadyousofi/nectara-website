@@ -67,7 +67,7 @@
     var opts = S.cats.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
     root.innerHTML =
       '<div class="home dc">' +
-      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara</b><small>Documents</small></span></a>' +
+      '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara<sup class="tm">&trade;</sup></b><small>Documents</small></span></a>' +
       '<div class="who"><a class="dc-btn c-sky" href="#/">Back to the app</a></div></header>' +
       '<section class="dc-head"><h1>Documents</h1><p>Your private Nectara library: plans, curriculum, partners and legal papers. Only you can see this page; families and staff can&rsquo;t.</p></section>' +
       (S.msg ? '<p class="dc-msg" role="status">' + esc(S.msg) + '</p>' : '') +

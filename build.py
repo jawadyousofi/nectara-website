@@ -43,7 +43,7 @@ def page(fname, title, desc, body, artifact=False):
 <link rel="stylesheet" href="assets/site.css">'''
     content = f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-head"><div class="wrap">
-  <a class="brand" href="index.html" aria-label="Nectara home"><img src="assets/logo-mark.svg" alt="" width="62" height="44"><span class="wordmark">nectara</span></a>
+  <a class="brand" href="index.html" aria-label="Nectara home"><img src="assets/logo-mark.svg" alt="" width="62" height="44"><span class="wordmark">nectara<sup class="tm" aria-label="trademark">&trade;</sup></span></a>
   <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
   <ul class="nav" id="nav">{nav}<li><a href="login.html"{" aria-current=\"page\"" if fname == "login.html" else ""}>Members</a></li>{"" if PRIVATE else '<li><a class="btn" href="join.html">Join us</a></li>'}</ul>
 </div></header>

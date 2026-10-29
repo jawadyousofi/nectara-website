@@ -243,3 +243,6 @@ fieldset { border: 0; display: grid; gap: 10px; }
 .pill.off { background: #F3E6E2; color: #8A3A2B; }
 .admin-table code { font-size: 0.95rem; letter-spacing: 0.04em; }
 .btn.quiet { background: #FFFFFF; color: #2F4A35; box-shadow: inset 0 0 0 2px #E9A23B; }
+
+/* NECTARA trademark (application filed Oct 29, 2026, serial 50189307) */
+.wordmark .tm { font-size: 0.42em; font-weight: 700; vertical-align: super; margin-left: 1px; letter-spacing: 0; }
