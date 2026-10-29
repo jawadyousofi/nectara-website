@@ -312,3 +312,10 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .wonder-home { display: grid; gap: 2px; margin-bottom: 22px; padding: 16px 22px; border-radius: 22px; background: #FFFFFF; border: 2px dashed #E8D3A8; text-decoration: none; color: var(--ink-soft); }
 .wonder-home b { color: var(--forest); font-size: 1.15rem; }
 .wonder-home:focus, .wonder-home:hover { border-style: solid; border-color: var(--honey); }
+
+/* Month chips on the home screen */
+.series-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 16px; }
+.series-chip { display: grid; text-align: left; min-height: 52px; padding: 6px 16px; border-radius: 16px; border: 2px solid var(--line); background: #FFFFFF; font: inherit; font-weight: 800; color: var(--forest); cursor: pointer; }
+.series-chip small { font-weight: 700; font-size: 0.78rem; color: var(--ink-soft); letter-spacing: 0.04em; }
+.series-chip.on { border-color: var(--honey); background: #FFF3D6; }
+.series-chip:focus-visible { outline: none; box-shadow: 0 0 0 3px #FFFDF5, 0 0 0 7px var(--honey); }

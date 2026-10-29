@@ -9,7 +9,9 @@
     'little-drop': ['earth', 'mind', 'spirit'], 'little-seed': ['earth', 'spirit', 'body'], 'little-leaf': ['earth', 'body', 'world'],
     'day-and-night': ['mind', 'spirit'], 'i-am-grand': ['spirit', 'body', 'heart'], 'little-light': ['heart', 'voice'],
     'little-breath': ['body', 'spirit'], 'one-little-bee': ['earth', 'world'], 'one-circle': ['world', 'heart'], 'still-water': ['spirit', 'heart'],
-    'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world']
+    'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world'],
+    'inside-seed': ['earth', 'mind', 'spirit'], 'seed-window': ['earth', 'mind', 'heart'], 'soil-safari': ['earth', 'body', 'mind'], 'worm-hotel': ['earth', 'world', 'heart'],
+    'which-part': ['body', 'earth', 'mind'], 'regrow': ['earth', 'mind', 'heart'], 'rainbow-plate': ['body', 'world', 'voice'], 'food-journey': ['body', 'mind', 'earth']
   };
   window.NECTARA_GROWS = GROWS;
   function petalTags(id) {
@@ -96,7 +98,11 @@
   // ---------- Home ----------
   function renderHome() {
     stopLesson(); if (window.NectaraGarden) window.NectaraGarden.preload();
-    var series = DATA.series.filter(function (s) { return s.ready; })[0];
+    // This month's series first; earlier months stay one tap away (chips under the series title).
+    var ready = DATA.series.filter(function (s) { return s.ready; });
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var nowMonth = MONTHS[new Date().getMonth()];
+    var series = ready.filter(function (s) { return s.id === state.seriesId; })[0] || ready.filter(function (s) { return s.month === nowMonth; })[0] || ready[ready.length - 1];
     var grown = series.lessons.filter(function (l) { return state.done[l.id]; }).length;
     var next = series.lessons.filter(function (l) { return !state.done[l.id]; })[0] || series.lessons[0];
     var first = (state.user && state.user.name || '').split(' ')[0];
@@ -131,6 +137,10 @@
           '<span class="go">' + (state.done[st.id] ? 'Read it again &rarr;' : 'Read the story &rarr;') + '</span></span></button>';
       }).join('') + '</div>' : '') +
       '<div class="section-title"><h2>' + esc(series.title) + '</h2><span>' + esc(series.month) + ' &middot; ' + esc(series.idea) + '</span></div>' +
+      (ready.length > 1 ? '<div class="series-chips" role="group" aria-label="Choose a month">' + ready.map(function (s) {
+        var on = s.id === series.id;
+        return '<button type="button" class="series-chip' + (on ? ' on' : '') + '" data-series="' + s.id + '" aria-pressed="' + on + '"><small>' + esc(s.month) + (s.month === nowMonth ? ' &middot; now' : '') + '</small>' + esc(s.title) + '</button>';
+      }).join('') + '</div>' : '') +
       '<div class="lesson-grid">' + series.lessons.map(function (l) {
         return '<button class="lesson-card" type="button" data-open="' + l.id + '">' +
           (state.done[l.id] ? '<span class="done-badge">' + ICON.check + 'Done</span>' : '') +
@@ -148,6 +158,9 @@
       '<div class="tip"><b>For grown-ups</b>Every lesson has a Grown-ups button with the materials list, setup and safety notes. Gather materials before you start.</div></div>' +
       '</div>';
     var wc = document.getElementById('world-card'); if (wc) wc.addEventListener('click', function () { location.hash = '#/world'; });
+    root.querySelectorAll('[data-series]').forEach(function (b) {
+      b.addEventListener('click', function () { state.seriesId = b.getAttribute('data-series'); var y = window.scrollY; renderHome(); window.scrollTo(0, y); });
+    });
     root.querySelectorAll('[data-open]').forEach(function (b) { b.addEventListener('click', function () { location.hash = '#/lesson/' + b.getAttribute('data-open'); }); });
     document.getElementById('signout').addEventListener('click', function () {
       api('/api/auth/logout', { method: 'POST' }).finally(function () { location.href = '/login.html?signedout=1'; });
@@ -356,11 +369,12 @@
       return;
     }
     dialog.innerHTML = '<div class="gu"><header><h2 id="gu-title">For grown-ups</h2><button class="icon-btn" type="button" id="gu-close" aria-label="Close">' + ICON.close + '</button></header>' +
-      '<p><b>' + esc(l.title) + '</b> &middot; 30 minutes &middot; ages 4&ndash;7 (younger children with a parent helping)</p>' +
+      '<p><b>' + esc(l.title) + '</b> &middot; 30 minutes &middot; ages ' + (l.seeds ? '2&ndash;7' : '4&ndash;7 (younger children with a parent helping)') + '</p>' +
       '<div><h3>Materials</h3><ul>' + l.materials.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
       '<div><h3>Before you start</h3><p>' + esc(l.setup) + '</p></div>' +
       '<div><h3>Safety</h3><ul>' + l.safety.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
       '<div><h3>The big idea</h3><p>' + esc(l.bigIdea) + '</p></div>' +
+      (l.seeds || l.blossoms ? '<div><h3>For every age</h3><ul>' + (l.seeds ? '<li><b>Seeds (2&ndash;3):</b> ' + esc(l.seeds) + '</li>' : '') + '<li><b>Sprouts (4&ndash;5):</b> the lesson as it is.</li>' + (l.blossoms ? '<li><b>Blossoms (6&ndash;7):</b> ' + esc(l.blossoms) + '</li>' : '') + '</ul></div>' : '') +
       '<div><h3>Leading tips</h3><ul><li>Slow is the point: waiting is part of the lesson.</li><li>Every guess is welcome. Repeat children&rsquo;s words back to them.</li><li>During &ldquo;Do,&rdquo; the screen can rest. Use Next when everyone is ready.</li></ul></div></div>';
     dialog.showModal();
     document.getElementById('gu-close').addEventListener('click', function () { dialog.close(); });

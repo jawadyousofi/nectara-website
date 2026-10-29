@@ -39,6 +39,8 @@ const STARTERS = [
   ['Where did your child learn all of this? (Google Drive copy)', 'Families', 'https://docs.google.com/document/d/1Aoxp1GVvqJX4mRMo2GWKWPa3rBlro-qP0g-ducGiXwY/edit', ''],
   ['Garden Partners flyer (to leave with nursery owners)', 'Partners', 'https://claude.ai/artifact/BiwWBDdEoqfqb7XutDSM8x', 'One printable page: what a garden morning is, what the nursery gets, what we ask, and how to reach you. Export as PDF to print.'],
   ['Garden Partners flyer (Google Drive copy)', 'Partners', 'https://docs.google.com/document/d/1mukJLPk7Q009JBPsPg7ESEyVrKZi22JDOA1c8y0RCGE/edit', ''],
+  ['Nectara Year One Curriculum', 'Curriculum', 'https://claude.ai/artifact/SNEfPp5omonKoTta4iFcah', 'Ten monthly series, 40 lessons with Seeds and Blossoms versions, Wow Days, new Asal\'s World corners and the build order.'],
+  ['Nectara Year One Curriculum (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1q-tTitChev_xSjQq7DP2yjF0iHkjtREZw0N_L0OG4Hs/edit', ''],
 ];
 
 // New documents Claude makes are added to STARTERS; each is put on the shelf once (idx.seeded remembers which),
