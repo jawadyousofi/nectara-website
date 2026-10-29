@@ -105,7 +105,7 @@
     root.innerHTML =
       '<div class="home">' +
       '<header class="topbar"><a class="brand" href="#/"><img src="/assets/logo-mark.svg" alt="" width="52" height="37"><span><b>nectara<sup class="tm">&trade;</sup></b><small>Little Scientists</small></span></a>' +
-      '<div class="who"><span>' + (first ? 'Hi, ' + esc(first) : '') + '</span>' + (state.user && state.user.access === 'owner' && window.NectaraDocs ? '<a class="btn ghost" href="#/docs" style="min-height:44px;padding:0 16px">Documents</a>' : '') + '<button class="btn ghost" id="signout" type="button" style="min-height:44px;padding:0 16px">Sign out</button></div></header>' +
+      '<div class="who"><span>' + (first ? 'Hi, ' + esc(first) : '') + '</span>' + (state.user && state.user.access === 'owner' && window.NectaraDocs ? '<a class="btn ghost" href="#/docs" style="min-height:44px;padding:0 16px">Documents</a>' : '') + (window.NectaraSettings ? '<a class="btn ghost" href="#/settings" style="min-height:44px;padding:0 16px">Grown-ups</a>' : '') + '<button class="btn ghost" id="signout" type="button" style="min-height:44px;padding:0 16px">Sign out</button></div></header>' +
       (window.NectaraWorld ? '<button type="button" class="world-card" id="world-card" aria-label="Explore Asal&rsquo;s World">' + window.NectaraWorld.preview() +
         '<span class="wc-text"><h2>Asal&rsquo;s World</h2><p>Fly to the garden, the pond, the hive and the sky. Tap anything to discover something new. ' +
         (function () { var m = window.NectaraWorld.memories ? window.NectaraWorld.memories() : []; return m.length ? 'Your memory jar remembers the ' + m.join(', the ').replace(/, the ([^,]*)$/, ' and the $1') + '.' : ''; })() + '</p><span class="btn">Explore</span></span></button>' : '') +
@@ -402,6 +402,8 @@
     var gm = location.hash.match(/^#\/garden(?:\/(.+))?$/);
     if (gm && window.NectaraGarden) { stopLesson(); state.lesson = null; window.NectaraGarden.open(gm[1], { user: state.user, done: state.done }); return; }
     if (window.NectaraGarden) window.NectaraGarden.close();
+    if (/^#\/settings/.test(location.hash) && window.NectaraSettings) { stopLesson(); state.lesson = null; window.NectaraSettings.open(); return; }
+    if (window.NectaraSettings) window.NectaraSettings.close();
     if (/^#\/me/.test(location.hash) && window.NectaraMe) { stopLesson(); state.lesson = null; window.NectaraMe.open(); return; }
     if (window.NectaraMe) window.NectaraMe.close();
     if (/^#\/docs/.test(location.hash) && window.NectaraDocs && state.user && state.user.access === 'owner') { stopLesson(); state.lesson = null; window.NectaraDocs.open(); return; }
@@ -412,7 +414,7 @@
   window.addEventListener('hashchange', route);
 
   Promise.all([api('/api/auth/me'), api('/api/progress').catch(function () { return { done: {} }; })])
-    .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); })
+    .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); if (window.NectaraSettings) window.NectaraSettings.start(); })
     .catch(function (e) {
       if (e.status === 401) location.href = '/login.html?next=/app/';
       else root.innerHTML = '<p class="loading">We couldn&rsquo;t open the garden. Please check your connection and refresh.</p>';

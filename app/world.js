@@ -873,6 +873,13 @@
   }
 
   // ---------- Gentle ending ----------
+  // Quiet hours set by grown-ups (app/settings.js): from quietFrom until 6:00, Asal is asleep.
+  function quietNow() {
+    var q = ''; try { q = (JSON.parse(localStorage.getItem('nx_settings') || '{}').quietFrom) || ''; } catch (e) {}
+    if (!q) return false;
+    var d = new Date(), mins = d.getHours() * 60 + d.getMinutes(), p = q.split(':'), from = parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+    return mins >= from || mins < 6 * 60;
+  }
   function startSession() {
     var now = Date.now(), st = 0;
     try { st = parseInt(sessionStorage.getItem('nx_world_start') || '0', 10); } catch (e) {}
@@ -881,7 +888,7 @@
     clearInterval(S.tick);
     S.tick = setInterval(function () {
       if (!S.active || S.mode === 'bye') return;
-      if (Date.now() - S.sessionStart > S.limitMin * 60000) goodbye();
+      if (Date.now() - S.sessionStart > S.limitMin * 60000 || (quietNow() && !S.quietOk)) goodbye();
     }, 10000);
   }
   // ---------- Opening and closing rituals: Breath, Gratitude, Food, Rest ----------
@@ -951,7 +958,7 @@
     var acts = [{ id: 'w-bye-home', label: 'Goodbye, Asal!', cls: 'fun honey', fn: leave }];
     if (timed) acts.push({ id: 'w-bye-more', label: 'Grown-ups: hold for 10 more minutes', cls: 'grown', setup: function (more) {
       var holdT = null, o = document.getElementById('w-over');
-      function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; if (S.a3d) S.a3d.setMood('idle'); startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
+      function startHold() { more.classList.add('holding'); holdT = setTimeout(function () { S.quietOk = true; S.sessionStart = Date.now() - (S.limitMin - 10) * 60000; o.hidden = true; o.innerHTML = ''; if (wrap) wrap.classList.remove('w-sleepy'); S.mode = 'world'; if (S.a3d) S.a3d.setMood('idle'); startAmbient(S.place ? S.place.id : 'map'); focusItem(0); }, 2500); }
       function endHold() { more.classList.remove('holding'); clearTimeout(holdT); }
       more.addEventListener('mousedown', startHold); more.addEventListener('touchstart', startHold, { passive: true });
       more.addEventListener('mouseup', endHold); more.addEventListener('mouseleave', endHold); more.addEventListener('touchend', endHold);

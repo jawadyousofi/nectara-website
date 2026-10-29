@@ -54,7 +54,7 @@ async function changeEmail(env, from, to) {
   if (await KV.get('user:' + to)) return json({ error: 'another account already uses that email' }, 409);
   user.email = to;
   await KV.put('user:' + to, JSON.stringify(user));
-  for (const pre of ['prog:', 'gg:', 'kids:']) {
+  for (const pre of ['prog:', 'gg:', 'kids:', 'set:']) {
     const v = await KV.get(pre + from);
     if (v !== null) { await KV.put(pre + to, v); await KV.delete(pre + from); }
   }

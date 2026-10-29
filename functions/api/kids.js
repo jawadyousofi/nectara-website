@@ -1,7 +1,8 @@
 // The family's children's characters, for Asal's World and the app (members only).
 // GET  /api/kids                         -> { kids: [{ id, nick, traits }], active }
 // POST /api/kids { kids, active }        -> saves (up to 6 children)
-// Privacy by design: only a first name or nickname and the choices from the character builder are stored.
+// Privacy by design: only a first name or nickname, an age group (Seeds 2-3, Sprouts 4-5, Blossoms 6-7) and the
+// choices from the character builder are stored.
 // No photos, no birthdays, no last names. Nothing here is shared with other families.
 import { json, clean, getUser, hasAccess, sameOrigin, readJson } from '../_lib/auth.js';
 
@@ -40,6 +41,7 @@ export async function onRequestPost({ request, env }) {
     id: k && typeof k.id === 'string' && /^[a-z0-9]{6,12}$/.test(k.id) ? k.id : Math.random().toString(36).slice(2, 10),
     nick: cleanNick(k && k.nick) || 'Little bee',
     traits: cleanTraits(k && k.traits),
+    ...(['seeds', 'sprouts', 'blossoms'].includes(k && k.band) ? { band: k.band } : {}),
   }));
   const active = kids.some(k => k.id === data.active) ? data.active : (kids[0] ? kids[0].id : null);
   const saved = { kids, active };
