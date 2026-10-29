@@ -869,6 +869,32 @@
     outside: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#E4F5DD" stroke="#2F5E36" stroke-width="2.2"/><circle cx="21.5" cy="10.5" r="3" fill="#F2B23A"/><path d="M10 24 C10 17 13 13 17 12 C16.5 17 14 21 10 24 Z" fill="#5FA36A" stroke="#2F5E36" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 24 L14.5 17.5" stroke="#2F5E36" stroke-width="1.6" stroke-linecap="round"/></svg>',
     back: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#FFFFFF" stroke="#1F4E73" stroke-width="2.2"/><path d="M18.5 9.5 L11.5 16 L18.5 22.5" fill="none" stroke="#1F4E73" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
+  // Put the caption where it covers the fewest place names and things to tap. It tries the bottom and the top,
+  // full width and then narrower boxes in the corners, measuring each with all the words showing.
+  var CAP_SPOTS = ['', 'top', 'narrow left', 'narrow right', 'top narrow left', 'top narrow right'];
+  function overlap(a, b) {
+    var w = Math.min(a.right, b.right) - Math.max(a.left, b.left), h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+    return w > 0 && h > 0 ? w * h : 0;
+  }
+  function placeCaption(p, spotY) {
+    var stage = document.getElementById('w-stage'), cap = p.querySelector('.w-cap-text'); if (!stage || !cap) return;
+    var things = [];
+    [].forEach.call(stage.querySelectorAll('.w-place .w-label, .w-place, .w-spot'), function (el) {
+      var r = el.getBoundingClientRect(); if (r.width) things.push({ r: r, w: el.classList.contains('w-label') ? 3 : 1 });
+    });
+    cap.className += ' all';
+    var best = '', bestScore = 1e15, pref = spotY > 430 ? 1 : 0;
+    for (var i = 0; i < CAP_SPOTS.length; i++) {
+      p.className = 'w-panel w-cap' + (CAP_SPOTS[i] ? ' ' + CAP_SPOTS[i] : '');
+      var r = cap.getBoundingClientRect(), score = 0;
+      for (var j = 0; j < things.length; j++) score += overlap(r, things[j].r) * things[j].w;
+      score += i === pref ? 0 : (i < 2 ? 1 : 2);   // ties: the usual place first, corners last
+      if (score < bestScore) { bestScore = score; best = CAP_SPOTS[i]; }
+      if (score < 1) break;
+    }
+    p.className = 'w-panel w-cap' + (best ? ' ' + best : '');
+    cap.className = cap.className.replace(' all', '');
+  }
   // Asal's words appear one by one as he says them, fade when he is done, then the buttons pop in.
   function showPanel(o) {
     S.mode = 'panel';
@@ -882,6 +908,7 @@
         return '<button type="button" class="w-act fun ' + (a.cls || 'honey') + '" data-i="' + i + '" style="animation-delay:' + (i * 0.12) + 's"><span class="w-act-ico">' + (ICONS[a.icon] || '') + '</span><span>' + a.label + '</span></button>';
       }).join('') + '</div>';
     p.hidden = false;
+    placeCaption(p, o.spotY);
     var spans = [].slice.call(p.querySelectorAll('.w-cap-text span')), cap = document.getElementById('w-cap-text');
     var chars = [], total = 0;
     words.forEach(function (w) { total += w.length + 1; chars.push(total); });

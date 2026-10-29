@@ -381,3 +381,11 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 #w-weather.play { animation: wweather 2.4s ease-in-out; }
 @keyframes wweather { 0% { transform: rotate(0) scale(1); } 50% { transform: rotate(180deg) scale(1.12); } 100% { transform: rotate(360deg) scale(1); } }
 @media (prefers-reduced-motion: reduce) { .w-flap, #w-rainy .w-drops ellipse { animation: none; } }
+
+/* Caption placement (placeCaption in world.js): measured with all words showing, then put where it covers least */
+.w-cap-text.all span { display: inline-block; visibility: hidden; }
+.w-cap-text.all span.on { visibility: visible; }
+.w-panel.w-cap.narrow { width: 46%; margin-left: 0; }
+.w-panel.w-cap.narrow.left { left: 3%; }
+.w-panel.w-cap.narrow.right { left: auto; right: 3%; }
+.w-panel.w-cap.narrow .w-cap-text { font-size: 2em; }
