@@ -25,7 +25,8 @@
     if (S.a3dTried) return; S.a3dTried = true;
     if (!(window.WebGLRenderingContext)) return;
     function add(src, cb) { var sc = document.createElement('script'); sc.src = src; sc.onload = cb; sc.onerror = function () {}; document.head.appendChild(sc); }
-    add('/assets/three.min.js', function () {
+    var three = function (cb) { if (window.THREE) cb(); else add('/assets/three.min.js', cb); };   // the character maker may have loaded it already
+    three(function () {
       add('/app/asal3d.js', function () {
         if (!window.Asal3D || !window.Asal3D.supported()) return;
         try {
@@ -418,9 +419,11 @@
   }
   function kidName(offset) { if (kidTurn < 0) nextKid(); return KIDS[(kidTurn + (offset || 0)) % KIDS.length]; }
   function kidImg(src, x, y, w, h) { return '<image href="' + src + '" xlink:href="' + src + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/>'; }
+  // The child playing appears as their own character (made in My character, app/me.js) wherever a scene shows "you".
+  function myImg() { return window.NectaraMe ? window.NectaraMe.img() : ''; }
   function child(x, y, s, offset) {   // a standing child, about 190 tall at scale 1, feet near y + 92
-    var h = 200 * (s || 1), w = h * 2 / 3;
-    return kidImg('/assets/world/kids/' + kidName(offset) + '.webp', x - w / 2, y + 96 * (s || 1) - h, w, h);
+    var h = 200 * (s || 1), w = h * 2 / 3, mine = !offset && myImg();
+    return kidImg(mine || '/assets/world/kids/' + kidName(offset) + '.webp', x - w / 2, y + 96 * (s || 1) - h, w, h);
   }
   function sceneOrchard() {
     var b = skyAndSun(1440, 130);
@@ -448,7 +451,7 @@
     // you are a seed: a child beside a young orange tree, with a heart
     b += '<g transform="translate(1000 610)"><g id="w-youseed">' +
       '<path d="M70 110 V20" stroke="#8A5A3B" stroke-width="10"/><circle cx="70" cy="10" r="36" fill="#6DB25A"/>' + orange(58, 4, 9) + orange(84, 18, 8) +
-      child(-14, 30, 1.25, 3) +
+      child(-14, 30, 1.25, myImg() ? 0 : 3) +
       '<path d="M-10 -78 c-10 -14 -30 -4 -20 10 l20 18 l20 -18 c10 -14 -10 -24 -20 -10z" fill="#E76F9A"/></g></g>';
     // compost
     b += '<g transform="translate(1150 735)"><g id="w-peel"><rect x="-80" y="-30" width="160" height="90" rx="10" fill="#A8754E" stroke="#7A5235" stroke-width="5"/>' +
@@ -489,8 +492,9 @@
       '<g id="w-glass"><path d="M-32 -60 L-24 64 H24 L32 -60Z" fill="#EAF5FB" stroke="#9BC7E4" stroke-width="4"/><path d="M-29 -20 L-24 60 H24 L29 -20Z" fill="#7FB3D5" opacity="0.85"/>' +
       '<ellipse cx="-10" cy="10" rx="5" ry="16" fill="#FFFFFF" opacity="0.6"/></g></g>';
     // the child: rendered in 3D in the same style as Asal (tools/inside_kid.html), with see-through skin over the organs
-    nextKid();   // a new friend shows us their insides on each visit
-    b += kidImg('/assets/world/kids/' + kidName(0) + '-inside.webp', 160, -81, 800, 1200);
+    nextKid();   // a new friend shows us their insides on each visit, unless the child has made their own character
+    var myInside = window.NectaraMe ? window.NectaraMe.insideImg() : '';
+    b += kidImg(myInside || '/assets/world/kids/' + kidName(0) + '-inside.webp', 160, -81, 800, 1200);
     // a soft glow lights up each part of the journey when it is tapped
     b += '<g id="w-mouth"><circle class="w-glow" cx="538" cy="313" r="50" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +
       '<g id="w-tube"><circle class="w-glow" cx="558" cy="449" r="36" fill="#FFF6C8" stroke="#F2C14E" stroke-width="6"/></g>' +

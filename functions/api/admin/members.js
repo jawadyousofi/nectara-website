@@ -43,7 +43,7 @@ export async function onRequestPost({ request, env }) {
   return json({ ok: true, email, access: user.access });
 }
 
-// Move an account to a new email: the account, lesson progress, Growth Garden and its pictures and sounds all
+// Move an account to a new email: the account, lesson progress, children's characters, Growth Garden and its pictures and sounds all
 // come along. Old sign-ins stop working, so the person signs in again with the new email and the same password.
 async function changeEmail(env, from, to) {
   const KV = env.NECTARA_INTEREST;
@@ -54,7 +54,7 @@ async function changeEmail(env, from, to) {
   if (await KV.get('user:' + to)) return json({ error: 'another account already uses that email' }, 409);
   user.email = to;
   await KV.put('user:' + to, JSON.stringify(user));
-  for (const pre of ['prog:', 'gg:']) {
+  for (const pre of ['prog:', 'gg:', 'kids:']) {
     const v = await KV.get(pre + from);
     if (v !== null) { await KV.put(pre + to, v); await KV.delete(pre + from); }
   }

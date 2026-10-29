@@ -3,6 +3,7 @@
 //   user:<email>          account { email, name, salt, hash, access, created, children }
 //   sess:<sha256(token)>  session { email, created }  (expires after 30 days)
 //   prog:<email>          lesson progress { done: { lessonId: isoDate } }
+//   kids:<email>          the family's children's characters { kids: [{ id, nick, traits }], active } (choices only, never photos)
 //   fail:<email>          failed sign-in counter (expires after 15 minutes)
 //   reset:<sha256(token)> password-reset link { email } (expires after 1 hour, or 24 hours when made by an admin)
 //   rlim:<email>          reset-email counter (max 3 an hour)
@@ -12,7 +13,7 @@
 //   mail:last-error       the most recent email that failed to send { at, status, detail } (shown on the admin page)
 // access: 'waiting' (signed up, no access yet) | 'founding' (invite code) | 'member' (paid) | 'staff' | 'paused'
 
-export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:', 'ecode:', 'elim:', 'pair:', 'mail:', 'tvfail:', 'invite:', 'gg:', 'ggm:'];
+export const KV_PREFIXES = ['user:', 'sess:', 'prog:', 'fail:', 'reset:', 'rlim:', 'ecode:', 'elim:', 'pair:', 'mail:', 'tvfail:', 'invite:', 'gg:', 'ggm:', 'kids:'];
 export const COOKIE = 'nx_session';
 const SESSION_DAYS = 30;
 const enc = new TextEncoder();
