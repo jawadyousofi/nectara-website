@@ -10,6 +10,15 @@
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   // Which corner of Asal's World matches each month's series, for the outdoor idea on a quiet week.
   var MONTH_PLACES = { 8: ['pond'], 9: ['garden', 'orchard'], 10: ['orchard', 'inside'], 11: ['sky'], 0: ['inside', 'meadow'], 1: ['meadow'], 2: ['sky'], 3: ['hive'], 4: ['garden', 'pond', 'hive', 'sky'], 5: ['sky'], 6: ['pond', 'garden'], 7: ['sky', 'orchard'] };
+  // A question just for the grown-up, different each week: Nectara is for the whole family's wonder.
+  var FOR_YOU = [
+    'What surprised you this week?',
+    'When did you feel like a child again this week?',
+    'What did your child notice that you would have walked past?',
+    'What would you love to learn alongside your child next?',
+    'What did you wonder about at your child’s age? Tell them the story.',
+    'Where did you feel calm this week, and could you take your child there?'
+  ];
   var PILLARS = [
     ['Breath', 'Before bed one night, lie side by side and breathe like bees: in through the nose, hum it out. Three hums each. Let your child lead the last one.'],
     ['Gratitude', 'At dinner, go around the table: one thing from today you are thankful for. Small things count. A warm sock is a fine answer.'],
@@ -64,7 +73,7 @@
       pick = pool.length ? pool[wk % pool.length] : null;
     }
     var ask = (lessons[0] && lessons[0].it.q) || (pick && askOf(pick.spot.say)) || '';
-    return { from: from, found: found, lessons: lessons, stories: stories, plant: plant, garden: garden, pick: pick, ask: ask, pillar: PILLARS[wk % 4], nick: data.nick };
+    return { forYou: FOR_YOU[wk % FOR_YOU.length], from: from, found: found, lessons: lessons, stories: stories, plant: plant, garden: garden, pick: pick, ask: ask, pillar: PILLARS[wk % 4], nick: data.nick };
   }
 
   function html(data, offset) {
@@ -90,6 +99,7 @@
       (w.pick ? '<div class="wonder-box out"><h3>Try together outside</h3><p>' + esc(w.pick.spot.mission) + '</p><small>From ' + esc(w.pick.spot.name) + ' at ' + esc(w.pick.place.name.replace(/^The /, 'the ')) + '</small></div>' : '') +
       (w.ask ? '<div class="wonder-box ask"><h3>Ask at dinner</h3><p>&ldquo;' + esc(w.ask) + '&rdquo;</p><small>No right answers. Just listen and wonder with them.</small></div>' : '') +
       '<div class="wonder-box pil"><h3>A moment for ' + w.pillar[0] + '</h3><p>' + esc(w.pillar[1]) + '</p></div>' +
+      '<div class="wonder-box you"><h3>Just for you</h3><p>' + esc(w.forYou) + '</p><small>A quiet question for the grown-up. Families grow together.</small></div>' +
       '</div></section>';
   }
 

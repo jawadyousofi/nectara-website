@@ -249,21 +249,24 @@
     var asalSmall = '<img class="asal asal-small" src="/assets/asal.svg" alt="Asal the bee kid" width="300" height="400">';
     var hero = '<img class="art" src="/assets/lessons/' + l.img + '.webp" alt="" width="1200" height="750">';
     var steps = '<img class="art" src="/assets/lessons/' + l.img + '-steps.webp" alt="" width="1200" height="465">';
-    return [
+    return slidesOf([
       { next: 'Let&rsquo;s begin', visual: hero, words: '<span class="soft">' + esc(s.title) + ' &middot; Week ' + l.week + '</span><h1 class="big">' + esc(l.title) + '</h1><p class="mid">Today, Asal has a big question for us.</p>' },
       { phase: 'watch', visual: asal, words: '<p class="soft">Sit in a circle and breathe with Asal.</p><div class="song">' + DATA.song.map(function (line, i) { return '<span style="animation-delay:' + (0.4 + i * 1.1) + 's">' + esc(line) + '</span>'; }).join('') + '</div>' },
       { phase: 'watch', visual: asal, words: '<div class="bubble"><p class="soft">Asal wonders&hellip;</p><p class="big">' + esc(l.question) + '</p></div><p class="mid">What do you think? Everyone shares a guess. Scientists start with a guess!</p>' },
       { phase: 'watch', visual: steps, words: '<p class="soft">Here&rsquo;s what we&rsquo;ll do:</p><ol class="steps-list">' + l.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' },
       { phase: 'do', next: 'We did it!', kind: 'do', visual: asalSmall + '<p class="rest" style="margin-top:14px">Screens rest. Hands work.</p>', words: '<h2 class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.2rem)">' + esc(l.doIntro) + '</h2><ul class="do-list">' + l.doSteps.map(function (t, i) { return '<li><button type="button" aria-pressed="false" data-tick="' + i + '"><span class="box"></span><span>' + esc(t) + '</span></button></li>'; }).join('') + '</ul>' +
           '<div class="timer"><button class="btn quiet" type="button" id="timer-btn">Start a ' + l.minutes + '-minute timer</button><span class="clock" id="clock" hidden></span><span class="bar" id="bar" hidden><i></i></span></div>' },
+      l.makeIt ? { phase: 'make', next: 'I made it!', visual: asalSmall + '<p class="rest" style="margin-top:14px">Your way is the right way.</p>', words: '<h2 class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.2rem)">Make it yours</h2><p class="mid">' + esc(l.makeIt) + '</p><p class="soft">Show someone what you made. Every idea is welcome.</p>' } : null,
       { phase: 'share', visual: asal, words: '<p class="soft">Notice</p><p class="big">' + esc(l.notice) + '</p>' },
       { phase: 'share', visual: asal, words: '<p class="soft">Feel</p><p class="big">' + esc(l.feel) + '</p>' },
       { phase: 'share', visual: asal, words: '<p class="soft">Body</p><p class="big">' + esc(l.body) + '</p>' },
-      { phase: 'share', visual: hero, words: '<p class="soft">What we found out</p><p class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.4rem)">' + esc(l.answer) + '</p><p class="mid challenge"><b>Big kid challenge</b>' + esc(l.challenge) + '</p>' },
+      { phase: 'share', visual: asal, words: '<div class="bubble"><p class="soft">Your ideas first</p><p class="big">What do you think happened, and why?</p></div><p class="mid">Everyone shares an idea. Scientists share their ideas before anyone knows for sure.</p>' },
+      { phase: 'share', visual: hero, words: '<p class="soft">What scientists think so far</p><p class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.4rem)">' + esc(l.answer) + '</p><p class="mid challenge"><b>Big kid challenge</b>' + esc(l.challenge) + '</p>' },
       { next: 'Back to the garden', kind: 'finish', visual: '<svg class="flower-grow" viewBox="0 0 200 230" role="img" aria-label="A new flower grows"><ellipse cx="100" cy="212" rx="70" ry="14" fill="#A9C98E"/><path class="stem" d="M100 210 C92 160 108 120 100 74" stroke="#5E9A43" stroke-width="8" fill="none" stroke-linecap="round"/><g class="petals">' + [0, 60, 120, 180, 240, 300].map(function (r) { return '<ellipse cx="100" cy="44" rx="16" ry="27" fill="' + PETALS[(l.week - 1) % PETALS.length] + '" transform="rotate(' + r + ' 100 70)"/>'; }).join('') + '<circle cx="100" cy="70" r="17" fill="#2A2118"/><circle cx="95" cy="65" r="7" fill="#F7E7B4"/></g></svg>',
         words: '<h1 class="big">A flower grew in your garden!</h1><p class="mid">' + esc(l.bigIdea) + '</p><div class="bubble"><p class="soft">Take it home</p><p class="mid">' + esc(l.takeHome) + '</p></div>' },
-    ];
+    ]);
   }
+  function slidesOf(list) { return list.filter(function (x) { return !!x; }); }
 
   function renderLesson(id, index) {
     var found = findLesson(id);
@@ -276,7 +279,7 @@
     var sl = state.slides[state.i], l = found.l, n = state.slides.length;
     document.title = l.title + ' · Nectara';
     clearTimer();
-    var phaseLabel = { watch: 'Watch', do: 'Do', share: 'Share' }[sl.phase];
+    var phaseLabel = { watch: 'Watch', do: 'Do', make: 'Make', share: 'Share' }[sl.phase];
     root.innerHTML =
       '<div class="player">' +
       '<div class="p-top"><button class="icon-btn" type="button" id="exit" aria-label="Close lesson">' + ICON.close + '</button>' +
@@ -370,6 +373,7 @@
     }
     dialog.innerHTML = '<div class="gu"><header><h2 id="gu-title">For grown-ups</h2><button class="icon-btn" type="button" id="gu-close" aria-label="Close">' + ICON.close + '</button></header>' +
       '<p><b>' + esc(l.title) + '</b> &middot; 30 minutes &middot; ages ' + (l.seeds ? '2&ndash;7' : '4&ndash;7 (younger children with a parent helping)') + '</p>' +
+      (l.grownWonder ? '<div class="gu-wonder"><h3>Your own wonder</h3><p>' + esc(l.grownWonder) + '</p><p class="soft">Children learn wonder by watching grown-ups wonder. This one is just for you.</p></div>' : '') +
       '<div><h3>Materials</h3><ul>' + l.materials.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
       '<div><h3>Before you start</h3><p>' + esc(l.setup) + '</p></div>' +
       '<div><h3>Safety</h3><ul>' + l.safety.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul></div>' +
