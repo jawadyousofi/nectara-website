@@ -133,7 +133,7 @@
       if (!S.sound || S.mode === 'bye') return;
       var r = Math.random();
       if (id === 'inside') { tone(72, 0, 0.14, 'sine', 0.06, 52); tone(72, 0.28, 0.14, 'sine', 0.045, 52); }
-      else if (id === 'garden' || id === 'map' || id === 'orchard') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
+      else if (id === 'garden' || id === 'map' || id === 'orchard' || id === 'meadow') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
       else if (id === 'pond') { tone(500 + r * 400, 0, 0.2, 'sine', 0.025, 220); }
       else if (id === 'sky') { noise(1.6, 0.03, 500); }
     }, 3500);
@@ -165,6 +165,16 @@
   }
   function tuft(x, y) {
     return '<path class="w-sway" d="M' + x + ' ' + y + ' q-6 -26 -14 -34 M' + x + ' ' + y + ' q2 -30 4 -40 M' + x + ' ' + y + ' q8 -24 18 -30" stroke="#6FAE55" stroke-width="5" fill="none" stroke-linecap="round"/>';
+  }
+  function tulip(x, y, c, s) {
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')"><g class="w-sway"><path d="M0 0 V-46" stroke="#5E9E4E" stroke-width="5"/><ellipse cx="-9" cy="-18" rx="10" ry="4" fill="#6DB25A" transform="rotate(-30 -9 -18)"/>' +
+      '<path d="M-14 -46 C-16 -62 -10 -72 -7 -66 L0 -76 L7 -66 C10 -72 16 -62 14 -46 C10 -38 -10 -38 -14 -46Z" fill="' + c + '"/></g></g>';
+  }
+  function butterfly(x, y, c, s, cls) {
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')"><g class="' + (cls || '') + '"><g class="w-flap">' +
+      '<path d="M0 0 C-30 -34 -46 -6 -30 8 C-44 20 -24 38 0 10Z" fill="' + c + '" stroke="#2A2118" stroke-width="2"/>' +
+      '<path d="M0 0 C30 -34 46 -6 30 8 C44 20 24 38 0 10Z" fill="' + c + '" stroke="#2A2118" stroke-width="2"/></g>' +
+      '<rect x="-3" y="-14" width="6" height="30" rx="3" fill="#2A2118"/><path d="M-2 -14 q-6 -12 -12 -14 M2 -14 q6 -12 12 -14" stroke="#2A2118" stroke-width="2" fill="none"/></g></g>';
   }
   function bee(x, y, s, cls) {
     return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')"><g class="' + (cls || '') + '">' +
@@ -223,6 +233,11 @@
     b += '<path d="M1440 335 C1400 420 1320 480 1250 520" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
     b += '<g transform="translate(1440 335)"><circle r="78" fill="#FDF1E3" stroke="#F2C9A8" stroke-width="5"/>' + child(0, 4, 0.72, 0) +
       '<path d="M-4 18 c-8 -6 -14 -11 -14 -17 c0 -4 3 -7 7 -7 c3 0 5 2 7 5 c2 -3 4 -5 7 -5 c4 0 7 3 7 7 c0 6 -6 11 -14 17z" fill="#E0503A"/></g>';
+    // feelings meadow: a patch of flowers in every feeling's color, with a butterfly
+    b += '<path d="M330 610 C300 640 270 660 245 675" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
+    b += '<g transform="translate(215 690)"><ellipse cx="0" cy="34" rx="120" ry="34" fill="#B7D99A"/>' +
+      tulip(-70, 22, '#F2C14E', 1) + tulip(-38, 12, '#7FB3D5', 1.1) + tulip(-4, 4, '#E2725B', 1.2) + tulip(32, 12, '#9C7FC9', 1.1) + tulip(66, 22, '#F4A6C0', 1) + tulip(14, 30, '#7BC25A', 0.9) +
+      butterfly(-30, -80, '#F4A6C0', 0.9, 'w-fly2') + '</g>';
     b += bee(560, 420, 1, 'w-fly3');
     return svg(b);
   }
@@ -505,7 +520,60 @@
       '';
     return svg(b);
   }
-  var SCENES = { map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
+  // ---------- Feelings Meadow: every feeling has a name, and every feeling is welcome ----------
+  function face(x, y, mood, s) {   // tiny friendly faces: happy, sad, mad, calm
+    var m = { happy: 'M-9 4 Q0 13 9 4', sad: 'M-8 9 Q0 2 8 9', mad: 'M-8 8 H8', calm: 'M-7 6 Q0 10 7 6' }[mood];
+    var brow = mood === 'mad' ? '<path d="M-13 -12 L-4 -8 M13 -12 L4 -8" stroke="#2A2118" stroke-width="3" stroke-linecap="round"/>' : '';
+    var eyes = mood === 'calm' ? '<path d="M-10 -4 q4 3 8 0 M2 -4 q4 3 8 0" stroke="#2A2118" stroke-width="3" fill="none" stroke-linecap="round"/>' : '<circle cx="-6" cy="-4" r="3" fill="#2A2118"/><circle cx="6" cy="-4" r="3" fill="#2A2118"/>';
+    return '<g transform="translate(' + x + ' ' + y + ') scale(' + (s || 1) + ')">' + eyes + brow + '<path d="' + m + '" stroke="#2A2118" stroke-width="3" fill="none" stroke-linecap="round"/></g>';
+  }
+  function sceneMeadow() {
+    var b = skyAndSun(1440, 120);
+    b += cloud(280, 120, 0.6, 'w-drift w-slow');
+    b += '<path d="M0 470 Q380 400 800 450 T1600 430 V900 H0Z" fill="#D7E9BF"/>';
+    b += '<path d="M0 560 Q420 500 860 560 T1600 540 V900 H0Z" fill="#B7D99A"/>';
+    b += '<path d="M0 690 Q400 650 820 690 T1600 680 V900 H0Z" fill="#A3CF85"/>';
+    for (var t = 0; t < 14; t++) b += tuft(30 + t * 118, 620 + (t % 4) * 40);
+    var cols = ['#F2C14E', '#7FB3D5', '#E2725B', '#9C7FC9', '#F4A6C0', '#7BC25A'];
+    for (var f = 0; f < 22; f++) b += tulip(60 + ((f * 337) % 1500), 600 + ((f * 131) % 260), cols[f % 6], 0.7 + (f % 3) * 0.15);
+    // all my feelings: one big flower with a petal for every feeling, and a face that changes like the weather
+    b += '<g transform="translate(810 400)"><path d="M0 60 C-10 160 10 220 0 330" stroke="#5E9E4E" stroke-width="14" fill="none"/>' +
+      '<ellipse cx="-50" cy="200" rx="50" ry="18" fill="#6DB25A" transform="rotate(-25 -50 200)"/><ellipse cx="46" cy="250" rx="46" ry="16" fill="#6DB25A" transform="rotate(25 46 250)"/>' +
+      '<g id="w-weather">' + cols.map(function (c, i) { return '<ellipse cx="0" cy="-70" rx="34" ry="52" fill="' + c + '" transform="rotate(' + (i * 60) + ')"/>'; }).join('') +
+      '<circle r="50" fill="#FFF3D6" stroke="#E9A23B" stroke-width="5"/>' + face(0, 4, 'happy', 2) + '</g></g>';
+    // happy: a bunny among sunflowers
+    b += '<g transform="translate(300 640)"><g id="w-joy"><ellipse cx="0" cy="40" rx="50" ry="36" fill="#F7EFE4" stroke="#D8C7B0" stroke-width="3"/><circle cx="34" cy="10" r="30" fill="#F7EFE4" stroke="#D8C7B0" stroke-width="3"/>' +
+      '<ellipse cx="22" cy="-36" rx="10" ry="30" fill="#F7EFE4" stroke="#D8C7B0" stroke-width="3" transform="rotate(-12 22 -36)"/><ellipse cx="46" cy="-36" rx="10" ry="30" fill="#F7EFE4" stroke="#D8C7B0" stroke-width="3" transform="rotate(12 46 -36)"/>' +
+      '<ellipse cx="22" cy="-36" rx="4" ry="20" fill="#F4C3D3" transform="rotate(-12 22 -36)"/><ellipse cx="46" cy="-36" rx="4" ry="20" fill="#F4C3D3" transform="rotate(12 46 -36)"/>' +
+      face(36, 12, 'happy', 1) + '<circle cx="-46" cy="34" r="12" fill="#FFFFFF"/><circle cx="20" cy="18" r="5" fill="#F4A6C0" opacity="0.7"/><circle cx="52" cy="18" r="5" fill="#F4A6C0" opacity="0.7"/></g></g>';
+    b += '<g transform="translate(190 640)"><path d="M0 40 V-60" stroke="#5E9E4E" stroke-width="7"/><g transform="translate(0 -70)">' + petals(12, 9, 22, 22) + '<circle r="16" fill="#6B4423"/></g></g>';
+    b += '<g transform="translate(410 660)"><path d="M0 40 V-40" stroke="#5E9E4E" stroke-width="6"/><g transform="translate(0 -48) scale(0.8)">' + petals(12, 9, 22, 22) + '<circle r="16" fill="#6B4423"/></g></g>';
+    // sad: a little rain cloud watering bluebells
+    b += '<g transform="translate(520 250)"><g id="w-rainy"><g transform="scale(0.75)"><g fill="#B9C7D6"><ellipse cx="0" cy="0" rx="90" ry="44"/><circle cx="-45" cy="-18" r="40"/><circle cx="18" cy="-38" r="52"/><circle cx="65" cy="-10" r="38"/></g></g>' +
+      face(0, 0, 'sad', 1.4) + '<g class="w-drops" fill="#7FB3D5"><ellipse cx="-40" cy="60" rx="5" ry="11"/><ellipse cx="0" cy="80" rx="5" ry="11"/><ellipse cx="40" cy="62" rx="5" ry="11"/><ellipse cx="-20" cy="110" rx="5" ry="11"/><ellipse cx="22" cy="130" rx="5" ry="11"/></g></g></g>';
+    b += tulip(470, 520, '#7FB3D5', 1.2) + tulip(520, 530, '#7FB3D5', 1.4) + tulip(570, 520, '#7FB3D5', 1.2);
+    // mad: a grumbly storm cloud
+    b += '<g transform="translate(1110 240)"><g id="w-storm"><path class="w-bolt" d="M10 30 L-14 84 H6 L-8 130 L32 66 H12 L28 30Z" fill="#F2C14E" stroke="#E0A92E" stroke-width="3"/>' +
+      '<g transform="scale(0.8)"><g fill="#7D8A9C"><ellipse cx="0" cy="0" rx="90" ry="44"/><circle cx="-45" cy="-18" r="40"/><circle cx="18" cy="-38" r="52"/><circle cx="65" cy="-10" r="38"/></g></g>' +
+      '<g fill="#E2725B" opacity="0.5"><circle cx="-26" cy="10" r="9"/><circle cx="26" cy="10" r="9"/></g>' + face(0, 0, 'mad', 1.4) + '</g></g>';
+    // scared: a hedgehog curled up by a log
+    b += '<g transform="translate(1210 710)"><rect x="-90" y="-26" width="180" height="56" rx="28" fill="#A8754E" stroke="#7A5235" stroke-width="4"/><ellipse cx="90" cy="2" rx="14" ry="28" fill="#D9B48A" stroke="#7A5235" stroke-width="4"/><path d="M84 2 a6 12 0 1 0 12 0 a6 12 0 1 0 -12 0" fill="none" stroke="#A8754E" stroke-width="3"/></g>';
+    var spikes = ''; for (var k = 0; k < 13; k++) spikes += '<path d="M0 -40 L6 -64 L12 -40Z" fill="#7A5235" transform="rotate(' + (-90 + k * 15) + ')"/>';
+    b += '<g transform="translate(1080 690)"><g id="w-hedgehog"><g transform="translate(0 6)">' + spikes + '</g><ellipse cx="0" cy="10" rx="56" ry="44" fill="#8A6141"/><ellipse cx="-30" cy="20" rx="26" ry="22" fill="#E8D2B4"/>' +
+      '<circle cx="-46" cy="16" r="4" fill="#2A2118"/><circle cx="-34" cy="12" r="4" fill="#2A2118"/><circle cx="-54" cy="24" r="5" fill="#2A2118"/><path d="M-44 30 q6 -4 12 0" stroke="#2A2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '<g class="w-shiver" fill="none" stroke="#9C7FC9" stroke-width="4" stroke-linecap="round"><path d="M-80 -10 q-8 10 0 20"/><path d="M72 -20 q8 10 0 20"/></g></g></g>';
+    // nervous: butterflies over pink flowers
+    b += tulip(1340, 600, '#F4A6C0', 1.3) + tulip(1390, 610, '#F4A6C0', 1.5) + tulip(1440, 600, '#F4A6C0', 1.3);
+    b += '<g transform="translate(1380 480)"><g id="w-flutter">' + butterfly(-40, 0, '#F4A6C0', 1.3, 'w-fly1') + butterfly(40, -30, '#9C7FC9', 1, 'w-fly2') + butterfly(10, 40, '#F2C14E', 0.9, 'w-fly3') + '</g></g>';
+    // calm: a turtle by a still little pond
+    b += '<g transform="translate(580 740)"><ellipse cx="110" cy="40" rx="120" ry="34" fill="url(#wwater)"/><g class="w-shimmer" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.6"><path d="M70 36 h40"/><path d="M130 50 h30"/></g></g>';
+    b += '<g transform="translate(580 700)"><g id="w-turtle"><ellipse cx="-50" cy="34" rx="14" ry="9" fill="#8FBF7A"/><ellipse cx="44" cy="34" rx="14" ry="9" fill="#8FBF7A"/>' +
+      '<g class="w-head"><circle cx="-72" cy="12" r="18" fill="#8FBF7A"/>' + face(-74, 12, 'calm', 0.8) + '</g>' +
+      '<path d="M-56 30 C-56 -30 56 -30 56 30Z" fill="#5E9E4E" stroke="#3F7A3A" stroke-width="4"/><path d="M-30 4 L0 -14 L30 4 L20 26 H-20Z M-30 4 L-52 24 M30 4 L52 24 M0 -14 V-24" fill="none" stroke="#3F7A3A" stroke-width="3"/></g></g>';
+    b += bee(950, 560, 0.8, 'w-fly2');
+    return svg(b);
+  }
+  var SCENES = { meadow: sceneMeadow, map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
 
   // ---------- Layout ----------
   function fit() {
@@ -738,7 +806,7 @@
     if (id === 'baby') { var cb = document.getElementById('w-comb'); cb.classList.remove('larva-play'); void cb.getBoundingClientRect(); cb.classList.add('larva-play'); }
     if (id === 'ripple') { var r = document.getElementById('w-rings'); r.classList.remove('play'); void r.getBoundingClientRect(); r.classList.add('play'); }
     if (id === 'wind') { var wr = document.getElementById('w-wrap'); wr.classList.add('windy'); setTimeout(function () { wr.classList.remove('windy'); }, 4000); }
-    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step' };
+    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step', joy: 'pop', rainy: 'plop', storm: 'whoosh', hedgehog: 'step', flutter: 'sparkle', turtle: 'chime', weather: 'sparkle' };
     sfx(sounds[id] || 'chime');
   }
   function discover(s, btn) {

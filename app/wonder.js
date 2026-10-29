@@ -9,7 +9,7 @@
   var DAY = 86400000;
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   // Which corner of Asal's World matches each month's series, for the outdoor idea on a quiet week.
-  var MONTH_PLACES = { 8: ['pond'], 9: ['garden', 'orchard'], 10: ['orchard', 'inside'], 11: ['sky'], 0: ['inside'], 1: ['garden', 'hive'], 2: ['sky'], 3: ['hive'], 4: ['garden', 'pond', 'hive', 'sky'], 5: ['sky'], 6: ['pond', 'garden'], 7: ['sky', 'orchard'] };
+  var MONTH_PLACES = { 8: ['pond'], 9: ['garden', 'orchard'], 10: ['orchard', 'inside'], 11: ['sky'], 0: ['inside', 'meadow'], 1: ['meadow'], 2: ['sky'], 3: ['hive'], 4: ['garden', 'pond', 'hive', 'sky'], 5: ['sky'], 6: ['pond', 'garden'], 7: ['sky', 'orchard'] };
   var PILLARS = [
     ['Breath', 'Before bed one night, lie side by side and breathe like bees: in through the nose, hum it out. Three hums each. Let your child lead the last one.'],
     ['Gratitude', 'At dinner, go around the table: one thing from today you are thankful for. Small things count. A warm sock is a fine answer.'],

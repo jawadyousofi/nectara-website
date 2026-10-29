@@ -355,3 +355,29 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 .w-glow { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
 .play > .w-glow { animation: wglow 2s ease-out; }
 @keyframes wglow { 0% { opacity: 0; transform: scale(0.6); } 30% { opacity: 0.55; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1.4); } }
+
+/* Feelings Meadow */
+.w-flap { animation: wflapb 0.5s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes wflapb { from { transform: scaleX(1); } to { transform: scaleX(0.55); } }
+#w-joy.play { animation: whop 1.3s ease-in-out 2; }
+#w-rainy .w-drops ellipse { animation: wrainfall 1.6s linear infinite; }
+#w-rainy .w-drops ellipse:nth-child(2) { animation-delay: 0.5s; } #w-rainy .w-drops ellipse:nth-child(3) { animation-delay: 1s; }
+#w-rainy .w-drops ellipse:nth-child(4) { animation-delay: 0.3s; } #w-rainy .w-drops ellipse:nth-child(5) { animation-delay: 0.8s; }
+@keyframes wrainfall { 0% { transform: translateY(-30px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(150px); opacity: 0; } }
+#w-rainy.play { animation: wjiggle 0.9s ease-in-out 2; transform-origin: 50% 0; }
+#w-storm .w-bolt { opacity: 0; }
+#w-storm.play { animation: wshake 0.5s ease-in-out 4; }
+#w-storm.play .w-bolt { animation: wflash 2s ease-in-out; }
+@keyframes wshake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+@keyframes wflash { 0%, 100% { opacity: 0; } 10%, 30% { opacity: 1; } 20% { opacity: 0.2; } 60% { opacity: 1; } }
+#w-hedgehog .w-shiver { opacity: 0; }
+#w-hedgehog.play { animation: wjiggle 0.25s ease-in-out 6; transform-origin: 50% 100%; }
+#w-hedgehog.play .w-shiver { animation: wflash 1.6s ease-in-out; }
+#w-flutter.play { animation: wzip 2.4s ease-in-out; }
+#w-turtle .w-head { transition: transform 0.6s ease; }
+#w-turtle.play .w-head { animation: wpeek 4s ease-in-out; }
+@keyframes wpeek { 0%, 100% { transform: translateX(0); } 30%, 50% { transform: translateX(30px); } 75% { transform: translateX(-8px); } }
+#w-weather { transform-origin: 0 0; }
+#w-weather.play { animation: wweather 2.4s ease-in-out; }
+@keyframes wweather { 0% { transform: rotate(0) scale(1); } 50% { transform: rotate(180deg) scale(1.12); } 100% { transform: rotate(360deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .w-flap, #w-rainy .w-drops ellipse { animation: none; } }
