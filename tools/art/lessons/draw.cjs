@@ -46,6 +46,23 @@ const plantPoster = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale($
   `<path d="M0 20 V-140" stroke="${C.leafD}" stroke-width="8"/><ellipse cx="-40" cy="-60" rx="34" ry="14" fill="${C.leaf}" transform="rotate(-20 -40 -60)"/><ellipse cx="40" cy="-90" rx="34" ry="14" fill="${C.leaf}" transform="rotate(20 40 -90)"/>` +
   `<g transform="translate(0 -160)">${[0, 72, 144, 216, 288].map(a => `<ellipse cx="0" cy="-20" rx="12" ry="20" fill="#F4A6C0" transform="rotate(${a})"/>`).join('')}<circle r="12" fill="#F2C14E"/></g>` + apple(60, -150, 0.55) + `<g transform="translate(-62 -120)">` + peapod(0, 0, 0.5, -20) + `</g></g>`;
 
+
+const flashlight = (x, y, s = 1, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})"><rect x="-70" y="-18" width="100" height="36" rx="10" fill="#5B8DEF"/><path d="M30 -18 L60 -30 V30 L30 18Z" fill="#4A76CF"/><ellipse cx="60" cy="0" rx="8" ry="30" fill="#FFF7C2"/><rect x="-40" y="-24" width="16" height="10" rx="3" fill="#F2C14E"/></g>`;
+const beam = (x1, y1, x2, y2a, y2b, op = 0.55) => `<path d="M${x1} ${y1 - 24} L${x2} ${y2a} L${x2} ${y2b} L${x1} ${y1 + 24}Z" fill="#FFF3B0" opacity="${op}"/>`;
+const bunnyHand = (x, y, s = 1, col = '#E8C3A6') => `<g transform="translate(${x} ${y}) scale(${s})" fill="${col}"><ellipse cx="0" cy="20" rx="44" ry="34"/><ellipse cx="-14" cy="-40" rx="12" ry="42" transform="rotate(-10 -14 -40)"/><ellipse cx="16" cy="-42" rx="12" ry="44" transform="rotate(12 16 -42)"/><ellipse cx="-44" cy="30" rx="14" ry="10"/></g>`;
+const bunnyShadow = (x, y, s = 1) => bunnyHand(x, y, s, '#5A5070') + `<circle cx="${x + 16 * s}" cy="${y + 8 * s}" r="${5 * s}" fill="#FBF3DF"/>`;
+const sunDisc = (x, y, r = 60) => `<g transform="translate(${x} ${y})"><circle r="${r * 1.55}" fill="#FFF3B0"/><circle r="${r}" fill="#F7C948"/>${[0, 45, 90, 135, 180, 225, 270, 315].map(a => `<rect x="${r * 1.15}" y="-5" width="${r * 0.35}" height="10" rx="5" fill="#F2B23A" transform="rotate(${a})"/>`).join('')}</g>`;
+const stick = (x, y, h = 160) => `<rect x="${x - 7}" y="${y - h}" width="14" height="${h}" rx="7" fill="#A0703F"/><ellipse cx="${x}" cy="${y}" rx="22" ry="7" fill="#7E5530"/>`;
+const stone = (x, y, s = 1, c = '#B9B2A6') => `<ellipse cx="${x}" cy="${y}" rx="${18 * s}" ry="${11 * s}" fill="${c}"/><ellipse cx="${x - 5 * s}" cy="${y - 4 * s}" rx="${6 * s}" ry="${3 * s}" fill="#FFF" opacity="0.5"/>`;
+const ground = (x, y, w, h) => `<ellipse cx="${x}" cy="${y}" rx="${w / 2}" ry="${h / 2}" fill="#CFE3B6"/><ellipse cx="${x}" cy="${y - 4}" rx="${w / 2 - 20}" ry="${h / 2 - 10}" fill="#DCEBC6"/>`;
+const shade = (x1, y1, x2, y2, w = 16) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="#5A5070" stroke-width="${w}" stroke-linecap="round" opacity="0.55"/>`;
+const glassW = (x, y, w, h) => cup(x, y, w, h, C.water, 0.82);
+const spectrum = (x, y, w, h, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot})">${RAIN.map((c, i) => `<rect x="${-w / 2}" y="${-h / 2 + i * h / 6}" width="${w}" height="${h / 6 + 1}" fill="${c[0]}" opacity="0.85"/>`).join('')}</g>`;
+const paperCard = (x, y, w, h, inner = '', rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="8" fill="#FFFFFF" stroke="#E2D6BE" stroke-width="4"/>${inner}</g>`;
+const lamp = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><circle r="70" fill="#FFF3B0" opacity="0.8"/><circle r="38" fill="#FFE27A"/><rect x="-14" y="36" width="28" height="22" rx="4" fill="#B9B2A6"/><rect x="-6" y="58" width="12" height="120" fill="#8A7F72"/><ellipse cx="0" cy="180" rx="56" ry="14" fill="#6E655A"/></g>`;
+const globe = (x, y, r, darkFrom = 0, sticker = null) => `<g transform="translate(${x} ${y})"><clipPath id="gl${x}"><circle r="${r}"/></clipPath><circle r="${r}" fill="#7FB3D5"/><g clip-path="url(#gl${x})" fill="#7BC25A"><path d="M${-r * 0.7} ${-r * 0.5} c${r * 0.3} ${-r * 0.3} ${r * 0.7} ${-r * 0.1} ${r * 0.6} ${r * 0.25} c${-r * 0.1} ${r * 0.3} ${-r * 0.5} ${r * 0.2} ${-r * 0.6} ${r * 0.5} c${-r * 0.2} ${-r * 0.2} ${-r * 0.2} ${-r * 0.5} 0 ${-r * 0.75}Z"/><path d="M${r * 0.2} ${r * 0.3} c${r * 0.3} ${-r * 0.1} ${r * 0.6} ${r * 0.1} ${r * 0.5} ${r * 0.4} c${-r * 0.2} ${r * 0.2} ${-r * 0.5} ${r * 0.1} ${-r * 0.5} ${-r * 0.4}Z"/><rect x="${darkFrom}" y="${-r}" width="${r * 2}" height="${r * 2}" fill="#2B2F55" opacity="0.55"/></g>${sticker ? `<circle cx="${sticker[0]}" cy="${sticker[1]}" r="${r * 0.11}" fill="#E76F9A" stroke="#FFF" stroke-width="4"/>` : ''}<circle r="${r}" fill="none" stroke="#4F7FA0" stroke-width="5"/></g>`;
+const starDot = (x, y, s = 1) => `<path d="M${x} ${y - 9 * s} L${x + 2.5 * s} ${y - 2.5 * s} L${x + 9 * s} ${y} L${x + 2.5 * s} ${y + 2.5 * s} L${x} ${y + 9 * s} L${x - 2.5 * s} ${y + 2.5 * s} L${x - 9 * s} ${y} L${x - 2.5 * s} ${y - 2.5 * s}Z" fill="#FFF3B0"/>`;
+const moon = (x, y, r, bg = '#2B2F55') => `<g transform="translate(${x} ${y})"><circle r="${r}" fill="#FFF3B0"/><circle cx="${r * 0.45}" cy="${-r * 0.2}" r="${r * 0.85}" fill="${bg}"/></g>`;
 const covers = {
   '5-inside-seed': () => bgCover() + shadow(470, 626, 230) + openSeed(470, 520, 2.2) + bean(250, 600, 1.4, -10) + bean(690, 600, 1.4, 15, true) +
     dotted('M560 470 C640 420 700 380 760 380') + magnifier(870, 360, 150, openSeed(-30, 30, 2.6)) + asalImg(560, 90, 100),
@@ -63,6 +80,11 @@ const covers = {
   '11-rainbow-plate': () => bgCover() + shadow(560, 690, 330) + plate(560, 520, 330, `<g transform="translate(0 90)">${rainbowArc(6, 250, 30)}</g>`) + asalImg(980, 140, 100),
   '12-food-journey': () => bgCover() + `<g transform="translate(380 360)"><circle r="200" fill="#FFFFFF" stroke="#F2C9A8" stroke-width="6"/>` + tube('M-40 -150 C-40 -100 -30 -70 -20 -40') + `<path d="M-20 -40 C60 -60 90 0 50 40 C20 70 -40 50 -40 10Z" fill="#F4A6A0" stroke="#E07F78" stroke-width="5"/>` + tube('M-30 50 C-110 60 -100 110 -40 110 C20 110 30 150 -20 160 C-80 170 -100 130 -120 150') + `</g>` +
     bag(830, 600, 220, 260, crumbs(0, -70, 16, 140) + `<path d="M-90 -40 Q0 -70 90 -40 V-14 H-90Z" fill="#CDE7F5" opacity="0.8"/>`) + cracker(980, 590, 1.1, 10) + dotted('M600 360 C680 360 720 400 740 450') + asalImg(620, 90, 100),
+  '13-shadow-friends': () => bgCover() + `<rect x="600" y="70" width="520" height="540" rx="24" fill="#FFFFFF" stroke="#EADFC6" stroke-width="5"/>` + beam(250, 470, 610, 120, 600, 0.6) + flashlight(200, 470, 1.4, 0) + bunnyHand(430, 410, 0.9) + bunnyShadow(860, 330, 2.1) + shadow(220, 626, 120) + asalImg(110, 120, 100),
+  '14-sun-clock': () => bgCover() + sunDisc(170, 170, 70) + ground(620, 590, 820, 120) + shade(620, 580, 960, 560, 18) + stick(620, 584, 230) + stone(960, 560, 1.2, '#E9A23B') + stone(800, 600, 1.1, '#7BC25A') + stone(700, 604, 1, '#5B8DEF') + dotted('M960 520 C880 470 780 490 700 560') + asalImg(980, 230, 100),
+  '15-rainbow-light': () => bgCover() + `<rect x="60" y="80" width="300" height="360" rx="16" fill="#E2EEF5" stroke="#C9D6DE" stroke-width="8"/><path d="M210 80 V440 M60 260 H360" stroke="#C9D6DE" stroke-width="8"/>` + beam(330, 300, 470, 380, 450, 0.75) + shadow(520, 626, 110) + glassW(520, 620, 170, 240) + `<path d="M590 470 L940 360 L940 560Z" fill="#FFF3B0" opacity="0.35"/>` + paperCard(980, 470, 120, 300, spectrum(0, 0, 100, 220), -4) + spark(860, 300, 1) + asalImg(720, 90, 100),
+  '16-day-night': () => `<rect width="1200" height="750" fill="${C.cream}"/><rect x="620" width="580" height="626" fill="#2B2F55"/>` + starDot(760, 120) + starDot(1100, 90, 1.3) + starDot(1000, 230, 0.8) + starDot(1140, 330) + moon(900, 140, 46) + `<circle cx="120" cy="170" r="200" fill="${C.honeyT}" opacity="0.8"/>` +
+    `<rect y="626" width="1200" height="124" fill="${C.table}"/><rect y="618" width="1200" height="12" fill="${C.tableTop}"/>` + lamp(260, 420, 1.15) + beam(320, 400, 520, 270, 530, 0.45) + globe(660, 400, 150, 20, [-70, -60]) + `<path d="M520 220 A190 190 0 0 1 800 220" fill="none" stroke="${C.honey}" stroke-width="6" stroke-linecap="round"/><path d="M800 220 l-6 -24 l-18 18Z" fill="${C.honey}"/>` + asalImg(470, 60, 100),
 };
 const strip = (panels) => {
   const W = 360, H = 420, gap = 30, x0 = 30; let s = `<rect width="1200" height="465" fill="${C.cream}"/>`;
@@ -97,11 +119,23 @@ const steps = {
   '12-food-journey': [{ label: 'Chew and swallow', art: bag(0, 120, 180, 220, crumbs(0, -70, 12, 110) + cracker(-30, -130, 0.8, 15)) },
     { label: 'The tummy squish', art: bag(0, 120, 190, 220, `<path d="M-80 -110 Q0 -150 80 -110 V-14 H-80Z" fill="#E7D2A6"/>` + crumbs(0, -60, 10, 120, '#D6B26E')) + `<g fill="none" stroke="${C.honey}" stroke-width="6" stroke-linecap="round"><path d="M-120 -30 q-14 30 0 60"/><path d="M120 -30 q14 30 0 60"/></g>` },
     { label: 'The twisty tube', art: tube('M-100 -60 C-20 -80 20 -20 -40 10 C-100 40 -40 100 30 80 C90 60 100 110 110 130') + `<circle cx="-100" cy="-60" r="20" fill="#E7D2A6"/>` }],
+  '13-shadow-friends': [{ label: 'Find the light', art: beam(-60, 0, 150, -110, 110, 0.6) + flashlight(-80, 0, 1) },
+    { label: 'Block the light', art: `<rect x="60" y="-150" width="100" height="300" rx="10" fill="#F4EEE0"/>` + beam(-120, 0, 60, -120, 120, 0.5) + `<ellipse cx="-20" cy="0" rx="26" ry="34" fill="#E8C3A6"/><ellipse cx="110" cy="0" rx="44" ry="58" fill="#5A5070"/>` },
+    { label: 'Make shadow friends', art: bunnyShadow(-70, 30, 1.0) + `<g transform="translate(80 -70) scale(0.8)"><path d="M-50 0 C-30 -40 30 -40 50 0 C30 -10 -30 -10 -50 0Z" fill="#5A5070"/><path d="M-50 0 L-90 -30 M50 0 L90 -30" stroke="#5A5070" stroke-width="14" stroke-linecap="round"/></g>` }],
+  '14-sun-clock': [{ label: 'Plant the stick', art: ground(0, 110, 260, 60) + stick(0, 104, 180) + sunDisc(-100, -110, 34) },
+    { label: 'Mark the shadow', art: ground(0, 110, 260, 60) + shade(-30, 104, 110, 96, 14) + stick(-30, 104, 180) + stone(110, 96, 1, '#E9A23B') },
+    { label: 'Come back and check', art: ground(0, 110, 280, 60) + shade(-60, 104, 40, 116, 14) + stick(-60, 104, 180) + stone(40, 116, 1, '#7BC25A') + stone(110, 96, 1, '#E9A23B') + `<g transform="translate(90 -90)"><circle r="44" fill="#FFF" stroke="${C.forest}" stroke-width="5"/><path d="M0 0 V-28 M0 0 L20 10" stroke="${C.forest}" stroke-width="5" stroke-linecap="round"/></g>` }],
+  '15-rainbow-light': [{ label: 'Catch the light', art: sunDisc(-90, -100, 30) + beam(-60, -60, 40, 10, 70, 0.6) + glassW(60, 130, 120, 170) },
+    { label: 'Water bends it', art: glassW(-30, 130, 120, 170) + `<path d="M-160 20 L-60 40 L60 80" stroke="#F2C14E" stroke-width="10" fill="none" stroke-linecap="round"/>` + RAIN.map((c, i) => `<path d="M40 76 L150 ${40 + i * 18}" stroke="${c[0]}" stroke-width="6" stroke-linecap="round"/>`).join('') },
+    { label: 'Find the colors', art: paperCard(0, 0, 200, 260, spectrum(0, 0, 150, 170, -8), 3) + spark(-120, -110, 0.8) + spark(120, -120, 0.7) }],
+  '16-day-night': [{ label: 'Meet the sun', art: lamp(0, -80, 0.9) },
+    { label: 'Spin the earth', art: globe(0, 0, 110, 1000, [-30, -40]) + `<path d="M-140 -110 A170 170 0 0 1 140 -110" fill="none" stroke="${C.honey}" stroke-width="6" stroke-linecap="round"/><path d="M140 -110 l-4 -22 l-16 16Z" fill="${C.honey}"/>` },
+    { label: 'Day here, night there', art: `<circle cx="-130" cy="-120" r="30" fill="#F7C948"/>` + globe(0, 10, 110, 0, [-60, -20]) + moon(130, -120, 26, '#FFFFFF') }],
 };
 const out = path.join(ROOT, 'assets/lessons');
 const fontCss = `@font-face{font-family:Figtree;font-weight:700;src:url(file://${FNT}/figtree-latin-700-normal.woff2)}@font-face{font-family:Figtree;font-weight:800;src:url(file://${FNT}/figtree-latin-800-normal.woff2)}`;
 const pages = [];
-for (const k of Object.keys(covers)) {
+for (const k of Object.keys(covers).filter(k => !process.env.ONLY || process.env.ONLY.split(',').includes(k))) {
   pages.push([k, 1200, 750, covers[k]()]);
   pages.push([k + '-steps', 1200, 465, strip(steps[k])]);
 }

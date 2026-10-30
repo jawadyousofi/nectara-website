@@ -11,7 +11,8 @@
     'little-breath': ['body', 'spirit'], 'one-little-bee': ['earth', 'world'], 'one-circle': ['world', 'heart'], 'still-water': ['spirit', 'heart'],
     'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world'],
     'inside-seed': ['earth', 'mind', 'spirit'], 'seed-window': ['earth', 'mind', 'heart'], 'soil-safari': ['earth', 'body', 'mind'], 'worm-hotel': ['earth', 'world', 'heart'],
-    'which-part': ['body', 'earth', 'mind'], 'regrow': ['earth', 'mind', 'heart'], 'rainbow-plate': ['body', 'world', 'voice'], 'food-journey': ['body', 'mind', 'earth']
+    'which-part': ['body', 'earth', 'mind'], 'regrow': ['earth', 'mind', 'heart'], 'rainbow-plate': ['body', 'world', 'voice'], 'food-journey': ['body', 'mind', 'earth'],
+    'shadow-friends': ['mind', 'body', 'heart'], 'sun-clock': ['earth', 'mind', 'spirit'], 'rainbow-light': ['mind', 'spirit', 'voice'], 'day-night': ['world', 'mind', 'body']
   };
   window.NECTARA_GROWS = GROWS;
   function petalTags(id) {
