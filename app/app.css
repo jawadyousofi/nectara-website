@@ -345,3 +345,15 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .rm-note { text-align: center; color: var(--ink-soft); font-size: 0.92rem; }
 .remote-toast { position: fixed; left: 50%; bottom: 4%; transform: translate(-50%, 20px); background: var(--forest); color: #FFFFFF; font-weight: 800; padding: 14px 26px; border-radius: 999px; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 9999; pointer-events: none; font-size: 1.3rem; }
 .remote-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* Pointer mode: the phone as a touchpad, and the pointer on the TV */
+.rm-modes { display: grid; grid-template-columns: 1fr 1fr; background: #FFFFFF; border: 2px solid var(--line); border-radius: 999px; padding: 4px; }
+.rm-mode { border: 0; background: transparent; border-radius: 999px; min-height: 46px; font: inherit; font-weight: 800; color: var(--forest); cursor: pointer; }
+.rm-mode.on { background: var(--forest); color: #FFFFFF; }
+.rm-touch { height: 46vh; min-height: 260px; border-radius: 28px; background: linear-gradient(160deg, #FFF8E4, #F7E3B0); border: 2px solid #EADFC6; display: grid; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.rm-touch span { color: #8A6A2E; font-weight: 800; text-align: center; opacity: 0.7; pointer-events: none; line-height: 1.5; }
+.rm-touch.touching { border-color: var(--honey); box-shadow: inset 0 0 0 4px rgba(233, 162, 59, 0.25); }
+.rm-btn.ok-big { background: var(--honey); color: #2A2118; min-height: 90px; touch-action: none; }
+.nx-pointer { position: fixed; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: rgba(233, 162, 59, 0.85); border: 4px solid #FFFFFF; box-shadow: 0 4px 18px rgba(42, 33, 24, 0.35); z-index: 100000; pointer-events: none; opacity: 0; transition: transform 0.12s linear, opacity 0.4s; }
+.nx-pointer.on { opacity: 1; }
+.nx-pointer.press { background: rgba(95, 163, 106, 0.95); }
