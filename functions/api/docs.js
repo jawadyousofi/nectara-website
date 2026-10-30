@@ -41,6 +41,10 @@ const STARTERS = [
   ['Garden Partners flyer (Google Drive copy)', 'Partners', 'https://docs.google.com/document/d/1mukJLPk7Q009JBPsPg7ESEyVrKZi22JDOA1c8y0RCGE/edit', ''],
   ['Nectara Year One Curriculum', 'Curriculum', 'https://claude.ai/artifact/SNEfPp5omonKoTta4iFcah', 'Ten monthly series, 40 lessons with Seeds and Blossoms versions, Wow Days, new Asal\'s World corners and the build order.'],
   ['Nectara Year One Curriculum (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1q-tTitChev_xSjQq7DP2yjF0iHkjtREZw0N_L0OG4Hs/edit', ''],
+  ['Nectara Year One Curriculum (Google Drive copy, updated Oct 29)', 'Curriculum', 'https://docs.google.com/document/d/1w6k3c23PNoYYDDE2ny-1DFMa3o4NN_D3Z1a3huXhyGE/edit', 'Includes the lesson shape (Make it yours, ideas first, grown-up wonder) and read-aloud.'],
+  ['Nectara Pilot Kit', 'Plans', 'https://claude.ai/artifact/2YVy3EL2x98oTNcGCvepju', 'Shopping checklist for all four weeks, the Rainbow Harvest Picnic Wow Day guide, and the parent permission note.'],
+  ['Nectara Pilot Kit (Google Drive copy)', 'Plans', 'https://docs.google.com/document/d/1I1jN8ES7WnrNyTASEDZaA5BX-uO1CEDZrqHi-3N8hOQ/edit', ''],
+  ['Nectara Pilot (Google Drive copy, updated Oct 29)', 'Plans', 'https://docs.google.com/document/d/12cHDDUMVQHJEk8RXC_o5xTHNwwP45di7x0f8zih2u7g/edit', 'Weeks 2 to 4 use the new Soil and Seeds and Food from the Garden lessons.'],
 ];
 
 // New documents Claude makes are added to STARTERS; each is put on the shelf once (idx.seeded remembers which),
