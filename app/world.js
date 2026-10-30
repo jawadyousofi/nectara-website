@@ -17,7 +17,7 @@
   var S = {
     active: false, place: null, items: [], focus: -1, mode: 'world', // world | panel | move | bye
     sound: true, found: {}, seedAt: 0, audio: null, ctx: null, ambient: null, ambientTimer: null,
-    sessionStart: 0, limitMin: 20, tick: null, cloudShape: 0, lastSpot: null
+    sessionStart: 0, limitMin: 20, tick: null, cloudShape: 0, puppet: 0, lastSpot: null
   };
 
   // ---------- 3D Asal (loaded on demand; the drawn Asal stays as a fallback) ----------
@@ -113,7 +113,8 @@
     buzz: function () { tone(210, 0, 0.7, 'sawtooth', 0.025, 240); },
     whoosh: function () { noise(0.8, 0.12, 700); },
     sparkle: function () { [1319, 1568, 2093, 2637].forEach(function (f, i) { tone(f, i * 0.07, 0.3, 'sine', 0.03); }); },
-    step: function () { tone(660, 0, 0.06, 'sine', 0.03); }
+    step: function () { tone(660, 0, 0.06, 'sine', 0.03); },
+    hoot: function () { tone(420, 0, 0.32, 'sine', 0.06, 380); tone(400, 0.42, 0.5, 'sine', 0.06, 350); }
   };
   function sfx(n) { if (SFX[n]) try { SFX[n](); } catch (e) {} }
 
@@ -136,6 +137,7 @@
       else if (id === 'garden' || id === 'map' || id === 'orchard' || id === 'meadow') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
       else if (id === 'pond') { tone(500 + r * 400, 0, 0.2, 'sine', 0.025, 220); }
       else if (id === 'sky') { noise(1.6, 0.03, 500); }
+      else if (id === 'shadow') { [0, 0.09, 0.18].forEach(function (t) { tone(4300 + r * 300, t, 0.05, 'sine', 0.01); }); }   // crickets at dusk
     }, 3500);
   }
 
@@ -238,6 +240,12 @@
     b += '<g transform="translate(215 690)"><ellipse cx="0" cy="34" rx="120" ry="34" fill="#B7D99A"/>' +
       tulip(-70, 22, '#F2C14E', 1) + tulip(-38, 12, '#7FB3D5', 1.1) + tulip(-4, 4, '#E2725B', 1.2) + tulip(32, 12, '#9C7FC9', 1.1) + tulip(66, 22, '#F4A6C0', 1) + tulip(14, 30, '#7BC25A', 0.9) +
       butterfly(-30, -80, '#F4A6C0', 0.9, 'w-fly2') + '</g>';
+    // shadow garden: half day, half night, with a sun-clock stick and its long shadow
+    b += '<path d="M1290 600 C1330 650 1360 690 1380 705" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
+    b += '<g transform="translate(1420 735)"><clipPath id="wshadclip"><circle r="70"/></clipPath><g clip-path="url(#wshadclip)"><rect x="-70" y="-70" width="140" height="140" fill="#FFF3D6"/><rect x="0" y="-70" width="70" height="140" fill="#2B2F55"/>' +
+      '<circle cx="-34" cy="-30" r="16" fill="#F7C948"/><circle cx="36" cy="-34" r="11" fill="#F4F1DE"/><circle cx="42" cy="-38" r="10" fill="#2B2F55"/><circle cx="22" cy="-10" r="2.5" fill="#FFF3B0"/><circle cx="52" cy="-6" r="2" fill="#FFF3B0"/>' +
+      '<ellipse cx="0" cy="44" rx="80" ry="30" fill="#8DC26F"/><path d="M-6 40 L54 50" stroke="#3F3A5A" stroke-width="9" stroke-linecap="round" opacity="0.7"/><rect x="-10" y="-14" width="9" height="56" rx="4" fill="#A0703F"/></g>' +
+      '<circle r="70" fill="none" stroke="#B7A6E0" stroke-width="5"/></g>';
     b += bee(560, 420, 1, 'w-fly3');
     return svg(b);
   }
@@ -573,7 +581,61 @@
     b += bee(950, 560, 0.8, 'w-fly2');
     return svg(b);
   }
-  var SCENES = { meadow: sceneMeadow, map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
+  // ---------- Shadow Garden: where light goes, shadows follow ----------
+  function sceneShadow() {
+    var b = skyAndSun(200, 330), SH = '#3F3A5A';
+    b += '<rect class="day-only" width="1600" height="900" fill="#F7B955" opacity="0.14"/>';
+    b += cloud(620, 120, 0.6, 'w-drift w-slow') + cloud(1150, 170, 0.5, 'w-drift');
+    b += '<path d="M0 520 Q400 470 800 500 T1600 490 V900 H0Z" fill="#C9DEAE"/>';
+    b += '<path d="M0 600 Q420 560 860 600 T1600 590 V900 H0Z" fill="#B3D597"/>';
+    b += '<path d="M0 740 Q400 700 820 740 T1600 730 V900 H0Z" fill="#9DCB80"/>';
+    for (var t = 0; t < 12; t++) b += tuft(40 + t * 135, 640 + (t % 4) * 50);
+    // the owl's tree, with its long shadow
+    b += '<path d="M1450 800 L1700 860 L1700 900 L1440 820Z" fill="' + SH + '" opacity="0.28"/>';
+    b += '<path d="M1416 820 C1424 600 1420 380 1430 120 H1470 C1474 380 1470 600 1484 820Z" fill="#8A5A3B"/><path d="M1440 420 C1400 400 1370 380 1340 340" stroke="#8A5A3B" stroke-width="16" fill="none" stroke-linecap="round"/>';
+    b += '<circle cx="1450" cy="90" r="130" fill="#5E9E4E"/><circle cx="1340" cy="130" r="90" fill="#6DB25A"/><circle cx="1560" cy="140" r="100" fill="#6DB25A"/><circle cx="1330" cy="320" r="44" fill="#6DB25A"/>';
+    b += '<g transform="translate(1440 300)"><g id="w-owl"><ellipse cx="0" cy="44" rx="58" ry="20" fill="#5B3A22"/><ellipse cx="0" cy="0" rx="46" ry="56" fill="#A57452"/><ellipse cx="0" cy="16" rx="30" ry="36" fill="#E8D2B4"/>' +
+      '<path d="M-38 -40 L-30 -66 L-16 -46Z M38 -40 L30 -66 L16 -46Z" fill="#A57452"/>' +
+      '<g class="w-eyes"><circle cx="-18" cy="-18" r="17" fill="#FFFFFF" stroke="#7A5235" stroke-width="3"/><circle cx="18" cy="-18" r="17" fill="#FFFFFF" stroke="#7A5235" stroke-width="3"/><circle cx="-16" cy="-16" r="8" fill="#2A2118"/><circle cx="16" cy="-16" r="8" fill="#2A2118"/></g>' +
+      '<path d="M-6 -2 L0 10 L6 -2Z" fill="#E9A23B"/><path d="M-10 26 q4 4 8 0 M2 34 q4 4 8 0 M-14 42 q4 4 8 0" stroke="#C9A06A" stroke-width="2.5" fill="none"/></g></g>';
+    // rainbow glass on a stump, spilling colors across the grass
+    b += '<path class="day-only" d="M200 330 L520 470" stroke="#FFF3B0" stroke-width="22" stroke-linecap="round" opacity="0.5"/>';
+    b += '<g transform="translate(540 470)"><rect x="-50" y="40" width="100" height="70" rx="10" fill="#A0703F"/><ellipse cx="0" cy="40" rx="50" ry="14" fill="#C9A06A"/><ellipse cx="0" cy="40" rx="34" ry="8" fill="none" stroke="#A0703F" stroke-width="3"/>' +
+      '<g id="w-prism"><g class="w-spectrum" opacity="0.55">' + ['#E2725B', '#F28C28', '#F2C14E', '#7BC25A', '#6E8FD8', '#9C6FC9'].map(function (c, i) { return '<path d="M26 20 L' + (150 + i * 8) + ' ' + (70 + i * 16) + ' L' + (150 + i * 8) + ' ' + (86 + i * 16) + 'Z" fill="' + c + '"/>'; }).join('') + '</g>' +
+      '<path d="M-24 -46 L-18 34 H18 L24 -46Z" fill="#EEF6FA" stroke="#8DB3CC" stroke-width="4"/><path d="M-21 -18 L-17 30 H17 L21 -18Z" fill="#A9D2EA"/><rect x="-14" y="-38" width="5" height="56" rx="2.5" fill="#FFF" opacity="0.85"/></g></g>';
+    // a toy globe: day on the sun's side, night on the far side
+    b += '<g transform="translate(800 330)"><path d="M0 70 V150 M-40 156 H40" stroke="#8A7F72" stroke-width="10" stroke-linecap="round"/><path d="M-84 0 A84 84 0 0 0 84 0" fill="none" stroke="#C9A06A" stroke-width="6"/>' +
+      '<g id="w-globe"><clipPath id="wglobeclip"><circle r="70"/></clipPath><circle r="70" fill="#7FB3D5"/><g clip-path="url(#wglobeclip)"><g class="w-lands" fill="#7BC25A">' +
+      '<path d="M-60 -30 c20 -24 50 -10 44 16 c-6 20 -36 14 -40 36 c-14 -14 -16 -36 -4 -52Z"/><path d="M14 18 c20 -8 42 6 34 28 c-14 12 -36 6 -34 -28Z"/><path d="M10 -50 c16 -6 30 4 22 16 c-10 6 -24 0 -22 -16Z"/>' +
+      '<path d="M-240 -30 c20 -24 50 -10 44 16 c-6 20 -36 14 -40 36 c-14 -14 -16 -36 -4 -52Z"/><path d="M-166 18 c20 -8 42 6 34 28 c-14 12 -36 6 -34 -28Z"/><path d="M-170 -50 c16 -6 30 4 22 16 c-10 6 -24 0 -22 -16Z"/></g>' +
+      '<rect x="4" y="-70" width="70" height="140" fill="#2B2F55" opacity="0.55"/><circle cx="34" cy="-20" r="2.5" fill="#FFF3B0"/><circle cx="50" cy="16" r="2" fill="#FFF3B0"/></g><circle r="70" fill="none" stroke="#4F7FA0" stroke-width="5"/></g></g>';
+    // the shadow theater: tap and a new shadow friend comes to play
+    var bunny = '<g class="ps ps0"><ellipse cx="0" cy="30" rx="54" ry="40"/><ellipse cx="-14" cy="-36" rx="13" ry="44" transform="rotate(-10 -14 -36)"/><ellipse cx="18" cy="-38" rx="13" ry="46" transform="rotate(12 18 -38)"/><circle cx="-56" cy="40" r="14"/></g>';
+    var bird = '<g class="ps ps1"><ellipse cx="0" cy="10" rx="56" ry="26"/><path d="M-10 0 C-60 -70 -110 -40 -120 -10 C-80 -24 -50 -10 -10 10Z M10 0 C60 -70 110 -40 120 -10 C80 -24 50 -10 10 10Z"/><path d="M50 4 L84 -4 L54 18Z"/></g>';
+    var snail = '<g class="ps ps2"><path d="M-80 50 H70 C80 50 84 40 76 34 C60 30 50 40 40 40Z"/><circle cx="-10" cy="10" r="46"/><path d="M50 40 C56 10 60 -10 56 -30 M66 40 C74 14 80 -6 82 -24" stroke="' + SH + '" stroke-width="8" stroke-linecap="round" fill="none"/></g>';
+    b += '<g transform="translate(1090 420)"><path d="M-130 110 V170 M130 110 V170" stroke="#7A5235" stroke-width="14" stroke-linecap="round"/>' +
+      '<rect x="-160" y="-140" width="320" height="260" rx="14" fill="#A0703F"/><rect x="-136" y="-116" width="272" height="212" rx="6" fill="#FFF8E4"/><circle cx="0" cy="-10" r="110" fill="#FFF3B0" opacity="0.6"/>' +
+      '<g id="w-puppets" class="pp-0" fill="' + SH + '">' + bunny + bird + snail + '</g>' +
+      '<path d="M-136 -116 C-110 -60 -120 20 -136 96Z M136 -116 C110 -60 120 20 136 96Z" fill="#E2725B"/><path d="M-170 -150 H170 V-120 H-170Z" fill="#7A5235"/>' +
+      '<g transform="translate(110 -200)"><path d="M0 0 V40" stroke="#5B4C3A" stroke-width="3"/><circle cy="54" r="30" fill="#FFF3B0" opacity="0.6"/><rect x="-14" y="40" width="28" height="30" rx="6" fill="#F2C14E" stroke="#C9822A" stroke-width="3"/></g></g>';
+    // the sun clock: a stick in a ring of stones, its shadow moving like a clock hand
+    var ring = ''; for (var k = 0; k < 10; k++) { var a = Math.PI * 2 * k / 10; ring += '<ellipse cx="' + Math.round(Math.cos(a) * 120) + '" cy="' + Math.round(Math.sin(a) * 36) + '" rx="14" ry="8" fill="' + (k % 2 ? '#B9B2A6' : '#D8D0C2') + '"/>'; }
+    b += '<g transform="translate(760 735)"><ellipse rx="138" ry="44" fill="#CFE3B6"/>' + ring +
+      '<g transform="scale(1 0.32)"><g id="w-sundial"><path d="M0 0 L112 0" stroke="' + SH + '" stroke-width="30" stroke-linecap="round" opacity="0.6"/></g></g>' +
+      '<rect x="-7" y="-130" width="14" height="132" rx="7" fill="#A0703F"/><ellipse cx="0" cy="2" rx="14" ry="5" fill="#7E5530"/></g>';
+    // a child and their long shadow, stretching away from the low sun
+    var person = '<circle cx="0" cy="-172" r="26"/><path d="M-34 -136 C-34 -150 34 -150 34 -136 L30 0 H4 L0 -40 L-4 0 H-30Z"/><path d="M-34 -132 L-58 -70 M34 -132 L58 -70" stroke="' + SH + '" stroke-width="22" stroke-linecap="round"/>';
+    b += '<g transform="translate(300 692)"><g id="w-myshadow"><g fill="' + SH + '" opacity="0.5" transform="matrix(0.42 0.42 -1.25 -0.12 0 0)">' + person + '</g></g></g>';
+    b += child(300, 600, 1, 0);
+    // fireflies over the bushes
+    b += '<g transform="translate(1230 720)"><ellipse cx="-70" cy="20" rx="90" ry="54" fill="#5E9E4E"/><ellipse cx="50" cy="10" rx="100" ry="64" fill="#4F8F45"/><ellipse cx="0" cy="40" rx="140" ry="40" fill="#5E9E4E"/>' +
+      '<g id="w-fireflies">' + [[-90, -70], [-30, -110], [40, -80], [100, -120], [-120, -20], [70, -30], [0, -50]].map(function (f, i) {
+        return '<g class="w-twinkle" style="animation-delay:' + (i * 0.37).toFixed(2) + 's"><circle cx="' + f[0] + '" cy="' + f[1] + '" r="16" fill="#E6F59A" opacity="0.45"/><circle cx="' + f[0] + '" cy="' + f[1] + '" r="6" fill="#F4FFB0"/></g>';
+      }).join('') + '</g></g>';
+    b += bee(980, 560, 0.8, 'w-fly2');
+    return svg(b);
+  }
+  var SCENES = { shadow: sceneShadow, meadow: sceneMeadow, map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
 
   // ---------- Layout ----------
   function fit() {
@@ -802,11 +864,12 @@
   function react(id) {
     var el = document.getElementById('w-' + id); if (!el) return;
     if (id === 'cloud') { S.cloudShape = (S.cloudShape + 1) % 4; el.setAttribute('class', 'cs-' + S.cloudShape); }
+    if (id === 'puppets') { S.puppet = (S.puppet + 1) % 3; el.setAttribute('class', 'pp-' + S.puppet); }
     el.classList.remove('play'); void el.getBoundingClientRect(); el.classList.add('play');
     if (id === 'baby') { var cb = document.getElementById('w-comb'); cb.classList.remove('larva-play'); void cb.getBoundingClientRect(); cb.classList.add('larva-play'); }
     if (id === 'ripple') { var r = document.getElementById('w-rings'); r.classList.remove('play'); void r.getBoundingClientRect(); r.classList.add('play'); }
     if (id === 'wind') { var wr = document.getElementById('w-wrap'); wr.classList.add('windy'); setTimeout(function () { wr.classList.remove('windy'); }, 4000); }
-    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step', joy: 'pop', rainy: 'plop', storm: 'whoosh', hedgehog: 'step', flutter: 'sparkle', turtle: 'chime', weather: 'sparkle' };
+    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step', joy: 'pop', rainy: 'plop', storm: 'whoosh', hedgehog: 'step', flutter: 'sparkle', turtle: 'chime', weather: 'sparkle', myshadow: 'step', sundial: 'chime', puppets: 'pop', prism: 'sparkle', globe: 'whoosh', owl: 'hoot', fireflies: 'sparkle' };
     sfx(sounds[id] || 'chime');
   }
   function discover(s, btn) {
