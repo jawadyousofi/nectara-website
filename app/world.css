@@ -408,3 +408,34 @@ button.w-jar:focus, button.w-jar:hover { box-shadow: 0 0 0 0.2em #FFFFFF, 0 0 0 
 #w-owl.play { animation: wjiggle 0.9s ease-in-out 2; transform-origin: 50% 100%; transform-box: fill-box; }
 #w-fireflies.play { animation: wfly1 3s ease-in-out; }
 @media (prefers-reduced-motion: reduce) { #w-globe .w-lands, #w-owl .w-eyes { animation: none; } }
+
+/* Under the Ground */
+#w-roots .w-sips circle { opacity: 0; }
+#w-roots.play .w-sips circle { animation: wsip 2.4s ease-in 1; }
+#w-roots.play .w-sips circle:nth-child(2) { animation-delay: 0.4s; } #w-roots.play .w-sips circle:nth-child(3) { animation-delay: 0.8s; }
+@keyframes wsip { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-150px); } }
+#w-wakeseed .w-root, #w-wakeseed .w-shoot { transform-box: fill-box; transform: scale(0.15); opacity: 0.4; }
+#w-wakeseed .w-root { transform-origin: 50% 0; } #w-wakeseed .w-shoot { transform-origin: 50% 100%; }
+#w-wakeseed.play .w-root { animation: wgrowr 3.6s ease-out both; }
+#w-wakeseed.play .w-shoot { animation: wgrowr 3.6s 0.9s ease-out both; }
+@keyframes wgrowr { 0% { transform: scale(0.15); opacity: 0.4; } 60% { transform: scale(1); opacity: 1; } 85% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.15); opacity: 0.4; } }
+#w-wakeseed.play { animation: wjiggle 0.4s ease-in-out 2; transform-box: fill-box; transform-origin: 50% 50%; }
+#w-earthworm.play { animation: wcrawl 3s ease-in-out; }
+@keyframes wcrawl { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(130px); } }
+#w-earthworm.play .w-wig { animation: wwiggle 0.5s ease-in-out 6; }
+#w-fungi { transition: opacity 0.4s; }
+#w-fungi.play { animation: wweb 2.6s ease-in-out; }
+@keyframes wweb { 0%, 100% { opacity: 0.75; } 25%, 75% { opacity: 1; stroke: #FFF3B0; stroke-width: 4.5; } 50% { opacity: 0.6; } }
+#w-carrot.play { animation: wpull 1.6s ease-in-out; }
+@keyframes wpull { 0%, 100% { transform: translateY(0); } 20% { transform: translateY(8px); } 55% { transform: translateY(-90px) rotate(-4deg); } 75% { transform: translateY(-70px) rotate(3deg); } }
+#w-mole.play { animation: wjiggle 0.5s ease-in-out 3; transform-box: fill-box; transform-origin: 50% 50%; }
+#w-mole.play .w-paws { animation: wdig 0.3s ease-in-out 8 alternate; }
+@keyframes wdig { from { transform: translateX(0); } to { transform: translateX(-10px); } }
+#w-ants .w-march { animation: wmarch 6s ease-in-out infinite alternate; }
+#w-ants.play .w-march { animation: wmarch 1.2s ease-in-out 4 alternate; }
+@keyframes wmarch { from { transform: translate(0, 0); } to { transform: translate(14px, 8px); } }
+#w-layers .w-lay rect { transition: opacity 0.3s; }
+#w-layers.play .w-lay rect { animation: wlayer 3.2s ease-in-out; }
+#w-layers.play .w-lay rect:nth-child(2) { animation-delay: 0.5s; } #w-layers.play .w-lay rect:nth-child(3) { animation-delay: 1s; } #w-layers.play .w-lay rect:nth-child(4) { animation-delay: 1.5s; }
+@keyframes wlayer { 0%, 100% { opacity: 0; } 20%, 45% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { #w-ants .w-march { animation: none; } }

@@ -137,6 +137,7 @@
       else if (id === 'garden' || id === 'map' || id === 'orchard' || id === 'meadow') { var f0 = 2200 + r * 1200; tone(f0, 0, 0.12, 'sine', 0.018, f0 * 1.3); tone(f0 * 1.1, 0.16, 0.1, 'sine', 0.014, f0 * 0.9); }
       else if (id === 'pond') { tone(500 + r * 400, 0, 0.2, 'sine', 0.025, 220); }
       else if (id === 'sky') { noise(1.6, 0.03, 500); }
+      else if (id === 'underground') { tone(380 + r * 160, 0, 0.18, 'sine', 0.02, 220); }   // a soft drip in the soil
       else if (id === 'shadow') { [0, 0.09, 0.18].forEach(function (t) { tone(4300 + r * 300, t, 0.05, 'sine', 0.01); }); }   // crickets at dusk
     }, 3500);
   }
@@ -240,6 +241,12 @@
     b += '<g transform="translate(215 690)"><ellipse cx="0" cy="34" rx="120" ry="34" fill="#B7D99A"/>' +
       tulip(-70, 22, '#F2C14E', 1) + tulip(-38, 12, '#7FB3D5', 1.1) + tulip(-4, 4, '#E2725B', 1.2) + tulip(32, 12, '#9C7FC9', 1.1) + tulip(66, 22, '#F4A6C0', 1) + tulip(14, 30, '#7BC25A', 0.9) +
       butterfly(-30, -80, '#F4A6C0', 0.9, 'w-fly2') + '</g>';
+    // under the ground: a slice of soil with a sprout on top, a root and a worm below
+    b += '<path d="M420 610 C450 640 470 665 495 680" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
+    b += '<g transform="translate(548 720)"><clipPath id="wunderclip"><circle r="64"/></clipPath><g clip-path="url(#wunderclip)"><rect x="-64" y="-64" width="128" height="128" fill="#5B3A22"/><rect x="-64" y="-64" width="128" height="40" fill="#BFE0F2"/><rect x="-64" y="-28" width="128" height="10" fill="#7BC25A"/>' +
+      '<rect x="-64" y="26" width="128" height="40" fill="#8A5A3B"/><path d="M0 -20 C-2 -34 2 -42 0 -50" stroke="#5E9E4E" stroke-width="5" fill="none"/><ellipse cx="-9" cy="-46" rx="10" ry="5" fill="#7BC25A" transform="rotate(-25 -9 -46)"/><ellipse cx="9" cy="-48" rx="10" ry="5" fill="#7BC25A" transform="rotate(25 9 -48)"/>' +
+      '<path d="M0 -18 C-2 0 2 14 0 30 M0 0 C-12 6 -18 14 -24 18 M0 10 C10 16 14 24 18 30" stroke="#E8D2A8" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M-44 44 C-36 36 -26 36 -20 44 S-4 52 4 44" stroke="#E89A9A" stroke-width="8" fill="none" stroke-linecap="round"/></g><circle r="64" fill="none" stroke="#C9A06A" stroke-width="5"/></g>';
     // shadow garden: half day, half night, with a sun-clock stick and its long shadow
     b += '<path d="M1290 600 C1330 650 1360 690 1380 705" fill="none" stroke="#E9A23B" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 22"/>';
     b += '<g transform="translate(1420 735)"><clipPath id="wshadclip"><circle r="70"/></clipPath><g clip-path="url(#wshadclip)"><rect x="-70" y="-70" width="140" height="140" fill="#FFF3D6"/><rect x="0" y="-70" width="70" height="140" fill="#2B2F55"/>' +
@@ -635,7 +642,68 @@
     b += bee(980, 560, 0.8, 'w-fly2');
     return svg(b);
   }
-  var SCENES = { shadow: sceneShadow, meadow: sceneMeadow, map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
+  // ---------- Under the Ground: a slice through the garden, full of hidden life ----------
+  function sceneUnder() {
+    var b = '<rect width="1600" height="900" fill="#6B4423"/>';
+    // a thin strip of sky and garden on top
+    b += '<rect width="1600" height="215" fill="url(#wsky)"/>';
+    b += '<g class="day-only"><circle cx="1500" cy="70" r="80" fill="url(#wsun)"/><circle cx="1500" cy="70" r="34" fill="#F7C948"/></g>';
+    b += cloud(700, 70, 0.45, 'w-drift w-slow');
+    b += '<path d="M0 200 Q400 185 800 200 T1600 198 V240 H0Z" fill="#7BC25A"/>';
+    for (var t = 0; t < 16; t++) b += tuft(30 + t * 100, 212);
+    // soil layers: dark topsoil, lighter subsoil, sandy clay, then rock
+    b += '<path d="M0 232 Q400 222 800 234 T1600 230 V520 H0Z" fill="#5B3A22"/>';
+    b += '<path d="M0 500 Q420 485 860 505 T1600 495 V720 H0Z" fill="#8A5A3B"/>';
+    b += '<path d="M0 700 Q400 690 820 708 T1600 700 V820 H0Z" fill="#C9A06A"/>';
+    b += '<path d="M0 805 Q420 795 860 812 T1600 806 V900 H0Z" fill="#8A8378"/>';
+    for (var r = 0; r < 14; r++) b += '<ellipse cx="' + (40 + r * 118) + '" cy="' + (838 + (r % 3) * 18) + '" rx="' + (34 + (r % 4) * 10) + '" ry="' + (16 + (r % 3) * 5) + '" fill="' + (r % 2 ? '#A39C90' : '#736C61') + '"/>';
+    for (var k = 0; k < 40; k++) b += '<circle cx="' + ((k * 173) % 1600) + '" cy="' + (260 + (k * 97) % 520) + '" r="' + (3 + k % 4) + '" fill="' + (k % 3 ? '#4A2E1A' : '#B98A5E') + '" opacity="0.7"/>';
+    for (var p = 0; p < 18; p++) b += '<ellipse cx="' + ((p * 211) % 1600) + '" cy="' + (720 + (p * 37) % 80) + '" rx="9" ry="6" fill="#E3C99B"/>';
+    // the soil-layers spot: a glowing edge that lights each layer in turn
+    b += '<g id="w-layers"><g class="w-lay"><rect x="1380" y="236" width="200" height="270" rx="10" fill="#FFF3D6" opacity="0"/><rect x="1380" y="508" width="200" height="196" rx="10" fill="#FFF3D6" opacity="0"/>' +
+      '<rect x="1380" y="708" width="200" height="98" rx="10" fill="#FFF3D6" opacity="0"/><rect x="1380" y="810" width="200" height="86" rx="10" fill="#FFF3D6" opacity="0"/></g>' +
+      '<g transform="translate(1560 260)"><rect x="0" y="0" width="16" height="620" rx="8" fill="#FFF3D6" opacity="0.85"/>' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (i) { return '<rect x="0" y="' + (i * 48) + '" width="' + (i % 2 ? 9 : 16) + '" height="3" fill="#8A5A3B"/>'; }).join('') + '</g></g>';
+    // roots: a sunflower above, its roots spreading below, drinking
+    b += '<g transform="translate(300 215)"><path d="M0 0 V-150" stroke="#5E9E4E" stroke-width="10"/><ellipse cx="-24" cy="-70" rx="26" ry="10" fill="#6DB25A" transform="rotate(-25 -24 -70)"/><g transform="translate(0 -170)">' + petals(14, 10, 26, 26) + '<circle r="18" fill="#6B4423"/></g></g>';
+    b += '<g id="w-roots"><g transform="translate(300 225)" stroke="#E8D2A8" stroke-width="7" fill="none" stroke-linecap="round">' +
+      '<path d="M0 0 C-4 60 6 120 0 200"/><path d="M0 50 C-30 70 -60 100 -90 110"/><path d="M0 80 C30 100 70 110 100 140"/><path d="M0 130 C-24 150 -40 180 -70 200"/><path d="M0 160 C20 180 40 200 50 240"/>' +
+      '<path d="M-90 110 C-110 120 -120 140 -130 150" stroke-width="4"/><path d="M100 140 C120 150 130 170 140 190" stroke-width="4"/></g>' +
+      '<g class="w-sips" fill="#7FB3D5"><circle cx="300" cy="420" r="6"/><circle cx="210" cy="335" r="5"/><circle cx="400" cy="365" r="5"/></g></g>';
+    // a seed waking up: root down, shoot up
+    b += '<g transform="translate(575 330)"><g id="w-wakeseed"><g class="w-root"><path d="M0 14 C-4 40 4 70 -2 100" stroke="#F5EAD0" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M0 50 C-14 58 -20 70 -26 76 M0 70 C12 78 16 88 20 96" stroke="#F5EAD0" stroke-width="3" fill="none" stroke-linecap="round"/></g>' +
+      '<g class="w-shoot"><path d="M0 -10 C-4 -50 4 -80 0 -110" stroke="#7BC25A" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="-14" cy="-110" rx="16" ry="8" fill="#7BC25A" transform="rotate(-25 -14 -110)"/><ellipse cx="14" cy="-116" rx="16" ry="8" fill="#7BC25A" transform="rotate(25 14 -116)"/></g>' +
+      '<path d="M-30 0 C-30 -22 -8 -28 6 -20 C14 -16 16 -9 24 -11 C34 -13 38 4 30 14 C20 26 -30 24 -30 0Z" fill="#F3E3C0" stroke="#C9A06A" stroke-width="3"/><path class="w-crack" d="M-6 -22 L0 -8 L-8 4 L2 18" stroke="#8A5A3B" stroke-width="3" fill="none"/></g></g>';
+    // worm tunnels and an earthworm
+    b += '<path d="M640 470 C700 400 760 470 820 420 S930 380 960 460 S1000 520 1080 500" stroke="#3E2615" stroke-width="40" fill="none" stroke-linecap="round" opacity="0.55"/>';
+    b += '<path d="M120 260 C160 320 120 380 180 430" stroke="#3E2615" stroke-width="30" fill="none" stroke-linecap="round" opacity="0.45"/>';
+    b += '<g transform="translate(790 430)"><g id="w-earthworm"><path class="w-wig" d="M-60 0 C-44 -20 -24 -20 -10 0 S20 20 36 0 S60 -18 66 -6" stroke="#E89A9A" stroke-width="18" fill="none" stroke-linecap="round"/><path d="M-36 -10 v8 M-14 -4 v8 M12 6 v8 M38 -2 v8" stroke="#D67F7F" stroke-width="3" stroke-linecap="round"/><circle cx="66" cy="-10" r="3" fill="#2A2118"/></g></g>';
+    // the secret web: a mushroom above, white threads below joining roots
+    b += '<g transform="translate(980 205)"><path d="M-12 0 C-14 -20 -10 -36 -8 -44 H8 C10 -36 14 -20 12 0Z" fill="#F4EEE0"/><path d="M-50 -40 C-50 -80 50 -80 50 -40Z" fill="#E2725B"/><g fill="#FFF"><circle cx="-24" cy="-56" r="6"/><circle cx="10" cy="-64" r="5"/><circle cx="30" cy="-50" r="4"/></g></g>';
+    b += '<g id="w-fungi" stroke="#F5EFE0" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.75">' +
+      '<path d="M980 215 C960 260 1000 300 980 340 C960 380 1020 400 1060 380 C1120 350 1180 360 1230 330"/><path d="M980 260 C900 280 860 330 820 340 C760 350 720 300 680 320"/><path d="M990 300 C1040 290 1080 300 1110 270"/>' +
+      '<path d="M960 340 C930 380 900 380 880 420"/><path d="M1060 380 C1080 420 1120 430 1150 420"/><circle cx="980" cy="340" r="4" fill="#F5EFE0"/><circle cx="1060" cy="380" r="4" fill="#F5EFE0"/><circle cx="820" cy="340" r="4" fill="#F5EFE0"/></g>';
+    // a carrot growing under its feathery leaves
+    b += '<g transform="translate(1260 215)"><path d="M-6 0 C-16 -40 -10 -60 -4 -70 M0 0 C0 -44 6 -64 8 -76 M6 0 C16 -36 24 -50 30 -58" stroke="#5E9E4E" stroke-width="7" fill="none" stroke-linecap="round"/></g>';
+    b += '<g transform="translate(1260 215)"><g id="w-carrot"><path d="M-26 10 C-28 70 -12 140 0 200 C12 140 28 70 26 10Z" fill="#F28C28"/><path d="M-16 50 h12 M6 80 h12 M-10 120 h10 M4 160 h8" stroke="#D7701A" stroke-width="4" stroke-linecap="round"/>' +
+      '<path d="M0 200 C2 220 -2 240 0 260" stroke="#E8D2A8" stroke-width="3" fill="none"/></g></g>';
+    b += '<g transform="translate(1380 215)"><path d="M-14 4 C-18 30 -6 56 0 70 C6 56 18 30 14 4Z" fill="#B8476E"/><path d="M-4 4 C-10 -20 -4 -36 0 -44 M4 4 C10 -20 16 -30 20 -36" stroke="#5E9E4E" stroke-width="5" fill="none" stroke-linecap="round"/></g>';
+    // a mole in its tunnel
+    b += '<path d="M200 640 C300 600 360 660 460 620 S600 580 680 640" stroke="#3E2615" stroke-width="70" fill="none" stroke-linecap="round" opacity="0.5"/>';
+    b += '<g transform="translate(420 620)"><g id="w-mole"><ellipse cx="0" cy="0" rx="62" ry="38" fill="#4A3B33"/><path d="M50 -8 C74 -6 86 4 84 12 C76 18 60 14 48 10Z" fill="#E8A3A3"/><circle cx="84" cy="10" r="5" fill="#C96A6A"/>' +
+      '<g class="w-paws" fill="#E8A3A3"><ellipse cx="34" cy="30" rx="16" ry="11" transform="rotate(-20 34 30)"/><ellipse cx="-30" cy="32" rx="14" ry="9"/></g><path d="M-62 4 q-16 4 -22 -4" stroke="#4A3B33" stroke-width="6" stroke-linecap="round" fill="none"/>' +
+      '<path d="M86 6 l18 -6 M86 12 l18 2" stroke="#2A2118" stroke-width="2"/></g></g>';
+    // an ant city: rooms joined by hallways
+    var rooms = [[960, 560, 60, 30], [1090, 600, 56, 28], [1000, 660, 70, 30], [1150, 680, 50, 24]];
+    b += '<path d="M1040 505 C1030 530 980 540 960 560 M960 560 C1010 580 1060 580 1090 600 M1090 600 C1060 630 1030 640 1000 660 M1090 600 C1120 630 1140 660 1150 680" stroke="#C9A06A" stroke-width="16" fill="none" stroke-linecap="round"/>';
+    b += rooms.map(function (r) { return '<ellipse cx="' + r[0] + '" cy="' + r[1] + '" rx="' + r[2] + '" ry="' + r[3] + '" fill="#C9A06A"/>'; }).join('');
+    b += '<g fill="#F3E3C0"><ellipse cx="945" cy="565" rx="10" ry="6"/><ellipse cx="968" cy="568" rx="10" ry="6"/><ellipse cx="985" cy="560" rx="10" ry="6"/></g>';
+    b += '<g fill="#7FB86A"><circle cx="1080" cy="606" r="7"/><circle cx="1100" cy="604" r="7"/><circle cx="1090" cy="592" r="6"/></g>';
+    var ant = function (x, y) { return '<g transform="translate(' + x + ' ' + y + ')"><circle cx="-7" cy="0" r="4" fill="#2A2118"/><circle cx="0" cy="0" r="3" fill="#2A2118"/><circle cx="7" cy="0" r="5" fill="#2A2118"/><path d="M-3 -1 l-4 -6 M0 1 l0 6 M3 -1 l4 -6" stroke="#2A2118" stroke-width="1.6"/></g>'; };
+    b += '<g id="w-ants"><g class="w-march">' + ant(1040, 520) + ant(1000, 548) + ant(1030, 578) + ant(1070, 590) + ant(1060, 630) + ant(1120, 650) + ant(1010, 655) + '</g></g>';
+    b += bee(150, 120, 0.7, 'w-fly2');
+    return svg(b);
+  }
+  var SCENES = { underground: sceneUnder, shadow: sceneShadow, meadow: sceneMeadow, map: sceneMap, garden: sceneGarden, pond: scenePond, hive: sceneHive, sky: sceneSky, orchard: sceneOrchard, inside: sceneInside };
 
   // ---------- Layout ----------
   function fit() {
@@ -869,7 +937,7 @@
     if (id === 'baby') { var cb = document.getElementById('w-comb'); cb.classList.remove('larva-play'); void cb.getBoundingClientRect(); cb.classList.add('larva-play'); }
     if (id === 'ripple') { var r = document.getElementById('w-rings'); r.classList.remove('play'); void r.getBoundingClientRect(); r.classList.add('play'); }
     if (id === 'wind') { var wr = document.getElementById('w-wrap'); wr.classList.add('windy'); setTimeout(function () { wr.classList.remove('windy'); }, 4000); }
-    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step', joy: 'pop', rainy: 'plop', storm: 'whoosh', hedgehog: 'step', flutter: 'sparkle', turtle: 'chime', weather: 'sparkle', myshadow: 'step', sundial: 'chime', puppets: 'pop', prism: 'sparkle', globe: 'whoosh', owl: 'hoot', fireflies: 'sparkle' };
+    var sounds = { frog: 'ribbit', ripple: 'plop', fish: 'plop', drop: 'plop', dance: 'buzz', water: 'buzz', flower: 'buzz', wind: 'whoosh', birds: 'whoosh', stars: 'sparkle', rainbow: 'sparkle', seed: 'pop', worm: 'pop', mushroom: 'pop', oseed: 'pop', sprout: 'pop', blossom: 'buzz', orange: 'pop', youseed: 'sparkle', glass: 'plop', toilet: 'plop', tube: 'whoosh', blood: 'step', joy: 'pop', rainy: 'plop', storm: 'whoosh', hedgehog: 'step', flutter: 'sparkle', turtle: 'chime', weather: 'sparkle', myshadow: 'step', sundial: 'chime', puppets: 'pop', prism: 'sparkle', globe: 'whoosh', owl: 'hoot', fireflies: 'sparkle', roots: 'plop', wakeseed: 'pop', earthworm: 'step', fungi: 'sparkle', carrot: 'pop', mole: 'step', ants: 'step', layers: 'chime' };
     sfx(sounds[id] || 'chime');
   }
   function discover(s, btn) {

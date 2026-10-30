@@ -9,7 +9,7 @@
   var DAY = 86400000;
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   // Which corner of Asal's World matches each month's series, for the outdoor idea on a quiet week.
-  var MONTH_PLACES = { 8: ['pond'], 9: ['garden', 'orchard'], 10: ['orchard', 'inside'], 11: ['shadow', 'sky'], 0: ['inside', 'meadow'], 1: ['meadow'], 2: ['sky'], 3: ['hive'], 4: ['garden', 'pond', 'hive', 'sky'], 5: ['sky'], 6: ['pond', 'garden'], 7: ['sky', 'orchard'] };
+  var MONTH_PLACES = { 8: ['pond'], 9: ['underground', 'garden', 'orchard'], 10: ['orchard', 'inside'], 11: ['shadow', 'sky'], 0: ['inside', 'meadow'], 1: ['meadow'], 2: ['sky'], 3: ['hive'], 4: ['garden', 'pond', 'hive', 'sky'], 5: ['sky'], 6: ['pond', 'garden'], 7: ['sky', 'orchard'] };
   // A question just for the grown-up, different each week: Nectara is for the whole family's wonder.
   var FOR_YOU = [
     'What surprised you this week?',
