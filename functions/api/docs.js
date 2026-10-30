@@ -43,6 +43,7 @@ const STARTERS = [
   ['Nectara Year One Curriculum (Google Drive copy)', 'Curriculum', 'https://docs.google.com/document/d/1q-tTitChev_xSjQq7DP2yjF0iHkjtREZw0N_L0OG4Hs/edit', ''],
   ['Nectara Year One Curriculum (Google Drive copy, updated Oct 29)', 'Curriculum', 'https://docs.google.com/document/d/1w6k3c23PNoYYDDE2ny-1DFMa3o4NN_D3Z1a3huXhyGE/edit', 'Includes the lesson shape (Make it yours, ideas first, grown-up wonder) and read-aloud.'],
   ['Nectara Year One Curriculum (Google Drive copy, updated Oct 30)', 'Curriculum', 'https://docs.google.com/document/d/1ELssa7fDBFsfz4kCiH84K1T-jyJ5Xhv1zf6JkhJlITk/edit', 'December Light and Shadow built, plus the Shadow Garden in Asal’s World.'],
+  ['Nectara Year One Curriculum (Google Drive copy, through February)', 'Curriculum', 'https://docs.google.com/document/d/1IaHzK8sMiTwCoAycF86KOZCJzE3LMGtfNnEkPReML1A/edit', 'Lessons built through February, plus Underground in Asal’s World.'],
   ['Nectara Pilot Kit', 'Plans', 'https://claude.ai/artifact/2YVy3EL2x98oTNcGCvepju', 'Shopping checklist for all four weeks, the Rainbow Harvest Picnic Wow Day guide, and the parent permission note.'],
   ['Nectara Pilot Kit (Google Drive copy)', 'Plans', 'https://docs.google.com/document/d/1I1jN8ES7WnrNyTASEDZaA5BX-uO1CEDZrqHi-3N8hOQ/edit', ''],
   ['Nectara TV Test Checklist', 'Plans', 'https://claude.ai/artifact/98eCvsspwtEqGDs4eWXvdz', 'Printable step-by-step check of the TV, phone remote, December lessons and Shadow Garden before the pilot.'],
