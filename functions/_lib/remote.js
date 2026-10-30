@@ -5,6 +5,9 @@ export const COMMANDS = ['up', 'down', 'left', 'right', 'ok', 'back', 'next', 'p
 // Pointer moves from the phone's touchpad or tilt: mv:<dx>,<dy> in TV pixels.
 export function validCommand(cmd) {
   if (COMMANDS.includes(cmd)) return true;
+  if (cmd === 'enter') return true;
+  if (typeof cmd === 'string' && cmd.indexOf('set:') === 0) return cmd.length <= 404;          // typing from the phone
+  if (typeof cmd === 'string' && /^go:[^\s]{4,400}$/.test(cmd)) return true;                    // open a web address on the TV
   const m = /^mv:(-?\d{1,4}),(-?\d{1,4})$/.exec(String(cmd || ''));
   return !!m && Math.abs(+m[1]) <= 4000 && Math.abs(+m[2]) <= 4000;
 }

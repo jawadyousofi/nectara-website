@@ -93,6 +93,34 @@
     (t || hit).dispatchEvent(e);
   }
 
+  // Typing from the phone: the text goes into the selected box on the TV (or the first box on the screen).
+  function isField(el) { return el && ((el.tagName === 'INPUT' && !/^(button|submit|checkbox|radio|range|file|color)$/i.test(el.type)) || el.tagName === 'TEXTAREA' || el.isContentEditable); }
+  function field() {
+    var a = document.activeElement;
+    if (isField(a)) return a;
+    var all = [].slice.call(document.querySelectorAll('input, textarea')).filter(function (el) { return isField(el) && visible(el); });
+    if (all[0]) { all[0].focus(); return all[0]; }
+    return null;
+  }
+  function typeText(t) {
+    var f = field();
+    if (!f) { toast(t ? 'Select a box on the TV first, or press Open on the phone to go to an address' : ''); return; }
+    if (f.isContentEditable) f.textContent = t; else f.value = t;
+    var e = document.createEvent('Event'); e.initEvent('input', true, true); f.dispatchEvent(e);
+  }
+  function pressEnter() {
+    var f = field(); if (!f) { act('ok'); return; }
+    var e = document.createEvent('Event'); e.initEvent('keydown', true, true); e.key = 'Enter'; e.keyCode = 13; e.which = 13;
+    if (f.dispatchEvent(e) && f.form) { var b = f.form.querySelector('[type=submit], button:not([type=button])'); if (b) b.click(); else if (f.form.requestSubmit) f.form.requestSubmit(); else f.form.submit(); }
+    var c = document.createEvent('Event'); c.initEvent('change', true, true); f.dispatchEvent(c);
+  }
+  function openAddress(u) {
+    u = String(u || '').trim(); if (!u) return;
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    toast('Opening ' + u.replace(/^https?:\/\//, ''));
+    setTimeout(function () { location.href = u; }, 600);
+  }
+
   // Keep the TV awake while the family is using Nectara; let it sleep after 20 quiet minutes.
   var W = { lock: null, quietT: null };
   function stayAwake() {
@@ -109,6 +137,9 @@
     var mv = /^mv:(-?\d+),(-?\d+)$/.exec(cmd);
     if (mv) { movePointer(parseInt(mv[1], 10), parseInt(mv[2], 10)); return; }
     if (cmd === 'tap') { tapPointer(); return; }
+    if (cmd.indexOf('set:') === 0) { typeText(cmd.slice(4)); return; }
+    if (cmd === 'enter') { pressEnter(); return; }
+    if (cmd.indexOf('go:') === 0) { openAddress(cmd.slice(3)); return; }
     if (KEYS[cmd]) {
       if (P.el) P.el.className = 'nx-pointer';                // arrow keys put the pointer away, like the LG remote
       if (key(cmd)) return;                                   // the app handled it (lessons, Asal's World, back)
@@ -214,14 +245,23 @@
   function modeTabs() {
     return '<div class="rm-modes" role="tablist">' +
       '<button type="button" role="tab" class="rm-mode' + (S.mode === 'buttons' ? ' on' : '') + '" data-mode="buttons" aria-selected="' + (S.mode === 'buttons') + '">Buttons</button>' +
-      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'pointer' ? ' on' : '') + '" data-mode="pointer" aria-selected="' + (S.mode === 'pointer') + '">Pointer</button></div>';
+      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'pointer' ? ' on' : '') + '" data-mode="pointer" aria-selected="' + (S.mode === 'pointer') + '">Pointer</button>' +
+      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'type' ? ' on' : '') + '" data-mode="type" aria-selected="' + (S.mode === 'type') + '">Type</button></div>';
   }
   function render() {
     if (!S.open) return;
     stopTilt();
     var b = function (cmd, label, inner, cls) { return '<button type="button" class="rm-btn ' + (cls || '') + '" data-cmd="' + cmd + '" aria-label="' + label + '">' + inner + '</button>'; };
     var body;
-    if (S.mode === 'pointer') {
+    if (S.mode === 'type') {
+      body = '<div class="rm-type"><label for="rm-text">Type here and it appears in the selected box on the TV</label>' +
+        '<textarea id="rm-text" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type here"></textarea>' +
+        '<div class="rm-row"><button type="button" class="rm-btn soft" id="rm-clear">Clear</button><button type="button" class="rm-btn" id="rm-enter">Enter</button></div>' +
+        '<button type="button" class="rm-btn soft" id="rm-go">Open this web address on the TV</button>' +
+        '<p class="rm-note">Use arrows or the pointer to pick a box on the TV first. Opening another website leaves Nectara, so the phone remote stops until you come back.</p></div>' +
+        '<div class="rm-pad">' + b('up', 'Up', svg(ICO.up), 'u') + b('left', 'Left', svg(ICO.left), 'l') + b('ok', 'OK', 'OK', 'ok') + b('right', 'Right', svg(ICO.right), 'r') + b('down', 'Down', svg(ICO.down), 'd') + '</div>' +
+        '<div class="rm-row">' + b('back', 'Back', 'Back', 'soft') + b('home', 'Home', 'Home', 'soft') + '</div>';
+    } else if (S.mode === 'pointer') {
       body = '<div class="rm-touch" id="rm-touch" aria-label="Touchpad: slide to move the pointer on the TV, tap to select"><span>Slide to move<br>Tap to select</span></div>' +
         '<div class="rm-row">' + b('back', 'Back', 'Back', 'soft') + b('home', 'Home', 'Home', 'soft') + b('world', 'Asal’s World', 'Asal&rsquo;s World', 'soft') + '</div>' +
         '<div class="rm-row">' + b('prev', 'Previous page', '&larr; Page', 'soft small') + b('read', 'Read aloud on or off', 'Read aloud', 'soft small') + b('next', 'Next page', 'Page &rarr;', 'soft small') + '</div>' +
@@ -244,6 +284,7 @@
       btn.addEventListener('click', function () { S.mode = btn.getAttribute('data-mode'); try { localStorage.setItem('nx_remote_mode', S.mode); } catch (e) {} render(); });
     });
     if (S.mode === 'pointer') setupPointer();
+    if (S.mode === 'type') setupType();
     status();
   }
 
@@ -288,6 +329,22 @@
       aim.addEventListener('mousedown', startAim); aim.addEventListener('mouseup', endAim);
     }
   }
+  // Type tab: every change is sent as the whole text, so a dropped or doubled press never scrambles it.
+  function setupType() {
+    var ta = document.getElementById('rm-text'), t = null;
+    var sendText = function () { var v = ta.value.slice(0, 400); var lastCmd = Q.list[Q.list.length - 1]; if (lastCmd && lastCmd.indexOf('set:') === 0) Q.list[Q.list.length - 1] = 'set:' + v; else queue('set:' + v); };
+    ta.addEventListener('input', function () { clearTimeout(t); t = setTimeout(sendText, 120); });
+    ta.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); clearTimeout(t); sendText(); queue('enter'); buzz(12); } });
+    document.getElementById('rm-clear').addEventListener('click', function () { ta.value = ''; sendText(); ta.focus(); });
+    document.getElementById('rm-enter').addEventListener('click', function (e) { clearTimeout(t); sendText(); send('enter', e.currentTarget); });
+    document.getElementById('rm-go').addEventListener('click', function (e) {
+      var v = ta.value.trim();
+      if (!/^[^\s]+\.[^\s]{2,}$/.test(v)) { S.msg = 'Type a web address first, like nectaraschool.org'; status(); return; }
+      S.msg = ''; send('go:' + v.slice(0, 400), e.currentTarget);
+    });
+    setTimeout(function () { ta.focus(); }, 50);
+  }
+
   // Tilt pointing: hold the phone like a remote, pointing at the TV. Turning it left or right moves the pointer
   // sideways; tipping the top up or down moves it up or down.
   var T = { on: false };
@@ -302,7 +359,7 @@
 
   function open() {
     S.open = true; document.title = 'Nectara · TV remote'; window.scrollTo(0, 0);
-    try { S.mode = localStorage.getItem('nx_remote_mode') === 'pointer' ? 'pointer' : 'buttons'; } catch (e) {}
+    try { var m = localStorage.getItem('nx_remote_mode'); S.mode = m === 'pointer' || m === 'type' ? m : 'buttons'; } catch (e) {}
     render(); send('hello');
   }
   function close() { S.open = false; stopTilt(); }
