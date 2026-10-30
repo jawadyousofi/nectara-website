@@ -499,7 +499,12 @@ if __name__ == '__main__':
     _app = open('app/index.html').read()
     _app = _re.sub(r'(src|href)="/app/([a-z0-9-]+\.(?:js|css))(?:\?v=[a-f0-9]+)?"',
                    lambda m: '%s="/app/%s?v=%s"' % (m.group(1), m.group(2), _hashlib.sha1(open('app/' + m.group(2), 'rb').read()).hexdigest()[:8]), _app)
+    # The app's version: TVs and tablets that stay open for days check it and reload themselves when it changes.
+    _ver = _hashlib.sha1(''.join(_re.findall(r'\?v=([a-f0-9]+)', _app)).encode()).hexdigest()[:10]
+    _app = _re.sub(r'<meta name="nx-version" content="[a-f0-9]*">', '', _app)
+    _app = _app.replace('<head>', '<head><meta name="nx-version" content="%s">' % _ver, 1)
     open('app/index.html', 'w').write(_app)
+    open('app/version.json', 'w').write('{"v":"%s"}\n' % _ver)
     if PRIVATE:
         PAGES['index.html'] = COMING_SOON
         hidden = [f for f in PAGES if f not in PRIVATE_PAGES]

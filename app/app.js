@@ -433,6 +433,24 @@
   }
   window.addEventListener('hashchange', route);
 
+  // ---------- Staying up to date ----------
+  // A TV or tablet can keep Nectara open for days. Every few minutes (and whenever the screen wakes) the app asks
+  // whether a new version is out, and reloads itself at a calm moment: on the home screen, never mid-lesson or mid-story.
+  var myVersion = (document.querySelector('meta[name="nx-version"]') || {}).content || '', updateReady = false;
+  function calmMoment() { return !state.lesson && (!location.hash || location.hash === '#/' || location.hash === '#'); }
+  function checkVersion() {
+    if (!myVersion) return;
+    var x = new XMLHttpRequest();
+    x.open('GET', '/app/version.json?t=' + Date.now());
+    x.onload = function () {
+      try { var v = JSON.parse(x.responseText).v; if (v && v !== myVersion) { updateReady = true; if (calmMoment()) location.reload(); } } catch (e) {}
+    };
+    x.send();
+  }
+  setInterval(checkVersion, 5 * 60000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkVersion(); });
+  window.addEventListener('hashchange', function () { if (updateReady && calmMoment()) location.reload(); });
+
   Promise.all([api('/api/auth/me'), api('/api/progress').catch(function () { return { done: {} }; })])
     .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); if (window.NectaraSettings) window.NectaraSettings.start(); })
     .catch(function (e) {
