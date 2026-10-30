@@ -55,6 +55,7 @@
   }
   function playPage(st, i) {
     stopVoice();
+    if (state.lesson && !state.lesson.story) return playSlide(st, i);
     if (!st.audio) return;
     loadTiming(st.id);
     if (!aloudOn()) return;
@@ -66,6 +67,17 @@
     followReading([].slice.call(document.querySelectorAll('.story-line')), t[(i < 9 ? '0' : '') + (i + 1)]);
     var pr = voice.play();
     if (pr && pr.then) pr.then(function () { voiceBlocked = false; aloudButton(); }, function () { voiceBlocked = true; aloudButton(); }); // the browser wants a tap first; keep the saved choice
+  }
+
+  // Lessons are read aloud slide by slide (words from app/lesson-script.js, recorded by tools/lesson_voice.py).
+  function playSlide(l, i) {
+    if (!aloudOn()) return;
+    if (!voice) { voice = new Audio(); voice.preload = 'auto'; }
+    voice.onended = function () { var n = document.getElementById('next'); if (n) n.classList.add('nudge'); };
+    voice.ontimeupdate = null;
+    voice.src = '/assets/lessons/audio/' + l.id + '/' + (i < 9 ? '0' : '') + (i + 1) + '.mp3';
+    var pr = voice.play();
+    if (pr && pr.then) pr.then(function () { voiceBlocked = false; aloudButton(); }, function () { voiceBlocked = true; aloudButton(); });
   }
 
   var PETALS = ['#E9A23B', '#F29BB5', '#7FB3D5', '#F4C25B', '#C9A0DC', '#F39A2B'];
@@ -284,7 +296,7 @@
       '<div class="player">' +
       '<div class="p-top"><button class="icon-btn" type="button" id="exit" aria-label="Close lesson">' + ICON.close + '</button>' +
       '<div class="p-title">' + esc(l.title) + '</div><div class="dots" aria-hidden="true">' + state.slides.map(function (_, k) { return '<i class="' + (k === state.i ? 'on' : k < state.i ? 'past' : '') + '"></i>'; }).join('') + '</div>' +
-      (found.story && l.audio ? '<button class="icon-btn aloud" type="button" id="aloud" aria-pressed="false"></button>' : '') +
+      ((found.story ? l.audio : l.makeIt && window.NectaraLessonScript) ? '<button class="icon-btn aloud" type="button" id="aloud" aria-pressed="false"></button>' : '') +
       '<button class="icon-btn" type="button" id="gu-open">Grown-ups</button>' +
       (document.fullscreenEnabled ? '<button class="icon-btn" type="button" id="fs" aria-label="Full screen">' + ICON.full + '</button>' : '') + '</div>' +
       '<main class="stage' + (found.story ? ' story' : '') + '" id="stage"><div class="visual">' + sl.visual + '</div><div class="words">' + (phaseLabel ? '<span class="phase ' + sl.phase + '">' + phaseLabel + '</span>' : '') + sl.words + '</div></main>' +

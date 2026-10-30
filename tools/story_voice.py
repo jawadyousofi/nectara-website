@@ -81,7 +81,9 @@ def kokoro():
 # Names said the way the family says them (the voice's own guesses were wrong: "Asal" came out "AY-zel").
 NAMES = [(r"^Asal$", 'ɐsˈɑːl'), (r"^Asals$", 'ɐsˈɑːlz'),     # a-SAHL, the same as in Asal's World
          (r"^Eli$", 'ˈiːlaɪ'), (r"^Keon$", 'kˈiːɑːn'), (r"^Priya$", 'pɹˈiːjə')]
-SOUNDS = NAMES + [(r"^s+h+$", 'ʃːːːː'),                 # shh, shhh, shhhhh
+SOUNDS = NAMES + [(r"^g+r+$", 'ɡɹːːːː'),                # grrr (a little growl)
+          (r"^h+a+h+$", 'hˈɑːːːːh'),            # haaah (a foggy breath)
+          (r"^s+h+$", 'ʃːːːː'),                 # shh, shhh, shhhhh
           (r"^h+m+$", 'mːːːːː'),                # hmmmm (a hum)
           (r"^b+z+$", 'bzːːːː'),                # bzzz
           (r"^w+h+o+o+s+h+$", 'wˈuːːːʃ'),       # whoooosh
