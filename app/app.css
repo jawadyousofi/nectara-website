@@ -365,3 +365,29 @@ dialog#grownups::backdrop { background: rgba(42, 33, 24, 0.35); }
 .rm-install img { border-radius: 14px; }
 .rm-install p { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.95rem; }
 .rm-install .rm-btn { margin-top: 8px; min-height: 48px; font-size: 1rem; }
+
+/* Colorful remote: every job keeps one color and one picture */
+.remote { --c-coral: #E07A5F; --c-green: #5FA36A; --c-purple: #9B7FD4; --c-blue: #5B8DEF; --c-honey: #F2B23A; --c-teal: #3E9CA8; }
+.rm-top b { display: inline-flex; align-items: center; gap: 8px; }
+.rm-top b img { border-radius: 8px; }
+.rm-shell { display: grid; gap: 14px; background: #FFFFFF; border: 2px solid #EFE6D2; border-radius: 34px; padding: 18px 14px; box-shadow: 0 10px 30px rgba(42, 33, 24, 0.08); }
+.remote .rm-btn { flex-direction: column; gap: 4px; display: flex; align-items: center; justify-content: center; min-height: 76px; border-radius: 22px; border: 0; color: #FFFFFF; font-size: 0.95rem; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.14); padding: 8px 6px; }
+.remote .rm-btn span { line-height: 1.1; text-align: center; }
+.remote .rm-btn.hit { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.14); }
+.remote .rm-btn.small { min-height: 60px; flex-direction: row; gap: 8px; }
+.remote .rm-btn.wide { flex-direction: row; gap: 10px; min-height: 58px; }
+.rm-btn.c-coral { background: var(--c-coral); } .rm-btn.c-green { background: var(--c-green); } .rm-btn.c-purple { background: var(--c-purple); }
+.rm-btn.c-blue { background: var(--c-blue); } .rm-btn.c-teal { background: var(--c-teal); }
+.remote .rm-btn.c-honey { background: var(--c-honey); color: #2A2118; }
+.rm-btn.c-purple.on { box-shadow: 0 0 0 4px #E7DEF8, 0 4px 0 rgba(0, 0, 0, 0.14); }
+.rm-row.three .rm-btn { flex: 1 1 0; }
+.rm-dpad { position: relative; width: min(76vw, 290px); aspect-ratio: 1 / 1; margin: 4px auto; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #3E5E45, #2F4A35); box-shadow: 0 6px 0 #22382A, 0 12px 24px rgba(42, 33, 24, 0.18); }
+.rm-arrow { position: absolute; border: 0; background: transparent; color: #FBF3DF; display: grid; place-items: center; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border-radius: 30%; }
+.rm-arrow:active, .rm-arrow.hit { background: rgba(255, 255, 255, 0.14); }
+.rm-arrow.a-up { left: 32%; top: 2%; width: 36%; height: 30%; } .rm-arrow.a-down { left: 32%; bottom: 2%; width: 36%; height: 30%; }
+.rm-arrow.a-left { top: 32%; left: 2%; width: 30%; height: 36%; } .rm-arrow.a-right { top: 32%; right: 2%; width: 30%; height: 36%; }
+.rm-ok { position: absolute; left: 31%; top: 31%; width: 38%; height: 38%; border-radius: 50%; border: 5px solid #FBF3DF; background: var(--c-honey); color: #2A2118; font: inherit; font-weight: 800; font-size: 1.6rem; cursor: pointer; box-shadow: 0 4px 0 #C98A1E; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.rm-ok.hit { transform: translateY(3px); box-shadow: 0 1px 0 #C98A1E; }
+.rm-modes .rm-mode { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.rm-mode.m-buttons.on { background: #2F4A35; } .rm-mode.m-pointer.on { background: var(--c-honey); color: #2A2118; } .rm-mode.m-type.on { background: var(--c-blue); }
+.rm-touch { display: grid; place-items: center; align-content: center; gap: 10px; color: #B88A32; }

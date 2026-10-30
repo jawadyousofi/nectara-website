@@ -200,10 +200,23 @@
   }
 
   // ---------- On the phone ----------
+  // Icons: simple shapes a child can recognize, drawn in the button's own color.
   var ICO = {
-    up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', left: '<path d="M15 6l-6 6 6 6"/>', right: '<path d="M9 6l6 6-6 6"/>'
+    up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', left: '<path d="M15 6l-6 6 6 6"/>', right: '<path d="M9 6l6 6-6 6"/>',
+    back: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+    home: '<path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10v10h4.5v-6h4v6h4.5V10"/>',
+    world: '<ellipse cx="8" cy="7.5" rx="3.6" ry="2.6" transform="rotate(-25 8 7.5)"/><ellipse cx="16" cy="7.5" rx="3.6" ry="2.6" transform="rotate(25 16 7.5)"/><ellipse cx="12" cy="14.5" rx="5.5" ry="5"/><path d="M9.5 10.5v8M14.5 10.5v8"/>',
+    read: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>',
+    prev: '<path d="M14 6l-6 6 6 6"/><path d="M19 6l-6 6 6 6" opacity="0.5"/>', next: '<path d="M10 6l6 6-6 6"/><path d="M5 6l6 6-6 6" opacity="0.5"/>',
+    scrollup: '<path d="M6 12l6-6 6 6M6 18l6-6 6 6"/>', scrolldown: '<path d="M6 6l6 6 6-6M6 12l6 6 6-6"/>',
+    buttons: '<circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.6"/>',
+    pointer: '<path d="M6 3.5l12.5 7-5.5 1.8-2.2 5.7z"/><path d="M13 12.3l4.5 6"/>',
+    type: '<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M9.5 10h.01M13 10h.01M16.5 10h.01M8 14h8"/>',
+    clear: '<path d="M6 6l12 12M18 6L6 18"/>', enter: '<path d="M20 5v6.5a3.5 3.5 0 0 1-3.5 3.5H5"/><path d="M9 11l-4 4 4 4"/>',
+    web: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+    tilt: '<rect x="8" y="3" width="8" height="18" rx="2.5" transform="rotate(-18 12 12)"/><path d="M3 9a9 9 0 0 0 0 6M21 9a9 9 0 0 1 0 6"/>'
   };
-  function svg(p) { return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  function svg(p, size) { var n = size || 30; return '<svg viewBox="0 0 24 24" width="' + n + '" height="' + n + '" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
   function buzz(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
   // Presses go out one at a time, in order. Pointer movement is added up while a press is on its way and sent as one.
   var Q = { list: [], busy: false, dx: 0, dy: 0 };
@@ -249,39 +262,40 @@
     if (who) who.textContent = S.account ? 'Signed in as ' + S.account + '. The TV must use the same account.' : '';
   }
   function modeTabs() {
-    return '<div class="rm-modes" role="tablist">' +
-      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'buttons' ? ' on' : '') + '" data-mode="buttons" aria-selected="' + (S.mode === 'buttons') + '">Buttons</button>' +
-      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'pointer' ? ' on' : '') + '" data-mode="pointer" aria-selected="' + (S.mode === 'pointer') + '">Pointer</button>' +
-      '<button type="button" role="tab" class="rm-mode' + (S.mode === 'type' ? ' on' : '') + '" data-mode="type" aria-selected="' + (S.mode === 'type') + '">Type</button></div>';
+    var tab = function (m, label) { return '<button type="button" role="tab" class="rm-mode m-' + m + (S.mode === m ? ' on' : '') + '" data-mode="' + m + '" aria-selected="' + (S.mode === m) + '">' + svg(ICO[m], 22) + '<span>' + label + '</span></button>'; };
+    return '<div class="rm-modes" role="tablist">' + tab('buttons', 'Buttons') + tab('pointer', 'Pointer') + tab('type', 'Type') + '</div>';
   }
   function render() {
     if (!S.open) return;
     stopTilt();
-    var b = function (cmd, label, inner, cls) { return '<button type="button" class="rm-btn ' + (cls || '') + '" data-cmd="' + cmd + '" aria-label="' + label + '">' + inner + '</button>'; };
+    // A colorful button: an icon on top, a short word underneath. Each job keeps the same color in every tab.
+    var b = function (cmd, label, word, color, extra) { return '<button type="button" class="rm-btn c-' + color + (extra ? ' ' + extra : '') + '" data-cmd="' + cmd + '" aria-label="' + label + '">' + svg(ICO[cmd]) + '<span>' + word + '</span></button>'; };
+    var nav = '<div class="rm-row three">' + b('back', 'Back', 'Back', 'coral') + b('home', 'Home', 'Home', 'green') + b('world', 'Asal’s World', 'Asal&rsquo;s World', 'purple') + '</div>';
+    var pages = '<div class="rm-row three">' + b('prev', 'Previous page', 'Page', 'blue') + b('read', 'Read aloud on or off', 'Read aloud', 'honey') + b('next', 'Next page', 'Page', 'blue') + '</div>';
+    var arrow = function (d, label) { return '<button type="button" class="rm-arrow a-' + d + '" data-cmd="' + d + '" aria-label="' + label + '">' + svg(ICO[d], 38) + '</button>'; };
+    var dpad = '<div class="rm-dpad">' + arrow('up', 'Up') + arrow('left', 'Left') + arrow('right', 'Right') + arrow('down', 'Down') +
+      '<button type="button" class="rm-ok" data-cmd="ok" aria-label="OK">OK</button></div>';
     var body;
     if (S.mode === 'type') {
       body = '<div class="rm-type"><label for="rm-text">Type here and it appears in the selected box on the TV</label>' +
         '<textarea id="rm-text" rows="2" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type here"></textarea>' +
-        '<div class="rm-row"><button type="button" class="rm-btn soft" id="rm-clear">Clear</button><button type="button" class="rm-btn" id="rm-enter">Enter</button></div>' +
-        '<button type="button" class="rm-btn soft" id="rm-go">Open this web address on the TV</button>' +
-        '<p class="rm-note">Use arrows or the pointer to pick a box on the TV first. Opening another website leaves Nectara, so the phone remote stops until you come back.</p></div>' +
-        '<div class="rm-pad">' + b('up', 'Up', svg(ICO.up), 'u') + b('left', 'Left', svg(ICO.left), 'l') + b('ok', 'OK', 'OK', 'ok') + b('right', 'Right', svg(ICO.right), 'r') + b('down', 'Down', svg(ICO.down), 'd') + '</div>' +
-        '<div class="rm-row">' + b('back', 'Back', 'Back', 'soft') + b('home', 'Home', 'Home', 'soft') + '</div>';
+        '<div class="rm-row"><button type="button" class="rm-btn c-coral" id="rm-clear">' + svg(ICO.clear) + '<span>Clear</span></button>' +
+        '<button type="button" class="rm-btn c-green" id="rm-enter">' + svg(ICO.enter) + '<span>Enter</span></button></div>' +
+        '<button type="button" class="rm-btn c-blue wide" id="rm-go">' + svg(ICO.web) + '<span>Open this web address on the TV</span></button>' +
+        '<p class="rm-note">Pick a box on the TV first with the arrows. Opening another website leaves Nectara, so the phone remote stops until you come back.</p></div>' +
+        dpad + nav;
     } else if (S.mode === 'pointer') {
-      body = '<div class="rm-touch" id="rm-touch" aria-label="Touchpad: slide to move the pointer on the TV, tap to select"><span>Slide to move<br>Tap to select</span></div>' +
-        '<div class="rm-row">' + b('back', 'Back', 'Back', 'soft') + b('home', 'Home', 'Home', 'soft') + b('world', 'Asal’s World', 'Asal&rsquo;s World', 'soft') + '</div>' +
-        '<div class="rm-row">' + b('prev', 'Previous page', '&larr; Page', 'soft small') + b('read', 'Read aloud on or off', 'Read aloud', 'soft small') + b('next', 'Next page', 'Page &rarr;', 'soft small') + '</div>' +
-        '<button type="button" class="rm-btn soft small" id="rm-tilt">' + (S.tilt ? 'Tilt pointing is on: hold the button and point' : 'Point by tilting the phone') + '</button>' +
-        (S.tilt ? '<button type="button" class="rm-btn ok-big" id="rm-aim">Hold to point &middot; let go to select</button>' : '');
+      body = '<div class="rm-touch" id="rm-touch" aria-label="Touchpad: slide to move the pointer on the TV, tap to select">' + svg(ICO.pointer, 44) + '<span>Slide to move<br>Tap to select</span></div>' +
+        nav + pages +
+        '<button type="button" class="rm-btn c-purple wide' + (S.tilt ? ' on' : '') + '" id="rm-tilt">' + svg(ICO.tilt) + '<span>' + (S.tilt ? 'Tilt pointing is on (tap to turn off)' : 'Point by tilting the phone') + '</span></button>' +
+        (S.tilt ? '<button type="button" class="rm-btn c-honey ok-big" id="rm-aim"><span>Hold to point &middot; let go to select</span></button>' : '');
     } else {
-      body = '<div class="rm-row">' + b('prev', 'Previous page', '&larr; Page') + b('read', 'Read aloud on or off', 'Read aloud', 'soft') + b('next', 'Next page', 'Page &rarr;') + '</div>' +
-        '<div class="rm-pad">' + b('up', 'Up', svg(ICO.up), 'u') + b('left', 'Left', svg(ICO.left), 'l') + b('ok', 'OK', 'OK', 'ok') + b('right', 'Right', svg(ICO.right), 'r') + b('down', 'Down', svg(ICO.down), 'd') + '</div>' +
-        '<div class="rm-row">' + b('back', 'Back', 'Back', 'soft') + b('home', 'Home', 'Home', 'soft') + b('world', 'Asal’s World', 'Asal&rsquo;s World', 'soft') + '</div>' +
-        '<div class="rm-row">' + b('scrollup', 'Scroll up', 'Scroll up', 'soft small') + b('scrolldown', 'Scroll down', 'Scroll down', 'soft small') + '</div>';
+      body = pages + dpad + nav +
+        '<div class="rm-row">' + b('scrollup', 'Scroll up', 'Scroll up', 'teal', 'small') + b('scrolldown', 'Scroll down', 'Scroll down', 'teal', 'small') + '</div>';
     }
     root.innerHTML = '<div class="remote">' +
-      '<header class="rm-top"><a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Done</a><b>TV remote</b><span></span></header>' +
-      '<p class="rm-status" id="rm-status" role="status"></p>' + modeTabs() + body +
+      '<header class="rm-top"><a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Done</a><b><img src="/assets/remote-icon-192.png" alt="" width="30" height="30">Nectara Remote</b><span></span></header>' +
+      '<p class="rm-status" id="rm-status" role="status"></p>' + modeTabs() + '<div class="rm-shell">' + body + '</div>' +
       '<p class="rm-note" id="rm-who"></p>' +
       '<p class="rm-note">Use the TV&rsquo;s own remote for volume and to turn the TV on.</p>' + installBox() + '</div>';
     [].forEach.call(root.querySelectorAll('[data-cmd]'), function (btn) {
