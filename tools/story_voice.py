@@ -116,8 +116,38 @@ def phonemes(text):
     return ' '.join(o for o in out if o)
 
 
+SHH = re.compile(r"\b([Ss]+[Hh]+)\b[!.,]?")
+
+
+def hiss(seconds=1.0):
+    """A real, soft "shhh": filtered breath noise. The voice can't make a lone consonant and says something like the letters."""
+    n = int(seconds * SR); rng = np.random.default_rng(7)
+    f = np.fft.rfft(rng.standard_normal(n)); fr = np.fft.rfftfreq(n, 1 / SR)
+    f *= np.exp(-((fr - 3200) / 1500) ** 2)                      # the "sh" band, centred near 3 kHz
+    y = np.fft.irfft(f, n); t = np.arange(n) / SR
+    env = np.minimum(1, t / 0.09) * np.minimum(1, (seconds - t) / 0.3) * (1 + 0.08 * np.sin(2 * np.pi * 3 * t))
+    y = y * env; return 0.035 * y / (np.sqrt((y ** 2).mean()) + 1e-9)
+
+
 def synth(text, speed=0.87):
-    """Speak one line. Pauses for each … are real silence (the voice used to stumble on the word after one)."""
+    """Speak one line. Pauses for each … are real silence (the voice used to stumble on the word after one).
+    Each shh/shhh becomes a real hiss (see hiss)."""
+    bits = []
+    for chunk in SHH.split(text):
+        if SHH.fullmatch(chunk.strip() + ''):
+            bits.append(('hiss', chunk))
+        elif chunk and re.fullmatch(r"[Ss]+[Hh]+", chunk.strip()):
+            bits.append(('hiss', chunk))
+        elif chunk.strip(' ,.!'):
+            bits.append(('say', chunk))
+    out = []
+    for kind, chunk in bits:
+        if out: out.append(np.zeros(int(0.18 * SR)))
+        out.append(hiss(0.5 + 0.12 * min(len(chunk), 6)) if kind == 'hiss' else _say(chunk, speed))
+    return np.concatenate(out) if out else np.zeros(1)
+
+
+def _say(text, speed=0.87):
     k = kokoro(); parts = [p.strip() for p in text.split('…')]; pieces = []
     for n, part in enumerate(parts):
         if not part: continue
