@@ -173,6 +173,7 @@
     req.onload = function () {
       var j = {}; try { j = JSON.parse(req.responseText); } catch (e) {}
       if (req.status !== 200 || j.off) { again(req.status === 401 ? 60000 : 5000); return; }
+      if (!lastOk || !S.readySaid) { S.readySaid = true; toast('Ready for the phone remote'); }
       lastOk = Date.now();
       if (typeof j.last === 'number') last = j.last;
       (j.cmds || []).forEach(function (c) { if (!greeted && c !== 'hello' && c.indexOf('mv:') !== 0) { greeted = true; toast('Phone remote connected'); } if (c === 'hello') greeted = true; act(c); });
@@ -223,7 +224,8 @@
     x.onload = function () {
       var j = {}; try { j = JSON.parse(x.responseText); } catch (e) {}
       var tv = x.status === 200 ? !!j.tv : null, msg = x.status === 200 ? '' : (j.error || 'Something went wrong');
-      if (tv !== S.tv || msg !== S.msg) { S.tv = tv; S.msg = msg; status(); }
+      if (x.status === 200) { S.ago = j.ago; S.account = j.account; }
+      if (tv !== S.tv || msg !== S.msg || x.status === 200) { S.tv = tv; S.msg = msg; status(); }
       Q.busy = false; setTimeout(function () { flushMove(); pump(); }, 0);
     };
     x.onerror = function () { Q.busy = false; S.msg = 'No connection. Check your phone’s Wi-Fi.'; status(); };
@@ -239,8 +241,12 @@
   function status() {
     var el = document.getElementById('rm-status'); if (!el) return;
     el.className = 'rm-status' + (S.tv ? ' on' : '');
+    var ago = S.ago, mins = ago == null ? 0 : Math.round(ago / 60);
     el.textContent = S.msg ? S.msg : S.tv === null ? 'Connecting to your TV…' : S.tv ? 'Connected to your TV' :
-      'Can’t find the TV. If it’s asleep, wake it with its own remote, then press any button here.';
+      ago == null ? 'No TV is signed in to this account yet. On the TV, open nectaraschool.org/tv and approve its code from this phone.' :
+      'Your TV was last here ' + (mins < 1 ? 'a moment' : mins < 60 ? mins + (mins === 1 ? ' minute' : ' minutes') : 'over an hour') + ' ago. It may be asleep or on another page: wake it with its own remote and open Nectara, then press any button here.';
+    var who = document.getElementById('rm-who');
+    if (who) who.textContent = S.account ? 'Signed in as ' + S.account + '. The TV must use the same account.' : '';
   }
   function modeTabs() {
     return '<div class="rm-modes" role="tablist">' +
@@ -276,6 +282,7 @@
     root.innerHTML = '<div class="remote">' +
       '<header class="rm-top"><a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Done</a><b>TV remote</b><span></span></header>' +
       '<p class="rm-status" id="rm-status" role="status"></p>' + modeTabs() + body +
+      '<p class="rm-note" id="rm-who"></p>' +
       '<p class="rm-note">Use the TV&rsquo;s own remote for volume and to turn the TV on.</p>' + installBox() + '</div>';
     [].forEach.call(root.querySelectorAll('[data-cmd]'), function (btn) {
       btn.addEventListener('click', function () { send(btn.getAttribute('data-cmd'), btn); });

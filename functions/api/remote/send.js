@@ -14,7 +14,8 @@ export async function onRequestPost({ request, env }) {
   await d.prepare('INSERT INTO remote (email, cmd, at) VALUES (?, ?, ?)').bind(user.email, data.cmd, now).run();
   if (Math.random() < 0.05) await d.prepare('DELETE FROM remote WHERE at < ?').bind(now - 120000).run();
   const s = await d.prepare('SELECT seen FROM screens WHERE email = ?').bind(user.email).first();
-  return json({ ok: true, tv: !!(s && now - s.seen < 45000) });
+  // tv: listening right now; ago: seconds since this account's TV last checked in (null = no TV signed in yet).
+  return json({ ok: true, tv: !!(s && now - s.seen < 45000), ago: s ? Math.round((now - s.seen) / 1000) : null, account: user.email });
 }
 
 export const onRequest = () => json({ error: 'use POST' }, 405);
