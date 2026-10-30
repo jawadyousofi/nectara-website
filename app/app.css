@@ -94,7 +94,8 @@ h1, h2, h3 { font-family: var(--display); color: var(--forest); line-height: 1.1
 .steps-list, .do-list { list-style: none; display: grid; gap: clamp(8px, 1.2vw, 18px); counter-reset: s; }
 .steps-list li { counter-increment: s; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; font-size: clamp(1.1rem, 0.85rem + 1.2vw, 2.1rem); font-weight: 600; color: var(--forest); }
 .steps-list li::before { content: counter(s); display: grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--honey); color: #fff; font-family: var(--display); }
-.do-list button { width: 100%; text-align: left; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; background: #fff; border: 3px solid var(--line); border-radius: 20px; padding: clamp(10px, 1.2vw, 20px) clamp(12px, 1.4vw, 24px); font-size: clamp(1.05rem, 0.85rem + 1vw, 1.9rem); font-weight: 600; color: var(--forest); }
+.do-list button { width: 100%; text-align: left; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; background: #fff; border: 3px solid var(--line); border-radius: 20px; padding: clamp(10px, 1.2vw, 20px) clamp(12px, 1.4vw, 24px); font-size: clamp(1rem, min(0.85rem + 1vw, 2.75vh), 1.9rem); font-weight: 600; color: var(--forest); }   /* fits short, wide TV screens too */
+.do-list.long button { font-size: clamp(0.95rem, min(0.8rem + 0.9vw, 2.45vh), 1.7rem); }
 .do-list button .box { width: 1.4em; height: 1.4em; border-radius: 8px; border: 3px solid var(--sage); display: grid; place-items: center; }
 .do-list button[aria-pressed="true"] { border-color: var(--sage); background: var(--mist); }
 .do-list button[aria-pressed="true"] .box { background: var(--forest); border-color: var(--forest); }

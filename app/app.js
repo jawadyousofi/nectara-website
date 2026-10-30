@@ -13,7 +13,8 @@
     'inside-seed': ['earth', 'mind', 'spirit'], 'seed-window': ['earth', 'mind', 'heart'], 'soil-safari': ['earth', 'body', 'mind'], 'worm-hotel': ['earth', 'world', 'heart'],
     'which-part': ['body', 'earth', 'mind'], 'regrow': ['earth', 'mind', 'heart'], 'rainbow-plate': ['body', 'world', 'voice'], 'food-journey': ['body', 'mind', 'earth'],
     'shadow-friends': ['mind', 'body', 'heart'], 'sun-clock': ['earth', 'mind', 'spirit'], 'rainbow-light': ['mind', 'spirit', 'voice'], 'day-night': ['world', 'mind', 'body'],
-    'heart-drum': ['body', 'heart', 'voice'], 'balloon-breath': ['body', 'spirit', 'mind'], 'bones-bend': ['body', 'mind', 'voice'], 'five-senses': ['body', 'earth', 'mind']
+    'heart-drum': ['body', 'heart', 'voice'], 'balloon-breath': ['body', 'spirit', 'mind'], 'bones-bend': ['body', 'mind', 'voice'], 'five-senses': ['body', 'earth', 'mind'],
+    'inner-weather': ['heart', 'voice', 'spirit'], 'feel-it': ['heart', 'body', 'mind'], 'calm-jar': ['heart', 'spirit', 'body'], 'kindness-garden': ['heart', 'world', 'voice']
   };
   window.NECTARA_GROWS = GROWS;
   function petalTags(id) {
@@ -268,7 +269,7 @@
       { phase: 'watch', visual: asal, words: '<p class="soft">Sit in a circle and breathe with Asal.</p><div class="song">' + DATA.song.map(function (line, i) { return '<span style="animation-delay:' + (0.4 + i * 1.1) + 's">' + esc(line) + '</span>'; }).join('') + '</div>' },
       { phase: 'watch', visual: asal, words: '<div class="bubble"><p class="soft">Asal wonders&hellip;</p><p class="big">' + esc(l.question) + '</p></div><p class="mid">What do you think? Everyone shares a guess. Scientists start with a guess!</p>' },
       { phase: 'watch', visual: steps, words: '<p class="soft">Here&rsquo;s what we&rsquo;ll do:</p><ol class="steps-list">' + l.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol>' },
-      { phase: 'do', next: 'We did it!', kind: 'do', visual: asalSmall + '<p class="rest" style="margin-top:14px">Screens rest. Hands work.</p>', words: '<h2 class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.2rem)">' + esc(l.doIntro) + '</h2><ul class="do-list">' + l.doSteps.map(function (t, i) { return '<li><button type="button" aria-pressed="false" data-tick="' + i + '"><span class="box"></span><span>' + esc(t) + '</span></button></li>'; }).join('') + '</ul>' +
+      { phase: 'do', next: 'We did it!', kind: 'do', visual: asalSmall + '<p class="rest" style="margin-top:14px">Screens rest. Hands work.</p>', words: '<h2 class="big" style="font-size:clamp(1.5rem,min(0.9rem + 2.4vw,5.4vh),3.2rem)">' + esc(l.doIntro) + '</h2><ul class="do-list' + (l.doSteps.join('').length > 230 ? ' long' : '') + '">' + l.doSteps.map(function (t, i) { return '<li><button type="button" aria-pressed="false" data-tick="' + i + '"><span class="box"></span><span>' + esc(t) + '</span></button></li>'; }).join('') + '</ul>' +
           '<div class="timer"><button class="btn quiet" type="button" id="timer-btn">Start a ' + l.minutes + '-minute timer</button><span class="clock" id="clock" hidden></span><span class="bar" id="bar" hidden><i></i></span></div>' },
       l.makeIt ? { phase: 'make', next: 'I made it!', visual: asalSmall + '<p class="rest" style="margin-top:14px">Your way is the right way.</p>', words: '<h2 class="big" style="font-size:clamp(1.5rem,0.9rem + 2.4vw,3.2rem)">Make it yours</h2><p class="mid">' + esc(l.makeIt) + '</p><p class="soft">Show someone what you made. Every idea is welcome.</p>' } : null,
       { phase: 'share', visual: asal, words: '<p class="soft">Notice</p><p class="big">' + esc(l.notice) + '</p>' },
