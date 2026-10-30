@@ -276,7 +276,7 @@
     root.innerHTML = '<div class="remote">' +
       '<header class="rm-top"><a class="btn ghost" href="#/" style="min-height:44px;padding:0 16px">Done</a><b>TV remote</b><span></span></header>' +
       '<p class="rm-status" id="rm-status" role="status"></p>' + modeTabs() + body +
-      '<p class="rm-note">Use the TV&rsquo;s own remote for volume and to turn the TV on.</p></div>';
+      '<p class="rm-note">Use the TV&rsquo;s own remote for volume and to turn the TV on.</p>' + installBox() + '</div>';
     [].forEach.call(root.querySelectorAll('[data-cmd]'), function (btn) {
       btn.addEventListener('click', function () { send(btn.getAttribute('data-cmd'), btn); });
     });
@@ -287,6 +287,24 @@
     if (S.mode === 'type') setupType();
     status();
   }
+
+  // Put the remote on the phone's home screen as its own app, "Nectara Remote".
+  var I = { prompt: null };
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); I.prompt = e; if (S.open) render(); });
+  window.addEventListener('appinstalled', function () { I.prompt = null; if (S.open) render(); });
+  function installed() { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+  function installBox() {
+    if (installed()) return '';
+    var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var how = I.prompt ? '<button type="button" class="rm-btn" id="rm-install">Add Nectara Remote to this phone</button>' :
+      ios ? '<p>In Safari, tap the <b>Share</b> button <span aria-hidden="true">&#x2191;</span>, then <b>Add to Home Screen</b>. It appears as <b>Nectara Remote</b>.</p>' :
+      '<p>In Chrome, tap the <b>&#8942;</b> menu, then <b>Add to Home screen</b> or <b>Install app</b>. It appears as <b>Nectara Remote</b>.</p>';
+    return '<div class="rm-install"><img src="/assets/remote-icon-192.png" alt="" width="56" height="56"><div><b>Keep the remote on your phone</b>' + how + '</div></div>';
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target || e.target.id !== 'rm-install' || !I.prompt) return;
+    I.prompt.prompt(); I.prompt.userChoice.then(function () { I.prompt = null; if (S.open) render(); });
+  });
 
   // Touchpad: slide to move, tap to select. Faster slides move farther, like a laptop trackpad.
   function setupPointer() {
@@ -358,11 +376,12 @@
   function stopTilt() { if (!T.on) return; T.on = false; window.removeEventListener('devicemotion', onMotion); }
 
   function open() {
-    S.open = true; document.title = 'Nectara · TV remote'; window.scrollTo(0, 0);
+    S.open = true; document.title = 'Nectara Remote'; window.scrollTo(0, 0);
+    if (window.NX_REMOTE_PAGE) window.NX_REMOTE_PAGE(true);
     try { var m = localStorage.getItem('nx_remote_mode'); S.mode = m === 'pointer' || m === 'type' ? m : 'buttons'; } catch (e) {}
     render(); send('hello');
   }
-  function close() { S.open = false; stopTilt(); }
+  function close() { if (S.open && window.NX_REMOTE_PAGE) window.NX_REMOTE_PAGE(false); S.open = false; stopTilt(); }
 
   window.NectaraRemote = { open: open, close: close, isTV: isTV, start: function () { if (isTV()) startTV(); } };
 })();

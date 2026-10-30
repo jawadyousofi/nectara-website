@@ -5,7 +5,7 @@ export async function onRequest({ request, env, next }) {
   const url = new URL(request.url);
   const user = await getUser(env, request);
   if (!user) {
-    return Response.redirect(`${url.origin}/login.html?next=${encodeURIComponent(url.pathname)}`, 302);
+    return Response.redirect(`${url.origin}/login.html?next=${encodeURIComponent(url.pathname + url.search)}`, 302);
   }
   if (!hasAccess(user)) {
     return Response.redirect(`${url.origin}/login.html?state=waiting`, 302);

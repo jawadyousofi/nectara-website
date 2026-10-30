@@ -470,7 +470,7 @@
   Promise.all([api('/api/auth/me'), api('/api/progress').catch(function () { return { done: {} }; })])
     .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); if (window.NectaraSettings) window.NectaraSettings.start(); if (window.NectaraRemote) window.NectaraRemote.start(); })
     .catch(function (e) {
-      if (e.status === 401) location.href = '/login.html?next=/app/';
+      if (e.status === 401) location.href = '/login.html?next=' + encodeURIComponent(/^#\/remote/.test(location.hash) || /[?&]remote=1/.test(location.search) ? '/app/?remote=1#/remote' : '/app/');   // the installed remote comes back to the remote
       else root.innerHTML = '<p class="loading">We couldn&rsquo;t open the garden. Please check your connection and refresh.</p>';
     });
 })();
