@@ -12,7 +12,8 @@
     'rain-cloud': ['mind', 'earth', 'voice'], 'seeds-drink': ['earth', 'mind', 'body'], 'float-sink': ['mind', 'body', 'voice'], 'puddles': ['earth', 'mind', 'world'],
     'inside-seed': ['earth', 'mind', 'spirit'], 'seed-window': ['earth', 'mind', 'heart'], 'soil-safari': ['earth', 'body', 'mind'], 'worm-hotel': ['earth', 'world', 'heart'],
     'which-part': ['body', 'earth', 'mind'], 'regrow': ['earth', 'mind', 'heart'], 'rainbow-plate': ['body', 'world', 'voice'], 'food-journey': ['body', 'mind', 'earth'],
-    'shadow-friends': ['mind', 'body', 'heart'], 'sun-clock': ['earth', 'mind', 'spirit'], 'rainbow-light': ['mind', 'spirit', 'voice'], 'day-night': ['world', 'mind', 'body']
+    'shadow-friends': ['mind', 'body', 'heart'], 'sun-clock': ['earth', 'mind', 'spirit'], 'rainbow-light': ['mind', 'spirit', 'voice'], 'day-night': ['world', 'mind', 'body'],
+    'heart-drum': ['body', 'heart', 'voice'], 'balloon-breath': ['body', 'spirit', 'mind'], 'bones-bend': ['body', 'mind', 'voice'], 'five-senses': ['body', 'earth', 'mind']
   };
   window.NECTARA_GROWS = GROWS;
   function petalTags(id) {
