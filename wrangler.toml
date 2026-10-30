@@ -7,3 +7,9 @@ compatibility_date = "2026-10-01"
 [[kv_namespaces]]
 binding = "NECTARA_INTEREST"
 id = "e49243529c9e4a8dbf2034c99fd01489"
+
+# Phone remote button presses (functions/_lib/remote.js)
+[[d1_databases]]
+binding = "NECTARA_DB"
+database_name = "nectara"
+database_id = "003e0f0c-bc53-4c6e-bc08-1bb251abdd20"
