@@ -130,14 +130,14 @@
     var back = null; try { back = JSON.parse(sessionStorage.getItem('nx_found_back') || 'null'); sessionStorage.removeItem('nx_found_back'); } catch (e) {}
     if (!back || !back.place) return false;
     try { if (saved) sessionStorage.setItem('nx_found_done', back.spot); } catch (e) {}
-    location.hash = '#/world/' + back.place;
+    NX.go('#/world/' + back.place);
     return true;
   }
   function closeSheet() {
     var sheet = document.getElementById('gg-sheet'); if (!sheet) return;
     stopRecording(); sheet.hidden = true; sheet.innerHTML = '';
-    if (/^#\/garden\/add\/[a-z]+\/mission/.test(location.hash) && worldBack(false)) return;
-    if (/^#\/garden\/add/.test(location.hash)) location.hash = '#/garden';
+    if (/^#\/garden\/add\/[a-z]+\/mission/.test(NX.hash()) && worldBack(false)) return;
+    if (/^#\/garden\/add/.test(NX.hash())) NX.go('#/garden');
   }
 
   // ---------- Adding: capture, then petals ----------
@@ -148,7 +148,7 @@
     if (REC.stream) { REC.stream.getTracks().forEach(function (t) { t.stop(); }); REC.stream = null; }
   }
   function openAdd(kind, source) {
-    if (!KIND[kind]) { location.hash = '#/garden'; return; }
+    if (!KIND[kind]) { NX.go('#/garden'); return; }
     var sheet = document.getElementById('gg-sheet');
     var draft = { kind: kind, blob: null, mime: '', source: source || '', petals: suggestPetals(source) };
     var spotName = '';
@@ -306,7 +306,7 @@
         S.entries = j.entries; stopRecording();
         var sheet = document.getElementById('gg-sheet'); sheet.hidden = true; sheet.innerHTML = '';
         if (/^mission:/.test(draft.source) && worldBack(true)) return;
-        location.hash = '#/garden';
+        NX.go('#/garden');
         render();
         var first = root.querySelector('.gg-card'); if (first) { first.classList.add('gg-new'); first.focus(); }
       })

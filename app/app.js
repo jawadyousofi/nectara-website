@@ -170,11 +170,11 @@
       '<div class="tip"><b>On a phone or iPad</b>Swipe or tap Next. Add Nectara to your home screen from your browser&rsquo;s share menu, and it opens like an app.</div>' +
       '<div class="tip"><b>For grown-ups</b>Every lesson has a Grown-ups button with the materials list, setup and safety notes. Gather materials before you start.</div></div>' +
       '</div>';
-    var wc = document.getElementById('world-card'); if (wc) wc.addEventListener('click', function () { location.hash = '#/world'; });
+    var wc = document.getElementById('world-card'); if (wc) wc.addEventListener('click', function () { NX.go('#/world'); });
     root.querySelectorAll('[data-series]').forEach(function (b) {
       b.addEventListener('click', function () { state.seriesId = b.getAttribute('data-series'); var y = window.scrollY; renderHome(); window.scrollTo(0, y); });
     });
-    root.querySelectorAll('[data-open]').forEach(function (b) { b.addEventListener('click', function () { location.hash = '#/lesson/' + b.getAttribute('data-open'); }); });
+    root.querySelectorAll('[data-open]').forEach(function (b) { b.addEventListener('click', function () { NX.go('#/lesson/' + b.getAttribute('data-open')); }); });
     document.getElementById('signout').addEventListener('click', function () {
       api('/api/auth/logout', { method: 'POST' }).finally(function () { location.href = '/login.html?signedout=1'; });
     });
@@ -283,7 +283,7 @@
 
   function renderLesson(id, index) {
     var found = findLesson(id);
-    if (!found) { location.hash = '#/'; return; }
+    if (!found) { NX.go('#/'); return; }
     if (!state.lesson || state.lesson.l.id !== id) {
       state.lesson = found; state.slides = found.story ? buildStorySlides(found.l) : buildSlides(found.s, found.l); requestWake();
     }
@@ -307,7 +307,7 @@
 
     var sf = document.getElementById('story-frame');
     if (sf) { if (turn) sf.className += turn; sf.addEventListener('click', function (e) { sparkleAt(sf, e); }); }
-    document.getElementById('exit').addEventListener('click', function () { location.hash = '#/'; });
+    document.getElementById('exit').addEventListener('click', function () { NX.go('#/'); });
     document.getElementById('back').addEventListener('click', prev);
     document.getElementById('next').addEventListener('click', next);
     document.getElementById('gu-open').addEventListener('click', openGrownups);
@@ -329,8 +329,8 @@
     document.getElementById('next').focus({ preventScroll: true });
   }
 
-  function go(k) { state.i = k; location.hash = '#/lesson/' + state.lesson.l.id + '/' + k; } // state.i moves now so quick double-presses each count
-  function next() { if (state.i >= state.slides.length - 1) { location.hash = '#/'; } else { go(state.i + 1); } }
+  function go(k) { state.i = k; NX.go('#/lesson/' + state.lesson.l.id + '/' + k); } // state.i moves now so quick double-presses each count
+  function next() { if (state.i >= state.slides.length - 1) { NX.go('#/'); } else { go(state.i + 1); } }
   function prev() { if (state.i > 0) go(state.i - 1); }
 
   function toggleFull() {
@@ -405,9 +405,10 @@
     if (!(e.keyCode === 461 || e.key === 'GoBack' || e.key === 'BrowserBack')) return;
     e.preventDefault(); e.stopImmediatePropagation();
     if (dialog.open) { dialog.close(); return; }
-    if (state.lesson) { location.hash = '#/'; return; }
+    if (state.lesson) { NX.go('#/'); return; }
+    if (NX.tv && NX.hash() !== '#/' && NX.hash() !== '#') { NX.go('#/'); return; }
     if (/Web0S|webOS/i.test(navigator.userAgent)) { try { window.close(); } catch (err) {} }
-    else if (history.length > 1) history.back();
+    else if (!NX.tv && history.length > 1) history.back();
   });
   document.addEventListener('keydown', function (e) {
     if (!state.lesson || dialog.open) return;
@@ -416,7 +417,7 @@
     else if (['ArrowLeft', 'PageUp', 'MediaTrackPrevious'].indexOf(e.key) > -1) { e.preventDefault(); prev(); }
     else if (e.key === ' ' && tag !== 'BUTTON') { e.preventDefault(); next(); }
     else if (e.key === 'f' || e.key === 'F') { toggleFull(); }
-    else if (e.key === 'Escape' && !document.fullscreenElement) { location.hash = '#/'; }
+    else if (e.key === 'Escape' && !document.fullscreenElement) { NX.go('#/'); }
   });
   var touchX = null;
   document.addEventListener('touchstart', function (e) { touchX = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
@@ -429,21 +430,21 @@
 
   // ---------- Routing ----------
   function route() {
-    var w = location.hash.match(/^#\/world(?:\/([a-z]+))?/);
+    var w = NX.hash().match(/^#\/world(?:\/([a-z]+))?/);
     if (w && window.NectaraWorld) { stopLesson(); state.lesson = null; window.NectaraWorld.open(w[1]); return; }
     if (window.NectaraWorld) window.NectaraWorld.close();
-    var gm = location.hash.match(/^#\/garden(?:\/(.+))?$/);
+    var gm = NX.hash().match(/^#\/garden(?:\/(.+))?$/);
     if (gm && window.NectaraGarden) { stopLesson(); state.lesson = null; window.NectaraGarden.open(gm[1], { user: state.user, done: state.done }); return; }
     if (window.NectaraGarden) window.NectaraGarden.close();
-    if (/^#\/remote/.test(location.hash) && window.NectaraRemote) { stopLesson(); state.lesson = null; window.NectaraRemote.open(); return; }
+    if (/^#\/remote/.test(NX.hash()) && window.NectaraRemote) { stopLesson(); state.lesson = null; window.NectaraRemote.open(); return; }
     if (window.NectaraRemote) window.NectaraRemote.close();
-    if (/^#\/settings/.test(location.hash) && window.NectaraSettings) { stopLesson(); state.lesson = null; window.NectaraSettings.open(); return; }
+    if (/^#\/settings/.test(NX.hash()) && window.NectaraSettings) { stopLesson(); state.lesson = null; window.NectaraSettings.open(); return; }
     if (window.NectaraSettings) window.NectaraSettings.close();
-    if (/^#\/me/.test(location.hash) && window.NectaraMe) { stopLesson(); state.lesson = null; window.NectaraMe.open(); return; }
+    if (/^#\/me/.test(NX.hash()) && window.NectaraMe) { stopLesson(); state.lesson = null; window.NectaraMe.open(); return; }
     if (window.NectaraMe) window.NectaraMe.close();
-    if (/^#\/docs/.test(location.hash) && window.NectaraDocs && state.user && state.user.access === 'owner') { stopLesson(); state.lesson = null; window.NectaraDocs.open(); return; }
+    if (/^#\/docs/.test(NX.hash()) && window.NectaraDocs && state.user && state.user.access === 'owner') { stopLesson(); state.lesson = null; window.NectaraDocs.open(); return; }
     if (window.NectaraDocs) window.NectaraDocs.close();
-    var m = location.hash.match(/^#\/lesson\/([a-z0-9-]+)(?:\/(\d+))?/);
+    var m = NX.hash().match(/^#\/lesson\/([a-z0-9-]+)(?:\/(\d+))?/);
     if (m) renderLesson(m[1], m[2] ? parseInt(m[2], 10) : 0); else renderHome();
   }
   window.addEventListener('hashchange', route);
@@ -452,7 +453,7 @@
   // A TV or tablet can keep Nectara open for days. Every few minutes (and whenever the screen wakes) the app asks
   // whether a new version is out, and reloads itself at a calm moment: on the home screen, never mid-lesson or mid-story.
   var myVersion = (document.querySelector('meta[name="nx-version"]') || {}).content || '', updateReady = false;
-  function calmMoment() { return !state.lesson && (!location.hash || location.hash === '#/' || location.hash === '#'); }
+  function calmMoment() { return !state.lesson && (!NX.hash() || NX.hash() === '#/' || NX.hash() === '#'); }
   function checkVersion() {
     if (!myVersion) return;
     var x = new XMLHttpRequest();

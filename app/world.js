@@ -729,7 +729,7 @@
     o.hidden = false;
     function shut() { stopVoice(); o.hidden = true; o.innerHTML = ''; S.mode = 'world'; focusItem(S.focus >= 0 ? S.focus : 0); }
     S.jarClose = shut;
-    [].forEach.call(o.querySelectorAll('.chip'), function (b) { b.addEventListener('click', function () { shut(); location.hash = '#/world/' + b.getAttribute('data-place'); }); });
+    [].forEach.call(o.querySelectorAll('.chip'), function (b) { b.addEventListener('click', function () { shut(); NX.go('#/world/' + b.getAttribute('data-place')); }); });
     document.getElementById('w-jar-close').addEventListener('click', shut);
     document.getElementById('w-jar-close').focus();
     speak(W.jar.id, W.jar.text);
@@ -793,7 +793,7 @@
     document.getElementById('w-back').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span>';
     W.places.forEach(function (p) {
       addSpot({ id: 'place-' + p.id, name: p.name, x: p.x, y: p.y }, {
-        cls: 'w-place', onPick: function () { sfx('whoosh'); location.hash = '#/world/' + p.id; },
+        cls: 'w-place', onPick: function () { sfx('whoosh'); NX.go('#/world/' + p.id); },
         onFocus: function () { asalTo(p.x, p.y); sfx('step'); }
       });
     });
@@ -911,7 +911,7 @@
     function go(kind) {
       try { sessionStorage.setItem('nx_found_back', JSON.stringify({ place: S.place ? S.place.id : '', spot: s.id })); } catch (e) {}
       closePanel();
-      location.hash = '#/garden/add/' + kind + '/' + encodeURIComponent('mission:' + s.id);
+      NX.go('#/garden/add/' + kind + '/' + encodeURIComponent('mission:' + s.id));
     }
     showPanel({ name: 'I found it!', text: W.foundAsk.text, audio: W.foundAsk.id, spotY: s.y, acts: [
       { label: 'Take a photo', icon: 'camera', cls: 'leaf', fn: function () { go('photo'); } },
@@ -1111,7 +1111,7 @@
     if (timed === undefined) timed = true;
     stopVoice(); clearTimeout(S.hintTimer); stopAmbient(); if (S.a3d) S.a3d.setMood('sleepy');
     var wrap = document.getElementById('w-wrap'); if (wrap) wrap.classList.add('w-sleepy');
-    var leave = function () { try { sessionStorage.removeItem('nx_world_open'); } catch (e) {} stopAll(); location.hash = '#/'; };
+    var leave = function () { try { sessionStorage.removeItem('nx_world_open'); } catch (e) {} stopAll(); NX.go('#/'); };
     S.leave = leave;
     var acts = [{ id: 'w-bye-home', label: 'Goodbye, Asal!', cls: 'fun honey', fn: leave }];
     if (timed) acts.push({ id: 'w-bye-more', label: 'Grown-ups: hold for 10 more minutes', cls: 'grown', setup: function (more) {
@@ -1149,7 +1149,7 @@
     var k = e.keyCode;
     if (isBack(e)) {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (S.mode === 'bye') { if (S.leave) S.leave(); else { stopAll(); location.hash = '#/'; } }
+      if (S.mode === 'bye') { if (S.leave) S.leave(); else { stopAll(); NX.go('#/'); } }
       else if (S.mode === 'ritual') { var r = document.querySelector('#r-acts .w-act'); if (r) r.click(); else if (S.ritualSkip) S.ritualSkip(); }
       else if (S.mode === 'jar') { if (S.jarClose) S.jarClose(); }
       else if (S.mode === 'panel') closePanel();
@@ -1173,7 +1173,7 @@
   window.addEventListener('resize', fit);
 
   // ---------- Open / close ----------
-  function goBack() { stopVoice(); if (S.place) location.hash = '#/world'; else if (S.mode !== 'bye') goodbye(false); else if (S.leave) S.leave(); }
+  function goBack() { stopVoice(); if (S.place) NX.go('#/world'); else if (S.mode !== 'bye') goodbye(false); else if (S.leave) S.leave(); }
   function stopAll() { stopVoice(); stopAmbient(); clearTimeout(S.hintTimer); clearTimeout(S.moveTimer); }
   window.NectaraWorld = {
     open: function (placeId) {

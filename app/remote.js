@@ -46,14 +46,14 @@
     if (KEYS[cmd]) {
       if (key(cmd)) return;                                   // the app handled it (lessons, Asal's World, back)
       if (cmd === 'ok') { var el = document.activeElement; if (el && el !== document.body && el.click) el.click(); return; }
-      if (cmd === 'back') { if (location.hash && location.hash !== '#/') location.hash = '#/'; return; }
+      if (cmd === 'back') { if (NX.hash() && NX.hash() !== '#/') NX.go('#/'); return; }
       moveFocus(cmd); return;
     }
     if (cmd === 'next') { if (!click('next')) key('right'); return; }
     if (cmd === 'prev') { if (!click('back')) key('left'); return; }
     if (cmd === 'read') { click('aloud'); return; }
-    if (cmd === 'home') { location.hash = '#/'; return; }
-    if (cmd === 'world') { location.hash = '#/world'; return; }
+    if (cmd === 'home') { NX.go('#/'); return; }
+    if (cmd === 'world') { NX.go('#/world'); return; }
     if (cmd === 'scrollup') { window.scrollBy(0, -window.innerHeight * 0.6); return; }
     if (cmd === 'scrolldown') { window.scrollBy(0, window.innerHeight * 0.6); }
   }

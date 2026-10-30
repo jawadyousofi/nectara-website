@@ -146,7 +146,7 @@
     });
     var ex = document.getElementById('set-export'); if (ex) ex.addEventListener('click', exportData);
     var lk = document.getElementById('set-lock');
-    if (lk) lk.addEventListener('click', function () { S.ok = false; S.q = null; try { sessionStorage.removeItem('nx_grownup'); } catch (e) {} location.hash = '#/'; });
+    if (lk) lk.addEventListener('click', function () { S.ok = false; S.q = null; try { sessionStorage.removeItem('nx_grownup'); } catch (e) {} NX.go('#/'); });
   }
   function load() {
     Promise.all([api('/api/settings'), api('/api/kids').catch(function () { return { kids: [], active: null }; }), api('/api/auth/me').catch(function () { return {}; }),
