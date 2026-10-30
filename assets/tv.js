@@ -41,6 +41,7 @@
     post('/api/tv/poll', { code: current.code, poll: current.poll }).then(function (j) {
       if (j.status === 'approved') {
         statusEl.textContent = 'You’re in! Opening Asal’s garden…';
+        try { localStorage.setItem('nx_tv', '1'); } catch (e) {}   // this screen listens for the phone remote
         location.replace('/app/');
         return;
       }

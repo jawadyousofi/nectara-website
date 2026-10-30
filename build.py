@@ -465,6 +465,7 @@ PAGES['link.html'] = ('Link a TV · Nectara', 'Let a TV into your Nectara accoun
     <form id="link-done" hidden onsubmit="return false">
       <h2>Your TV is in!</h2>
       <p>Look at the TV: Asal&rsquo;s garden is opening. You can close this page.</p>
+      <a class="btn" href="/app/#/remote">Use this phone as the remote</a>
       <a class="btn ghost" href="/app/">Open the app here too</a>
     </form>
   </div>

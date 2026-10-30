@@ -153,7 +153,7 @@
       '<div class="coming">' + DATA.series.filter(function (s) { return !s.ready; }).map(function (s) {
         return '<div><small>' + esc(s.month) + '</small><b>' + esc(s.title) + '</b><p>' + esc(s.idea) + '</p></div>';
       }).join('') + '</div>' +
-      '<div class="tips"><div class="tip"><b>On a TV</b>Open <b>nectaraschool.org/tv</b> on the TV and approve its code from your phone (<a href="/link.html">enter a TV code</a>). Then open a lesson and tap full screen; the remote&rsquo;s arrows and OK button move it along.</div>' +
+      '<div class="tips"><div class="tip"><b>On a TV</b>Open <b>nectaraschool.org/tv</b> on the TV and approve its code from your phone (<a href="/link.html">enter a TV code</a>). Then <a href="#/remote">use your phone as the remote</a>. Then open a lesson and tap full screen; the remote&rsquo;s arrows and OK button move it along.</div>' +
       '<div class="tip"><b>On a phone or iPad</b>Swipe or tap Next. Add Nectara to your home screen from your browser&rsquo;s share menu, and it opens like an app.</div>' +
       '<div class="tip"><b>For grown-ups</b>Every lesson has a Grown-ups button with the materials list, setup and safety notes. Gather materials before you start.</div></div>' +
       '</div>';
@@ -422,6 +422,8 @@
     var gm = location.hash.match(/^#\/garden(?:\/(.+))?$/);
     if (gm && window.NectaraGarden) { stopLesson(); state.lesson = null; window.NectaraGarden.open(gm[1], { user: state.user, done: state.done }); return; }
     if (window.NectaraGarden) window.NectaraGarden.close();
+    if (/^#\/remote/.test(location.hash) && window.NectaraRemote) { stopLesson(); state.lesson = null; window.NectaraRemote.open(); return; }
+    if (window.NectaraRemote) window.NectaraRemote.close();
     if (/^#\/settings/.test(location.hash) && window.NectaraSettings) { stopLesson(); state.lesson = null; window.NectaraSettings.open(); return; }
     if (window.NectaraSettings) window.NectaraSettings.close();
     if (/^#\/me/.test(location.hash) && window.NectaraMe) { stopLesson(); state.lesson = null; window.NectaraMe.open(); return; }
@@ -452,7 +454,7 @@
   window.addEventListener('hashchange', function () { if (updateReady && calmMoment()) location.reload(); });
 
   Promise.all([api('/api/auth/me'), api('/api/progress').catch(function () { return { done: {} }; })])
-    .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); if (window.NectaraSettings) window.NectaraSettings.start(); })
+    .then(function (r) { state.user = r[0].user; state.done = (r[1] && r[1].done) || {}; route(); if (window.NectaraMe) window.NectaraMe.start(); if (window.NectaraSettings) window.NectaraSettings.start(); if (window.NectaraRemote) window.NectaraRemote.start(); })
     .catch(function (e) {
       if (e.status === 401) location.href = '/login.html?next=/app/';
       else root.innerHTML = '<p class="loading">We couldn&rsquo;t open the garden. Please check your connection and refresh.</p>';
